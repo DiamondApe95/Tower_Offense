@@ -1,0 +1,221 @@
+Unten ist eine **Unity-3D (URP) Projektstruktur** + **konkrete Script-Namen** (inkl. Verantwortlichkeiten), so dass Codex/KI daraus sauber Systeme bauen kann. Fokus: **datengetrieben**, **Tower Offense zuerst**, aber so angelegt, dass **Defense-Modus** später “nur” ein anderer Controller ist.
+
+---
+
+## Ordnerstruktur (Assets)
+
+```
+Assets/
+  _Project/
+    Art/
+      Materials/
+      Models/
+      VFX/
+      UI/
+    Audio/
+      Music/
+      SFX/
+    Data/
+      JSON/
+        units.json
+        towers.json
+        levels.json
+        heroes.json
+      Schemas/
+      Localization/
+    Prefabs/
+      Units/
+      Towers/
+      Traps/
+      Heroes/
+      Projectiles/
+      UI/
+    Scenes/
+      Boot.unity
+      MainMenu.unity
+      WorldMap.unity
+      LevelGameplay.unity
+    Scripts/
+      Core/
+      Data/
+      Gameplay/
+      Combat/
+      AI/
+      UI/
+      Audio/
+      Saving/
+      Debug/
+    Settings/
+      URP/
+      Input/
+  Plugins/
+  TextMesh Pro/
+```
+
+**Wichtig:** alles Projekt-spezifische liegt in `Assets/_Project/…` (sauber, portabel).
+
+---
+
+## Szenen (minimal & sinnvoll)
+
+* `Boot.unity`
+  Lädt Settings, initialisiert Services, lädt MainMenu.
+* `MainMenu.unity`
+  Mode wählen (Offense/Defense später), Continue, Settings.
+* `WorldMap.unity`
+  Regionen/Level-Knoten, Fortschritt.
+* `LevelGameplay.unity`
+  Map + Kamera + UI + Gameplay-Loop.
+
+---
+
+## Script-Architektur (Layering)
+
+### 1) Core (Framework/Services)
+
+**Pfad:** `Scripts/Core/`
+
+* `GameBootstrapper.cs` – Entry, Service-Lifecycle
+* `ServiceLocator.cs` – leichtgewichtig (oder DI später)
+* `GameConfig.cs` – globale Settings (hand size, speed modes, etc.)
+* `GameTime.cs` – Pause/Speed (x1/x2)
+* `EventBus.cs` – Gameplay-Events (UnitSpawned, TowerHit, WaveEnded…)
+
+### 2) Data (JSON → Runtime-Model)
+
+**Pfad:** `Scripts/Data/`
+
+* `JsonDatabase.cs` – lädt alle JSONs, hält Lookup-Dictionaries
+* `JsonLoader.cs` – Datei-IO (Resources/StreamingAssets)
+* `DataValidator.cs` – prüft IDs, Referenzen, fehlende Felder
+* `UnitDefinition.cs` – POCO/DTO
+* `TowerDefinition.cs`
+* `TrapDefinition.cs`
+* `LevelDefinition.cs`
+* `HeroDefinition.cs`
+* `SpellDefinition.cs`
+
+> Empfehlung: JSON in `StreamingAssets` ablegen, damit du ohne Rebuild balancen kannst.
+
+### 3) Gameplay (Run/State Machines)
+
+**Pfad:** `Scripts/Gameplay/`
+
+* `GameMode.cs` (enum) – Offense/Defense
+* `LevelController.cs` – orchestriert ein Level (state machine)
+* `LevelStateMachine.cs` – Planning → Attack → Results
+* `RunState.cs` – aktueller Run-Status (Deck, Hand, WaveIndex, etc.)
+* `WaveController.cs` – startet/stoppt Wellen, Timing, Endbedingungen
+* `SpawnController.cs` – spawnt Units/Heroes aus Karten/Plänen
+* `PathManager.cs` – hält Paths/Waypoints, liefert Pfad-Queries
+* `BaseController.cs` – Enemy Base HP/Armor, Destroy-Logic
+* `SpeedController.cs` – x1/x2 Umschalten + UI Hook
+
+### 4) Combat (Damage/Status/Projectiles)
+
+**Pfad:** `Scripts/Combat/`
+
+* `HealthComponent.cs`
+* `DamageSystem.cs` – ApplyDamage(damageType, amount, source)
+* `ArmorSystem.cs` – Schadensreduktion
+* `TargetingSystem.cs` – Prioritäten (nearest, lowest_hp, cluster…)
+* `StatusSystem.cs` – burn/slow/stun etc.
+* `EffectResolver.cs` – “effects[]” aus JSON ausführen (damage, heal, buff…)
+* `ProjectileController.cs` – Flugbahn/Impact
+* `AreaEffect.cs` – AoE Logik (circle/cone)
+
+### 5) Entities (Units/Towers/Traps/Heroes)
+
+**Pfad:** `Scripts/Gameplay/Entities/` (oder `Scripts/AI/` für Unit AI)
+
+* `UnitController.cs` – Bewegung + Angriff (delegiert an Systems)
+* `UnitMover.cs` – folgt Pfad, waypoint-steering
+* `UnitAttack.cs` – Attack-Timing, triggert Projectile/Melee hit
+* `TowerController.cs` – findet Targets, feuert
+* `TrapController.cs` – Trigger (on_enter), cooldown, effects
+* `HeroController.cs` – Held-spezifisch, Spawn-Window alle 5 Wellen
+
+### 6) AI (Simple, deterministisch)
+
+**Pfad:** `Scripts/AI/`
+
+* `UnitBrain.cs` – “seek base, attack blockers”
+* `TowerBrain.cs` – target selection wrapper
+* `Steering.cs` – optional (glatteres Movement)
+
+### 7) Cards & Deck (dein Kern!)
+
+**Pfad:** `Scripts/Gameplay/Cards/`
+
+* `CardId.cs` – wrapper/struct optional
+* `DeckManager.cs` – draw pile / discard / reshuffle
+* `HandManager.cs` – aktuelle Hand, play card
+* `CardPlayResolver.cs` – beim Ausspielen: spawn unit / cast spell
+* `CardViewModel.cs` – UI-ready Daten (Name, Cost, Icon…)
+
+### 8) UI (UGUI oder UI Toolkit)
+
+**Pfad:** `Scripts/UI/`
+
+* `UIRoot.cs` – zentrale Referenzen
+* `WorldMapUI.cs`
+* `LevelHUD.cs` – Hand, Welleninfo, BaseHP, Speed
+* `CardHandView.cs` – Kartenleiste
+* `CardView.cs` – einzelnes Karten-Prefab Script
+* `WavePanelView.cs` – Planung/Start Button
+* `ResultScreenView.cs` – Victory/Defeat, Next
+* `TooltipView.cs`
+
+### 9) Saving (Offline Progress)
+
+**Pfad:** `Scripts/Saving/`
+
+* `SaveManager.cs`
+* `PlayerProgress.cs` – unlocked levels, best scores
+* `RunSnapshot.cs` – optional (resume mid-level)
+* `JsonSaveSerializer.cs`
+
+### 10) Audio
+
+**Pfad:** `Scripts/Audio/`
+
+* `AudioManager.cs`
+* `SfxRouter.cs`
+* `MusicController.cs`
+
+### 11) Debug/Tools
+
+**Pfad:** `Scripts/Debug/`
+
+* `DevConsole.cs` – spawn unit, skip wave, give cards
+* `GizmoDrawer.cs` – Paths, ranges, triggers visualisieren
+* `ProfilerOverlay.cs` – FPS, entity count
+
+---
+
+## Prefab-Konvention (damit Daten + Prefabs sauber matchen)
+
+* Unit Prefab Name = `unit_<id>.prefab` (oder Mapping-Tabelle)
+* Tower Prefab Name = `tower_<id>.prefab`
+* Trap Prefab Name = `trap_<id>.prefab`
+* Projectile Prefab Name = `proj_<id>.prefab`
+
+Dazu ein Script:
+
+* `PrefabRegistry.cs` (in `Scripts/Data/` oder `Scripts/Core/`)
+  Mappt `id -> prefab` (via Addressables oder Resources).
+
+---
+
+## Minimaler “Must-have” Script-Set fürs MVP (wenn du klein starten willst)
+
+1. `JsonDatabase.cs`, `JsonLoader.cs`, `DataValidator.cs`
+2. `LevelController.cs`, `LevelStateMachine.cs`, `RunState.cs`
+3. `DeckManager.cs`, `HandManager.cs`, `CardPlayResolver.cs`
+4. `SpawnController.cs`, `PathManager.cs`, `UnitController.cs`, `TowerController.cs`
+5. `HealthComponent.cs`, `DamageSystem.cs`, `TargetingSystem.cs`
+6. `LevelHUD.cs`, `CardHandView.cs`, `CardView.cs`
+
+---
+
+Wenn du willst, schreibe ich dir als nächstes **eine Codex-Prompt-Serie**, die genau diese Struktur in Unity anlegt (inkl. leeren Klassen + Namespaces + TODOs), damit du in 1–2 Durchläufen ein “kompilierbares Skelett” bekommst.
