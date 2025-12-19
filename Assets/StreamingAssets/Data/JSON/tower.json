@@ -1,0 +1,168 @@
+{
+  "version": "1.0",
+  "tower_definitions": [
+    {
+      "id": "tower_ballista",
+      "display_name": "Ballista",
+      "category": "projectile_tower",
+      "tags": [ "roman", "physical" ],
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": {
+            "hp": 9999,
+            "armor": 0.0
+          },
+          "attack": {
+            "damage_type": "physical",
+            "base_damage": 28,
+            "attacks_per_second": 0.9,
+            "range": 6.5,
+            "splash_radius": 0.0,
+            "targeting": {
+              "priority": "nearest_enemy",
+              "can_target_air": false
+            }
+          },
+          "effects": []
+        },
+        {
+          "tier": 2,
+          "stats": {
+            "hp": 9999,
+            "armor": 0.0
+          },
+          "attack": {
+            "damage_type": "physical",
+            "base_damage": 38,
+            "attacks_per_second": 1.0,
+            "range": 7.0,
+            "splash_radius": 0.0,
+            "targeting": {
+              "priority": "nearest_enemy",
+              "can_target_air": false
+            }
+          },
+          "effects": []
+        }
+      ]
+    },
+    {
+      "id": "tower_mage_obelisk",
+      "display_name": "Runen-Obelisk",
+      "category": "magic_tower",
+      "tags": [ "magic", "druidic" ],
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": {
+            "hp": 9999,
+            "armor": 0.0
+          },
+          "attack": {
+            "damage_type": "arcane",
+            "base_damage": 20,
+            "attacks_per_second": 1.2,
+            "range": 6.0,
+            "splash_radius": 0.0,
+            "targeting": {
+              "priority": "lowest_hp",
+              "can_target_air": false
+            }
+          },
+          "effects": [
+            {
+              "effect_type": "status_on_hit",
+              "status": {
+                "apply": "slow",
+                "chance": 0.35,
+                "duration_seconds": 2.5,
+                "slow_percent": 0.35
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tower_flame_brazier",
+      "display_name": "Feuerbecken",
+      "category": "aoe_tower",
+      "tags": [ "fire" ],
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": {
+            "hp": 9999,
+            "armor": 0.0
+          },
+          "attack": {
+            "damage_type": "fire",
+            "base_damage": 10,
+            "attacks_per_second": 4.0,
+            "range": 4.5,
+            "splash_radius": 1.8,
+            "targeting": {
+              "priority": "cluster",
+              "can_target_air": false
+            }
+          },
+          "effects": [
+            {
+              "effect_type": "status_on_hit",
+              "status": {
+                "apply": "burn",
+                "chance": 0.25,
+                "duration_seconds": 3,
+                "tick_damage": 6,
+                "tick_interval_seconds": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "trap_definitions": [
+    {
+      "id": "trap_spike_pit",
+      "display_name": "Stachelgrube",
+      "category": "trap",
+      "trigger": {
+        "type": "on_enter",
+        "cooldown_seconds": 4
+      },
+      "effects": [
+        {
+          "effect_type": "damage",
+          "damage_type": "physical",
+          "value": 55,
+          "area": {
+            "shape": "cell",
+            "radius": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "trap_tar",
+      "display_name": "Teerfeld",
+      "category": "trap",
+      "trigger": {
+        "type": "on_enter",
+        "cooldown_seconds": 0
+      },
+      "effects": [
+        {
+          "effect_type": "status",
+          "status": {
+            "apply": "slow",
+            "chance": 1.0,
+            "duration_seconds": 4,
+            "slow_percent": 0.45
+          }
+        }
+      ]
+    }
+  ]
+}
