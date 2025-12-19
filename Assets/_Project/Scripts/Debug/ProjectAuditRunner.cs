@@ -1,15 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using TowerOffense.Combat;
-using TowerOffense.Core;
-using TowerOffense.Data;
-using TowerOffense.Gameplay;
-using TowerOffense.Gameplay.Entities;
-using TowerOffense.Saving;
+using TowerConquest.Combat;
+using TowerConquest.Core;
+using TowerConquest.Data;
+using TowerConquest.Gameplay;
+using TowerConquest.Gameplay.Entities;
+using TowerConquest.Saving;
 using UnityEngine;
 
-namespace TowerOffense.Debug
+namespace TowerConquest.Debug
 {
     public class ProjectAuditRunner : MonoBehaviour
     {
