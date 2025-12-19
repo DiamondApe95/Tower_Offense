@@ -1,4 +1,4 @@
-namespace TowerOffense.Combat
+namespace TowerConquest.Combat
 {
     public static class DamageSystem
     {

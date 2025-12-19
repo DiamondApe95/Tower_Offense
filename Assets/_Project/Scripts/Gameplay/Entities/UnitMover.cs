@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace TowerOffense.Gameplay.Entities
+namespace TowerConquest.Gameplay.Entities
 {
     public class UnitMover : MonoBehaviour
     {
@@ -10,11 +10,15 @@ namespace TowerOffense.Gameplay.Entities
 
         private IReadOnlyList<Vector3> path;
         private int waypointIndex;
+        private BaseController baseController;
+        private float baseDamage;
 
-        public void Initialize(IReadOnlyList<Vector3> pathWaypoints)
+        public void Initialize(IReadOnlyList<Vector3> pathWaypoints, BaseController baseTarget, float damageToBase)
         {
             path = pathWaypoints;
             waypointIndex = 0;
+            baseController = baseTarget;
+            baseDamage = Mathf.Max(0f, damageToBase);
         }
 
         private void Update()
@@ -26,7 +30,11 @@ namespace TowerOffense.Gameplay.Entities
 
             if (waypointIndex >= path.Count)
             {
-                Debug.Log("Reached end/base");
+                Debug.Log("UnitMover: Reached end/base.");
+                if (baseController != null)
+                {
+                    baseController.ApplyDamage(baseDamage);
+                }
                 Destroy(gameObject);
                 return;
             }

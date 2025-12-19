@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TowerOffense.Core
+namespace TowerConquest.Core
 {
     public class GameTime
     {

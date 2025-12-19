@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TowerOffense.Audio
+namespace TowerConquest.Audio
 {
     public class SfxRouter
     {

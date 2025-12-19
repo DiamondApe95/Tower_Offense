@@ -1,17 +1,26 @@
-using TowerOffense.Combat;
+using TowerConquest.Combat;
+using TowerConquest.Data;
 using UnityEngine;
 
-namespace TowerOffense.Gameplay.Entities
+namespace TowerConquest.Gameplay.Entities
 {
     public class TowerController : MonoBehaviour
     {
         public float range = 6f;
         public float damage = 20f;
         public float attacksPerSecond = 1f;
+        public TowerDefinition.EffectDto[] effects;
+        public float EstimatedDps { get; private set; }
 
         private float scanTimer;
         private float attackTimer;
         private UnitController currentTarget;
+        private readonly EffectResolver effectResolver = new EffectResolver();
+
+        private void Awake()
+        {
+            UpdateDpsCache();
+        }
 
         private void Update()
         {
@@ -33,6 +42,11 @@ namespace TowerOffense.Gameplay.Entities
             {
                 attackTimer = 0f;
                 DamageSystem.Apply(currentTarget.gameObject, damage);
+                if (effects != null && effects.Length > 0)
+                {
+                    effectResolver.ApplyEffects(gameObject, currentTarget.gameObject, effects);
+                }
+
                 Debug.Log($"Tower hit unit {currentTarget.UnitId}");
             }
         }
@@ -60,6 +74,11 @@ namespace TowerOffense.Gameplay.Entities
             }
 
             currentTarget = closest;
+        }
+
+        public void UpdateDpsCache()
+        {
+            EstimatedDps = Mathf.Max(0f, damage) * Mathf.Max(0.1f, attacksPerSecond);
         }
     }
 }

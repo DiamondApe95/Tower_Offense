@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace TowerOffense.Gameplay.Cards
+namespace TowerConquest.Gameplay.Cards
 {
     public class DeckManager
     {

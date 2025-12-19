@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using TowerOffense.Data;
+using TowerConquest.Data;
 
-namespace TowerOffense.Combat
+namespace TowerConquest.Combat
 {
     public class AreaEffect : MonoBehaviour
     {

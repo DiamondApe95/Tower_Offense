@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 
-namespace TowerOffense.Data
+namespace TowerConquest.Data
 {
     public class JsonLoader
     {

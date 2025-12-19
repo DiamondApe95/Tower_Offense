@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TowerOffense.Gameplay;
+using TowerConquest.Gameplay;
+using TowerConquest.Gameplay.Cards;
+using TowerConquest.Core;
+using TowerConquest.Data;
 
-namespace TowerOffense.UI
+namespace TowerConquest.UI
 {
     public class LevelHUD : MonoBehaviour
     {
@@ -13,6 +16,7 @@ namespace TowerOffense.UI
         public CardView cardViewPrefab;
         public Text waveText;
         public Text speedText;
+        public Text energyText;
 
         private LevelController level;
         private readonly CardHandView handView = new CardHandView();
@@ -57,7 +61,12 @@ namespace TowerOffense.UI
                 speedText.text = $"{speedValue:0.#}x";
             }
 
-            List<string> handCards = level.hand != null ? level.hand.hand : level.Run.handCardIds;
+            if (energyText != null)
+            {
+                energyText.text = $"Energy {level.Run.energy}/{level.Run.maxEnergyPerWave}";
+            }
+
+            List<CardViewModel> handCards = BuildHandModels();
             handView.Render(handCards, OnCardClicked);
         }
 
@@ -92,6 +101,54 @@ namespace TowerOffense.UI
 
             level.PlayCard(cardId);
             Refresh();
+        }
+
+        private List<CardViewModel> BuildHandModels()
+        {
+            var models = new List<CardViewModel>();
+            List<string> handCards = level.hand != null ? level.hand.hand : level.Run.handCardIds;
+            if (handCards == null)
+            {
+                return models;
+            }
+
+            JsonDatabase database = ServiceLocator.Get<JsonDatabase>();
+            foreach (string cardId in handCards)
+            {
+                if (string.IsNullOrWhiteSpace(cardId))
+                {
+                    continue;
+                }
+
+                var model = new CardViewModel
+                {
+                    cardId = cardId,
+                    displayName = cardId,
+                    cost = 0,
+                    group = "unknown",
+                    isPlayable = true
+                };
+
+                if (cardId.StartsWith("unit_"))
+                {
+                    UnitDefinition unit = database.FindUnit(cardId);
+                    model.displayName = unit?.display_name ?? cardId;
+                    model.cost = unit?.card?.cost ?? 0;
+                    model.group = unit?.card?.hand_group ?? "units";
+                }
+                else if (cardId.StartsWith("spell_"))
+                {
+                    SpellDefinition spell = database.FindSpell(cardId);
+                    model.displayName = spell?.display_name ?? cardId;
+                    model.cost = spell?.card?.cost ?? 0;
+                    model.group = spell?.card?.hand_group ?? "spells";
+                }
+
+                model.isPlayable = level.Run.energy >= model.cost && level.CanPlayCard(cardId);
+                models.Add(model);
+            }
+
+            return models;
         }
     }
 }

@@ -1,34 +1,64 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace TowerOffense.Gameplay
+namespace TowerConquest.Gameplay
 {
     public class WaveController : MonoBehaviour
     {
+        public float spawnIntervalSeconds = 0.4f;
+
         public void StartWave(LevelController ctx)
         {
-            if (ctx != null && ctx.Run != null)
+            if (ctx == null || ctx.Run == null)
             {
-                RunState run = ctx.Run;
-                run.heroAvailableThisWave = run.heroEveryNWaves > 0 && run.waveIndex % run.heroEveryNWaves == 0;
-                if (run.heroAvailableThisWave)
+                Debug.LogWarning("WaveController.StartWave called without context.");
+                return;
+            }
+
+            RunState run = ctx.Run;
+            run.heroAvailableThisWave = run.heroEveryNWaves > 0 && run.waveIndex % run.heroEveryNWaves == 0;
+            if (run.heroAvailableThisWave)
+            {
+                if (string.IsNullOrWhiteSpace(run.selectedHeroId))
                 {
-                    if (string.IsNullOrWhiteSpace(run.selectedHeroId))
+                    run.selectedHeroId = "hero_legatus";
+                }
+
+                ctx.SpawnHero(run.selectedHeroId);
+            }
+
+            StartCoroutine(RunWave(ctx));
+        }
+
+        private IEnumerator RunWave(LevelController ctx)
+        {
+            IReadOnlyList<string> unitsToSpawn = ctx.GetWaveUnits();
+            if (unitsToSpawn == null || unitsToSpawn.Count == 0)
+            {
+                Debug.LogWarning("WaveController: No units configured for this wave.");
+            }
+            else
+            {
+                foreach (string unitId in unitsToSpawn)
+                {
+                    if (ctx.Spawner == null)
                     {
-                        run.selectedHeroId = "hero_legatus";
+                        Debug.LogWarning("WaveController: SpawnController missing.");
+                        break;
                     }
 
-                    ctx.SpawnHero(run.selectedHeroId);
+                    ctx.Spawner.SpawnUnitGroup(unitId);
+                    yield return new WaitForSeconds(spawnIntervalSeconds);
                 }
             }
 
-            StartCoroutine(SimulateWave(ctx));
-        }
+            while (!ctx.IsBaseDestroyed() && ctx.HasActiveUnits())
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
 
-        private IEnumerator SimulateWave(LevelController ctx)
-        {
-            yield return new WaitForSeconds(2f);
-            ctx.OnWaveSimulatedEnd();
+            ctx.OnWaveFinished();
         }
     }
 }

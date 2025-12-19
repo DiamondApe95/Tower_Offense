@@ -1,16 +1,33 @@
 using UnityEngine;
+using UnityEngine.UI;
 
-namespace TowerOffense.UI
+namespace TowerConquest.UI
 {
-    public class ResultScreenView
+    public class ResultScreenView : MonoBehaviour
     {
-        public string Id { get; set; }
-        public bool IsEnabled { get; set; }
+        public GameObject root;
+        public Text resultLabel;
+        public Button nextLevelButton;
 
-        public void ShowResults()
+        public void ShowResults(bool victory, bool nextLevelUnlocked)
         {
-            UnityEngine.Debug.Log("Stub method called.");
-        }
+            if (root != null)
+            {
+                root.SetActive(true);
+            }
 
+            if (resultLabel != null)
+            {
+                resultLabel.text = victory ? "VICTORY" : "DEFEAT";
+            }
+
+            if (nextLevelButton != null)
+            {
+                nextLevelButton.gameObject.SetActive(nextLevelUnlocked);
+                nextLevelButton.interactable = nextLevelUnlocked;
+            }
+
+            Debug.Log($"ResultScreenView: Showing results. Victory={victory}, NextLevelUnlocked={nextLevelUnlocked}.");
+        }
     }
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace TowerOffense.Gameplay
+namespace TowerConquest.Gameplay
 {
     public class RunState
     {
@@ -8,6 +8,8 @@ namespace TowerOffense.Gameplay
         public int waveIndex;
         public int maxWaves;
         public float speed = 1f;
+        public int energy;
+        public int maxEnergyPerWave = 10;
         public List<string> deckUnitIds = new();
         public List<string> deckSpellIds = new();
         public List<string> handCardIds = new();
@@ -18,5 +20,7 @@ namespace TowerOffense.Gameplay
         public int heroEveryNWaves = 5;
         public bool heroAvailableThisWave;
         public string selectedHeroId;
+        public GameMode gameMode = GameMode.Offense;
+        public bool allowMidWaveSpawns;
     }
 }

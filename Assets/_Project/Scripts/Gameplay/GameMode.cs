@@ -1,4 +1,4 @@
-namespace TowerOffense.Gameplay
+namespace TowerConquest.Gameplay
 {
     public enum GameMode
     {

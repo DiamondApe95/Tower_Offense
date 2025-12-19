@@ -1,20 +1,33 @@
 using UnityEngine;
-using TowerOffense.Core;
+using TowerConquest.Core;
 
-namespace TowerOffense.Gameplay
+namespace TowerConquest.Gameplay
 {
     public class SpeedController
     {
-        public string Id { get; set; }
-        public bool IsEnabled { get; set; }
-
-        public float[] supportedSpeeds = new float[] { 1f, 2f };
+        public float[] supportedSpeeds = new float[] { 1f, 2f, 3f };
         public int currentIndex = 0;
         public float CurrentSpeed => supportedSpeeds[currentIndex];
 
         public void SetSpeed(float speed)
         {
-            UnityEngine.Debug.Log("Stub method called.");
+            if (supportedSpeeds == null || supportedSpeeds.Length == 0)
+            {
+                Debug.LogWarning("SpeedController has no supported speeds configured.");
+                return;
+            }
+
+            for (int index = 0; index < supportedSpeeds.Length; index++)
+            {
+                if (Mathf.Approximately(supportedSpeeds[index], speed))
+                {
+                    currentIndex = index;
+                    ServiceLocator.Get<GameTime>().SetTimeScale(CurrentSpeed);
+                    return;
+                }
+            }
+
+            Debug.LogWarning($"SpeedController: speed {speed} not supported.");
         }
 
         public void Toggle()

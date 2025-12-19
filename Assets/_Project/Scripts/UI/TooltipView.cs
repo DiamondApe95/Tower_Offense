@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TowerOffense.UI
+namespace TowerConquest.UI
 {
     public class TooltipView
     {

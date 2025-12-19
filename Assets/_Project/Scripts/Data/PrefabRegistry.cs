@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace TowerOffense.Data
+namespace TowerConquest.Data
 {
     public class PrefabRegistry : MonoBehaviour
     {

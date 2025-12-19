@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using TowerConquest.Gameplay.Cards;
 
-namespace TowerOffense.UI
+namespace TowerConquest.UI
 {
     public class CardHandView
     {
         public Transform handContainer;
         public CardView cardViewPrefab;
 
-        public void Render(List<string> hand, Action<string> onClick)
+        public void Render(List<CardViewModel> hand, Action<string> onClick)
         {
             if (handContainer == null || cardViewPrefab == null)
             {
@@ -30,15 +31,15 @@ namespace TowerOffense.UI
                 return;
             }
 
-            foreach (string cardId in hand)
+            foreach (CardViewModel card in hand)
             {
-                if (string.IsNullOrEmpty(cardId))
+                if (card == null || string.IsNullOrEmpty(card.cardId))
                 {
                     continue;
                 }
 
                 CardView viewInstance = UnityEngine.Object.Instantiate(cardViewPrefab, handContainer);
-                viewInstance.Bind(cardId, onClick);
+                viewInstance.Bind(card, onClick);
             }
         }
 

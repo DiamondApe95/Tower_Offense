@@ -1,8 +1,8 @@
-using TowerOffense.Core;
-using TowerOffense.Saving;
+using TowerConquest.Core;
+using TowerConquest.Saving;
 using UnityEngine;
 
-namespace TowerOffense.UI
+namespace TowerConquest.UI
 {
     public class WorldMapUI : MonoBehaviour
     {
