@@ -35,7 +35,23 @@ namespace TowerConquest.Core
 
             UnityEngine.Debug.Log($"Loaded Units: {db.Units.Count}, Spells: {db.Spells.Count}, Towers: {db.Towers.Count}, Traps: {db.Traps.Count}, Levels: {db.Levels.Count}, Heroes: {db.Heroes.Count}.");
 
+            RegisterPrefabRegistry();
+
             LoadMainMenuIfAvailable();
+        }
+
+        private void RegisterPrefabRegistry()
+        {
+            PrefabRegistry registry = FindObjectOfType<PrefabRegistry>();
+            if (registry != null)
+            {
+                ServiceLocator.Register(registry);
+                UnityEngine.Debug.Log("PrefabRegistry registered successfully.");
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning("PrefabRegistry not found in scene. Prefabs will use fallback primitives.");
+            }
         }
 
         private static void LoadMainMenuIfAvailable()
