@@ -14,6 +14,7 @@ namespace TowerOffense.Gameplay
         public DeckManager deck;
         public HandManager hand;
         public CardPlayResolver resolver;
+        public SpeedController speedController;
 
         public RunState Run { get; private set; }
         public LevelStateMachine Fsm { get; private set; }
@@ -53,10 +54,12 @@ namespace TowerOffense.Gameplay
             deck = new DeckManager();
             hand = new HandManager { handSize = 5 };
             resolver = new CardPlayResolver();
+            speedController = new SpeedController();
 
             deck.Initialize(testDeck, 123);
             hand.FillToHandSize(deck);
             Run.handCardIds = new List<string>(hand.hand);
+            Run.speed = speedController.CurrentSpeed;
 
             Fsm = new LevelStateMachine();
 
@@ -73,6 +76,35 @@ namespace TowerOffense.Gameplay
         {
             Fsm.StartWave(Run);
             Waves.StartWave(this);
+        }
+
+        public void ToggleSpeed()
+        {
+            if (speedController == null)
+            {
+                Debug.LogWarning("SpeedController not initialized.");
+                return;
+            }
+
+            speedController.Toggle();
+            Run.speed = speedController.CurrentSpeed;
+        }
+
+        public void PlayCard(string cardId)
+        {
+            if (hand == null || deck == null || resolver == null)
+            {
+                Debug.LogWarning("Cannot play card - hand/deck/resolver not ready.");
+                return;
+            }
+
+            if (!hand.PlayCard(cardId, deck, resolver))
+            {
+                Debug.LogWarning($"Card '{cardId}' not found in hand.");
+                return;
+            }
+
+            Run.handCardIds = new List<string>(hand.hand);
         }
 
         public void OnWaveSimulatedEnd()
