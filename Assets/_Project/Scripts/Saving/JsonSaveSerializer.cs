@@ -4,20 +4,14 @@ namespace TowerOffense.Saving
 {
     public class JsonSaveSerializer
     {
-        public string Id { get; set; }
-        public bool IsEnabled { get; set; }
-
-        public string Serialize(RunSnapshot snapshot)
+        public string ToJson<T>(T obj)
         {
-            UnityEngine.Debug.Log("Serializing snapshot.");
-            return string.Empty;
+            return JsonUtility.ToJson(obj, true);
         }
 
-        public RunSnapshot Deserialize(string json)
+        public T FromJson<T>(string json)
         {
-            UnityEngine.Debug.Log("Deserializing snapshot.");
-            return new RunSnapshot();
+            return JsonUtility.FromJson<T>(json);
         }
-
     }
 }
