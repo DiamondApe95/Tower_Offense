@@ -1,16 +1,13 @@
-using UnityEngine;
+using System;
+using System.Collections.Generic;
 
 namespace TowerOffense.Saving
 {
+    [Serializable]
     public class PlayerProgress
     {
-        public string Id { get; set; }
-        public bool IsEnabled { get; set; }
-
-        public void Reset()
-        {
-            UnityEngine.Debug.Log("Stub method called.");
-        }
-
+        public List<string> unlockedLevelIds = new();
+        public List<string> completedLevelIds = new();
+        public string lastSelectedLevelId;
     }
 }
