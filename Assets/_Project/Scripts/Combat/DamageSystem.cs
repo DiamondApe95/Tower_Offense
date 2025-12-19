@@ -1,17 +1,21 @@
-using UnityEngine;
-
 namespace TowerOffense.Combat
 {
-    public class DamageSystem
+    public static class DamageSystem
     {
-        public string Id { get; set; }
-        public bool IsEnabled { get; set; }
-
-        public int Calculate(int baseDamage)
+        public static void Apply(UnityEngine.GameObject target, float amount)
         {
-            UnityEngine.Debug.Log("Calculating damage.");
-            return baseDamage;
-        }
+            if (target == null)
+            {
+                return;
+            }
 
+            HealthComponent health = target.GetComponent<HealthComponent>();
+            if (health == null)
+            {
+                return;
+            }
+
+            health.ApplyDamage(amount);
+        }
     }
 }
