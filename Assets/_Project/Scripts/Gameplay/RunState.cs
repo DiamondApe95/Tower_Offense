@@ -15,5 +15,8 @@ namespace TowerOffense.Gameplay
         public bool isAttacking;
         public bool isFinished;
         public bool isVictory;
+        public int heroEveryNWaves = 5;
+        public bool heroAvailableThisWave;
+        public string selectedHeroId;
     }
 }

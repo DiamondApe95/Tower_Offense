@@ -13,9 +13,6 @@ namespace TowerOffense.Saving
         public List<string> drawPile = new();
         public List<string> discardPile = new();
         public List<string> hand = new();
-        public bool isPlanning;
-        public bool isAttacking;
-        public bool isFinished;
-        public bool isVictory;
+        public List<string> flags = new();
     }
 }

@@ -33,5 +33,16 @@ namespace TowerOffense.Combat
                 Destroy(gameObject);
             }
         }
+
+        public void Heal(float amount)
+        {
+            if (currentHp <= 0f)
+            {
+                return;
+            }
+
+            currentHp = Mathf.Min(maxHp, currentHp + amount);
+            Debug.Log($"{name} healed {amount}. HP: {currentHp}/{maxHp}");
+        }
     }
 }

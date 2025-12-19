@@ -3,6 +3,7 @@ using TowerOffense.Core;
 using TowerOffense.Data;
 using TowerOffense.Gameplay.Cards;
 using TowerOffense.Gameplay.Entities;
+using TowerOffense.Saving;
 using UnityEngine;
 
 namespace TowerOffense.Gameplay
@@ -62,6 +63,7 @@ namespace TowerOffense.Gameplay
             Run.speed = speedController.CurrentSpeed;
 
             Fsm = new LevelStateMachine();
+            Fsm.OnFinished += HandleRunFinished;
 
             Waves = GetComponent<WaveController>();
             if (Waves == null)
@@ -146,6 +148,96 @@ namespace TowerOffense.Gameplay
             }
 
             Spawner.SpawnUnit(unitId);
+        }
+
+        public void SpawnHero(string heroId)
+        {
+            if (string.IsNullOrWhiteSpace(heroId))
+            {
+                Debug.LogWarning("SpawnHero called with empty hero id.");
+                return;
+            }
+
+            Vector3 spawnPosition = Vector3.zero;
+            if (PathManager != null)
+            {
+                LevelDefinition levelDefinition = ServiceLocator.Get<JsonDatabase>().FindLevel(levelId);
+                spawnPosition = PathManager.GetSpawnPosition(levelDefinition);
+            }
+
+            spawnPosition += new Vector3(0.75f, 0f, 0.75f);
+
+            GameObject heroObject = null;
+            if (ServiceLocator.TryGet(out PrefabRegistry registry))
+            {
+                foreach (PrefabRegistry.IdPrefabPair entry in registry.entries)
+                {
+                    if (entry != null && entry.id == heroId && entry.prefab != null)
+                    {
+                        heroObject = Instantiate(entry.prefab);
+                        break;
+                    }
+                }
+            }
+
+            if (heroObject == null)
+            {
+                heroObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                heroObject.name = $"{heroId}_Fallback";
+            }
+
+            heroObject.transform.position = spawnPosition;
+
+            HeroController heroController = heroObject.GetComponent<HeroController>();
+            if (heroController == null)
+            {
+                heroController = heroObject.AddComponent<HeroController>();
+            }
+
+            float heroHp = 300f;
+            heroController.Initialize(heroId, heroHp);
+        }
+
+        private void HandleRunFinished(bool victory)
+        {
+            if (!victory)
+            {
+                return;
+            }
+
+            SaveManager saveManager = ServiceLocator.Get<SaveManager>();
+            PlayerProgress progress = saveManager.GetOrCreateProgress();
+
+            if (!progress.completedLevelIds.Contains(levelId))
+            {
+                progress.completedLevelIds.Add(levelId);
+            }
+
+            JsonDatabase database = ServiceLocator.Get<JsonDatabase>();
+            if (database.Levels != null && database.Levels.Count > 0)
+            {
+                int currentIndex = -1;
+                for (int index = 0; index < database.Levels.Count; index++)
+                {
+                    if (database.Levels[index].id == levelId)
+                    {
+                        currentIndex = index;
+                        break;
+                    }
+                }
+
+                int nextIndex = currentIndex + 1;
+                if (currentIndex >= 0 && nextIndex < database.Levels.Count)
+                {
+                    string nextLevelId = database.Levels[nextIndex].id;
+                    if (!string.IsNullOrWhiteSpace(nextLevelId) && !progress.unlockedLevelIds.Contains(nextLevelId))
+                    {
+                        progress.unlockedLevelIds.Add(nextLevelId);
+                    }
+                }
+            }
+
+            saveManager.SaveProgress(progress);
         }
 
         private void SpawnEnemyTowers(LevelDefinition levelDefinition)

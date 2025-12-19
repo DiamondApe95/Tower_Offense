@@ -1,12 +1,15 @@
 using System;
 using System.IO;
+using TowerOffense.Core;
+using TowerOffense.Data;
 using UnityEngine;
 
 namespace TowerOffense.Saving
 {
     public class SaveManager
     {
-        private const string ProgressFileName = "player_progress.json";
+        private const string ProgressFileName = "progress.json";
+        private const string RunFileName = "run.json";
         private readonly JsonSaveSerializer serializer = new JsonSaveSerializer();
 
         public PlayerProgress LoadProgress()
@@ -49,9 +52,78 @@ namespace TowerOffense.Saving
             }
         }
 
+        public PlayerProgress GetOrCreateProgress()
+        {
+            PlayerProgress progress = LoadProgress();
+            if (progress != null)
+            {
+                return progress;
+            }
+
+            progress = new PlayerProgress();
+
+            if (ServiceLocator.TryGet(out JsonDatabase database) && database.Levels != null && database.Levels.Count > 0)
+            {
+                string firstLevelId = database.Levels[0]?.id;
+                if (!string.IsNullOrWhiteSpace(firstLevelId))
+                {
+                    progress.unlockedLevelIds.Add(firstLevelId);
+                    progress.lastSelectedLevelId = firstLevelId;
+                }
+            }
+
+            SaveProgress(progress);
+            return progress;
+        }
+
+        public void SaveRun(RunSnapshot snapshot)
+        {
+            string path = GetRunPath();
+
+            try
+            {
+                string json = serializer.ToJson(snapshot);
+                File.WriteAllText(path, json);
+                Debug.Log($"Saved run snapshot to {path}.");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to save run snapshot to {path}: {ex}");
+            }
+        }
+
+        public RunSnapshot LoadRun()
+        {
+            string path = GetRunPath();
+
+            if (!File.Exists(path))
+            {
+                Debug.Log($"No run snapshot file found at {path}.");
+                return null;
+            }
+
+            try
+            {
+                string json = File.ReadAllText(path);
+                RunSnapshot snapshot = serializer.FromJson<RunSnapshot>(json);
+                Debug.Log($"Loaded run snapshot from {path}.");
+                return snapshot;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to load run snapshot from {path}: {ex}");
+                return null;
+            }
+        }
+
         public string GetProgressPath()
         {
             return Path.Combine(Application.persistentDataPath, ProgressFileName);
+        }
+
+        private string GetRunPath()
+        {
+            return Path.Combine(Application.persistentDataPath, RunFileName);
         }
 
         public void DebugWriteAndRead()
