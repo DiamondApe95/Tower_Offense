@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using TowerOffense.Gameplay.Cards;
 
 namespace TowerOffense.Gameplay
 {
@@ -10,6 +12,14 @@ namespace TowerOffense.Gameplay
         public LevelStateMachine Fsm { get; private set; }
         public WaveController Waves { get; private set; }
 
+        private readonly SpeedController speedController = new SpeedController();
+        private readonly DeckManager deckManager = new DeckManager();
+        private readonly HandManager handManager = new HandManager();
+        private readonly CardPlayResolver cardPlayResolver = new CardPlayResolver();
+
+        public List<string> Hand => handManager.hand;
+        public float CurrentSpeed => speedController.CurrentSpeed;
+
         private void Start()
         {
             Run = new RunState
@@ -17,6 +27,9 @@ namespace TowerOffense.Gameplay
                 levelId = levelId,
                 maxWaves = 5
             };
+
+            Run.speed = speedController.CurrentSpeed;
+            handManager.hand = Run.handCardIds;
 
             Fsm = new LevelStateMachine();
 
@@ -33,6 +46,20 @@ namespace TowerOffense.Gameplay
         {
             Fsm.StartWave(Run);
             Waves.StartWave(this);
+        }
+
+        public void ToggleSpeed()
+        {
+            speedController.Toggle();
+            if (Run != null)
+            {
+                Run.speed = speedController.CurrentSpeed;
+            }
+        }
+
+        public void PlayCard(string cardId)
+        {
+            handManager.PlayCard(cardId, deckManager, cardPlayResolver);
         }
 
         public void OnWaveSimulatedEnd()
