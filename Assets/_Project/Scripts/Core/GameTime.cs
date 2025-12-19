@@ -12,5 +12,11 @@ namespace TowerOffense.Core
             UnityEngine.Debug.Log("Stub method called.");
         }
 
+        public void SetTimeScale(float scale)
+        {
+            Time.timeScale = scale;
+            UnityEngine.Debug.Log($"GameTime set Time.timeScale to {scale}.");
+        }
+
     }
 }
