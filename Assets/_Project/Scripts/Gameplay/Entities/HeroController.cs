@@ -79,26 +79,26 @@ namespace TowerConquest.Gameplay.Entities
             HeroDefinition.AbilityDto active = GetActiveAbility();
             if (active == null)
             {
-                Debug.LogWarning("HeroController: No active ability configured.");
+                UnityEngine.Debug.LogWarning("HeroController: No active ability configured.");
                 return;
             }
 
             if (activeCooldownRemaining > 0f)
             {
-                Debug.Log($"HeroController: Active ability on cooldown ({activeCooldownRemaining:0.0}s).");
+                UnityEngine.Debug.Log($"HeroController: Active ability on cooldown ({activeCooldownRemaining:0.0}s).");
                 return;
             }
 
             ApplyAbilityEffects(active);
             activeCooldownRemaining = Mathf.Max(1f, active.cooldown_seconds);
-            Debug.Log($"HeroController: Activated ability '{active.id}' for hero {HeroId}.");
+            UnityEngine.Debug.Log($"HeroController: Activated ability '{active.id}' for hero {HeroId}.");
         }
 
         private void ApplyAbilityEffects(HeroDefinition.AbilityDto ability)
         {
             if (ability == null || ability.effects == null || ability.effects.Length == 0)
             {
-                Debug.LogWarning("HeroController: Ability has no effects.");
+                UnityEngine.Debug.LogWarning("HeroController: Ability has no effects.");
                 return;
             }
 
@@ -115,7 +115,7 @@ namespace TowerConquest.Gameplay.Entities
                 if (distance <= radius)
                 {
                     effectResolver.ApplyEffects(gameObject, unit.gameObject, ability.effects);
-                    Debug.Log($"HeroController: Applied {ability.id} to {unit.UnitId}.");
+                    UnityEngine.Debug.Log($"HeroController: Applied {ability.id} to {unit.UnitId}.");
                 }
             }
         }

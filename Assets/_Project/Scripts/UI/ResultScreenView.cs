@@ -27,7 +27,7 @@ namespace TowerConquest.UI
                 nextLevelButton.interactable = nextLevelUnlocked;
             }
 
-            Debug.Log($"ResultScreenView: Showing results. Victory={victory}, NextLevelUnlocked={nextLevelUnlocked}.");
+            UnityEngine.Debug.Log($"ResultScreenView: Showing results. Victory={victory}, NextLevelUnlocked={nextLevelUnlocked}.");
         }
     }
 }

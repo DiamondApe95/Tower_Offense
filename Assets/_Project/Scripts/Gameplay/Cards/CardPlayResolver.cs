@@ -18,7 +18,7 @@ namespace TowerConquest.Gameplay.Cards
         {
             if (string.IsNullOrEmpty(cardId))
             {
-                Debug.LogWarning("Play request received with empty card id.");
+                UnityEngine.Debug.LogWarning("Play request received with empty card id.");
                 return;
             }
 
@@ -34,7 +34,7 @@ namespace TowerConquest.Gameplay.Cards
             }
             else
             {
-                Debug.LogWarning($"Unknown card type: {cardId}");
+                UnityEngine.Debug.LogWarning($"Unknown card type: {cardId}");
             }
         }
 
@@ -42,25 +42,25 @@ namespace TowerConquest.Gameplay.Cards
         {
             if (levelController == null)
             {
-                Debug.LogWarning($"Unit card '{unitId}' played without LevelController.");
+                UnityEngine.Debug.LogWarning($"Unit card '{unitId}' played without LevelController.");
                 return;
             }
 
             if (levelController.Run != null && levelController.Run.isPlanning)
             {
                 levelController.QueueUnitCard(unitId);
-                Debug.Log($"Queued unit card '{unitId}' for next wave.");
+                UnityEngine.Debug.Log($"Queued unit card '{unitId}' for next wave.");
                 return;
             }
 
             if (levelController.Run != null && levelController.Run.allowMidWaveSpawns)
             {
                 levelController.Spawner?.SpawnUnitGroup(unitId);
-                Debug.Log($"Spawned unit card '{unitId}' mid-wave.");
+                UnityEngine.Debug.Log($"Spawned unit card '{unitId}' mid-wave.");
                 return;
             }
 
-            Debug.Log($"Unit card '{unitId}' ignored (not allowed mid-wave).");
+            UnityEngine.Debug.Log($"Unit card '{unitId}' ignored (not allowed mid-wave).");
         }
 
         private void CastSpell(string spellId)
@@ -69,7 +69,7 @@ namespace TowerConquest.Gameplay.Cards
             SpellDefinition spell = database.FindSpell(spellId);
             if (spell == null)
             {
-                Debug.LogWarning($"Spell '{spellId}' not found.");
+                UnityEngine.Debug.LogWarning($"Spell '{spellId}' not found.");
                 return;
             }
 
@@ -88,7 +88,7 @@ namespace TowerConquest.Gameplay.Cards
             LevelController levelController = Object.FindObjectOfType<LevelController>();
             if (levelController == null || levelController.Spawner == null)
             {
-                Debug.LogWarning("No LevelController/Spawner available to spawn unit.");
+                UnityEngine.Debug.LogWarning("No LevelController/Spawner available to spawn unit.");
                 return;
             }
 

@@ -63,14 +63,14 @@ namespace TowerConquest.Gameplay.Cards
 
             var handManager = new HandManager();
             handManager.FillToHandSize(this);
-            Debug.Log($"Demo hand size after draw: {handManager.hand.Count}");
+            UnityEngine.Debug.Log($"Demo hand size after draw: {handManager.hand.Count}");
 
             if (handManager.hand.Count > 0)
             {
                 var resolver = new CardPlayResolver();
                 var cardToPlay = handManager.hand[0];
                 handManager.PlayCard(cardToPlay, this, resolver);
-                Debug.Log($"Played card: {cardToPlay}");
+                UnityEngine.Debug.Log($"Played card: {cardToPlay}");
             }
         }
 

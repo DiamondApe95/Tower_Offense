@@ -13,15 +13,15 @@ namespace TowerConquest.UI
         {
             SaveManager saveManager = ServiceLocator.Get<SaveManager>();
             PlayerProgress progress = saveManager.GetOrCreateProgress();
-            Debug.Log($"Unlocked levels: {string.Join(", ", progress.unlockedLevelIds)}");
-            Debug.Log($"Completed levels: {string.Join(", ", progress.completedLevelIds)}");
+            UnityEngine.Debug.Log($"Unlocked levels: {string.Join(", ", progress.unlockedLevelIds)}");
+            UnityEngine.Debug.Log($"Completed levels: {string.Join(", ", progress.completedLevelIds)}");
         }
 
         public void DebugSelectLevel(string levelId)
         {
             if (string.IsNullOrWhiteSpace(levelId))
             {
-                Debug.LogWarning("DebugSelectLevel called with empty level id.");
+                UnityEngine.Debug.LogWarning("DebugSelectLevel called with empty level id.");
                 return;
             }
 
@@ -34,7 +34,7 @@ namespace TowerConquest.UI
             }
 
             saveManager.SaveProgress(progress);
-            Debug.Log($"Debug selected level: {levelId}");
+            UnityEngine.Debug.Log($"Debug selected level: {levelId}");
         }
 
         public void Open()

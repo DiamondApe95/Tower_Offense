@@ -23,19 +23,19 @@ namespace TowerConquest.Gameplay.Entities
         {
             if (levelController == null || levelController.Run == null)
             {
-                Debug.LogWarning("TowerSlotController: No LevelController assigned.");
+                UnityEngine.Debug.LogWarning("TowerSlotController: No LevelController assigned.");
                 return;
             }
 
             if (levelController.Run.gameMode != GameMode.Defense || !levelController.Run.isPlanning)
             {
-                Debug.Log("TowerSlotController: Not in build phase.");
+                UnityEngine.Debug.Log("TowerSlotController: Not in build phase.");
                 return;
             }
 
             if (isOccupied)
             {
-                Debug.Log("TowerSlotController: Slot already occupied.");
+                UnityEngine.Debug.Log("TowerSlotController: Slot already occupied.");
                 return;
             }
 
@@ -46,7 +46,7 @@ namespace TowerConquest.Gameplay.Entities
         {
             if (string.IsNullOrWhiteSpace(towerId))
             {
-                Debug.LogWarning("TowerSlotController: No tower id configured.");
+                UnityEngine.Debug.LogWarning("TowerSlotController: No tower id configured.");
                 return;
             }
 
@@ -73,7 +73,7 @@ namespace TowerConquest.Gameplay.Entities
 
             ConfigureTower(towerController, towerId, tier);
             isOccupied = true;
-            Debug.Log($"TowerSlotController: Placed tower '{towerId}' at slot.");
+            UnityEngine.Debug.Log($"TowerSlotController: Placed tower '{towerId}' at slot.");
         }
 
         private static void ConfigureTower(TowerController towerController, string towerDefinitionId, int tier)

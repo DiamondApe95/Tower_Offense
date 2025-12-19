@@ -33,7 +33,7 @@ namespace TowerConquest.Core
             DataValidator.ValidateAll(db);
             ServiceLocator.Register(db);
 
-            Debug.Log($"Loaded Units: {db.Units.Count}, Spells: {db.Spells.Count}, Towers: {db.Towers.Count}, Traps: {db.Traps.Count}, Levels: {db.Levels.Count}, Heroes: {db.Heroes.Count}.");
+            UnityEngine.Debug.Log($"Loaded Units: {db.Units.Count}, Spells: {db.Spells.Count}, Towers: {db.Towers.Count}, Traps: {db.Traps.Count}, Levels: {db.Levels.Count}, Heroes: {db.Heroes.Count}.");
 
             LoadMainMenuIfAvailable();
         }

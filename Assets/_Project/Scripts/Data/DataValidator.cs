@@ -8,7 +8,7 @@ namespace TowerConquest.Data
         {
             if (db == null)
             {
-                Debug.LogWarning("DataValidator received null JsonDatabase.");
+                UnityEngine.Debug.LogWarning("DataValidator received null JsonDatabase.");
                 return;
             }
 
@@ -26,7 +26,7 @@ namespace TowerConquest.Data
         {
             if (entries == null)
             {
-                Debug.LogWarning($"{label} list was null.");
+                UnityEngine.Debug.LogWarning($"{label} list was null.");
                 return;
             }
 
@@ -35,7 +35,7 @@ namespace TowerConquest.Data
                 string id = selector(entries[index]);
                 if (string.IsNullOrWhiteSpace(id))
                 {
-                    Debug.LogWarning($"{label} at index {index} has an empty id.");
+                    UnityEngine.Debug.LogWarning($"{label} at index {index} has an empty id.");
                     continue;
                 }
 
@@ -44,7 +44,7 @@ namespace TowerConquest.Data
                     string otherId = selector(entries[otherIndex]);
                     if (id == otherId)
                     {
-                        Debug.LogWarning($"{label} id '{id}' is duplicated at indices {index} and {otherIndex}.");
+                        UnityEngine.Debug.LogWarning($"{label} id '{id}' is duplicated at indices {index} and {otherIndex}.");
                     }
                 }
             }
@@ -54,7 +54,7 @@ namespace TowerConquest.Data
         {
             if (db.Levels == null)
             {
-                Debug.LogWarning("Level list was null.");
+                UnityEngine.Debug.LogWarning("Level list was null.");
                 return;
             }
 
@@ -63,7 +63,7 @@ namespace TowerConquest.Data
                 LevelDefinition level = db.Levels[levelIndex];
                 if (level == null)
                 {
-                    Debug.LogWarning($"Level at index {levelIndex} is null.");
+                    UnityEngine.Debug.LogWarning($"Level at index {levelIndex} is null.");
                     continue;
                 }
 
@@ -76,11 +76,11 @@ namespace TowerConquest.Data
                             string towerId = level.enemy_defenses.towers[towerIndex].tower_id;
                             if (string.IsNullOrWhiteSpace(towerId))
                             {
-                                Debug.LogWarning($"Level '{level.id}' tower placement at index {towerIndex} has empty tower_id.");
+                                UnityEngine.Debug.LogWarning($"Level '{level.id}' tower placement at index {towerIndex} has empty tower_id.");
                             }
                             else if (db.FindTower(towerId) == null)
                             {
-                                Debug.LogWarning($"Level '{level.id}' references missing tower_id '{towerId}'.");
+                                UnityEngine.Debug.LogWarning($"Level '{level.id}' references missing tower_id '{towerId}'.");
                             }
                         }
                     }
@@ -92,11 +92,11 @@ namespace TowerConquest.Data
                             string trapId = level.enemy_defenses.traps[trapIndex].trap_id;
                             if (string.IsNullOrWhiteSpace(trapId))
                             {
-                                Debug.LogWarning($"Level '{level.id}' trap placement at index {trapIndex} has empty trap_id.");
+                                UnityEngine.Debug.LogWarning($"Level '{level.id}' trap placement at index {trapIndex} has empty trap_id.");
                             }
                             else if (db.FindTrap(trapId) == null)
                             {
-                                Debug.LogWarning($"Level '{level.id}' references missing trap_id '{trapId}'.");
+                                UnityEngine.Debug.LogWarning($"Level '{level.id}' references missing trap_id '{trapId}'.");
                             }
                         }
                     }
@@ -114,11 +114,11 @@ namespace TowerConquest.Data
                                 string unitId = unitCards[unitIndex];
                                 if (string.IsNullOrWhiteSpace(unitId))
                                 {
-                                    Debug.LogWarning($"Level '{level.id}' unit_cards entry {unitIndex} is empty.");
+                                    UnityEngine.Debug.LogWarning($"Level '{level.id}' unit_cards entry {unitIndex} is empty.");
                                 }
                                 else if (db.FindUnit(unitId) == null)
                                 {
-                                    Debug.LogWarning($"Level '{level.id}' references missing unit card '{unitId}'.");
+                                    UnityEngine.Debug.LogWarning($"Level '{level.id}' references missing unit card '{unitId}'.");
                                 }
                             }
                         }
@@ -131,11 +131,11 @@ namespace TowerConquest.Data
                                 string spellId = spellCards[spellIndex];
                                 if (string.IsNullOrWhiteSpace(spellId))
                                 {
-                                    Debug.LogWarning($"Level '{level.id}' spell_cards entry {spellIndex} is empty.");
+                                    UnityEngine.Debug.LogWarning($"Level '{level.id}' spell_cards entry {spellIndex} is empty.");
                                 }
                                 else if (db.FindSpell(spellId) == null)
                                 {
-                                    Debug.LogWarning($"Level '{level.id}' references missing spell card '{spellId}'.");
+                                    UnityEngine.Debug.LogWarning($"Level '{level.id}' references missing spell card '{spellId}'.");
                                 }
                             }
                         }
@@ -144,7 +144,7 @@ namespace TowerConquest.Data
                     string[] heroPool = level.player_rules.hero_pool;
                     if (heroPool == null || heroPool.Length == 0)
                     {
-                        Debug.LogWarning($"Level '{level.id}' has empty hero_pool.");
+                        UnityEngine.Debug.LogWarning($"Level '{level.id}' has empty hero_pool.");
                     }
                     else
                     {
@@ -153,11 +153,11 @@ namespace TowerConquest.Data
                             string heroId = heroPool[heroIndex];
                             if (string.IsNullOrWhiteSpace(heroId))
                             {
-                                Debug.LogWarning($"Level '{level.id}' hero_pool entry {heroIndex} is empty.");
+                                UnityEngine.Debug.LogWarning($"Level '{level.id}' hero_pool entry {heroIndex} is empty.");
                             }
                             else if (db.FindHero(heroId) == null)
                             {
-                                Debug.LogWarning($"Level '{level.id}' references missing hero '{heroId}'.");
+                                UnityEngine.Debug.LogWarning($"Level '{level.id}' references missing hero '{heroId}'.");
                             }
                         }
                     }

@@ -21,7 +21,7 @@ namespace TowerConquest.Gameplay
         {
             if (levelDefinition == null)
             {
-                Debug.LogWarning("LevelSpawner.Spawn called with null level definition.");
+                UnityEngine.Debug.LogWarning("LevelSpawner.Spawn called with null level definition.");
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace TowerConquest.Gameplay
             basePosition = Vector3.zero;
             if (levelDefinition.@base == null || levelDefinition.@base.position == null)
             {
-                Debug.LogWarning("LevelSpawner.SpawnBase missing base definition.");
+                UnityEngine.Debug.LogWarning("LevelSpawner.SpawnBase missing base definition.");
                 return;
             }
 
@@ -171,7 +171,7 @@ namespace TowerConquest.Gameplay
         {
             if (levelDefinition.enemy_defenses?.towers == null)
             {
-                Debug.LogWarning("LevelSpawner.SpawnTowerSlots: no tower slots defined.");
+                UnityEngine.Debug.LogWarning("LevelSpawner.SpawnTowerSlots: no tower slots defined.");
                 return;
             }
 

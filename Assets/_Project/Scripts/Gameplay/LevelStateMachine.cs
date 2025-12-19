@@ -26,7 +26,7 @@ namespace TowerConquest.Gameplay
             run.isFinished = false;
             run.isVictory = false;
             run.energy = run.maxEnergyPerWave;
-            Debug.Log($"LevelStateMachine: Entered planning for level {run.levelId}.");
+            UnityEngine.Debug.Log($"LevelStateMachine: Entered planning for level {run.levelId}.");
             OnPlanningStarted?.Invoke();
         }
 
@@ -34,7 +34,7 @@ namespace TowerConquest.Gameplay
         {
             if (state != State.Planning)
             {
-                Debug.LogWarning("LevelStateMachine: StartWave called outside planning state.");
+                UnityEngine.Debug.LogWarning("LevelStateMachine: StartWave called outside planning state.");
                 return;
             }
 
@@ -42,7 +42,7 @@ namespace TowerConquest.Gameplay
             run.isPlanning = false;
             run.isAttacking = true;
             run.waveIndex += 1;
-            Debug.Log($"LevelStateMachine: Wave {run.waveIndex} started.");
+            UnityEngine.Debug.Log($"LevelStateMachine: Wave {run.waveIndex} started.");
             OnWaveStarted?.Invoke(run.waveIndex);
         }
 
@@ -52,7 +52,7 @@ namespace TowerConquest.Gameplay
             run.isPlanning = true;
             run.isAttacking = false;
             run.energy = run.maxEnergyPerWave;
-            Debug.Log($"LevelStateMachine: Wave {run.waveIndex} ended.");
+            UnityEngine.Debug.Log($"LevelStateMachine: Wave {run.waveIndex} ended.");
             OnWaveEnded?.Invoke(run.waveIndex);
             OnPlanningStarted?.Invoke();
         }
@@ -64,7 +64,7 @@ namespace TowerConquest.Gameplay
             run.isVictory = victory;
             run.isPlanning = false;
             run.isAttacking = false;
-            Debug.Log($"LevelStateMachine: Finished. Victory={victory}.");
+            UnityEngine.Debug.Log($"LevelStateMachine: Finished. Victory={victory}.");
             OnFinished?.Invoke(victory);
         }
     }

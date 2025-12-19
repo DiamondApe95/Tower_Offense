@@ -61,13 +61,13 @@ namespace TowerConquest.Debug
         {
             if (!Application.isPlaying)
             {
-                Debug.LogWarning("DebugOverlay: JSON reload only available in Play Mode.");
+                UnityEngine.Debug.LogWarning("DebugOverlay: JSON reload only available in Play Mode.");
                 return;
             }
 
             JsonDatabase database = ServiceLocator.Get<JsonDatabase>();
             database.LoadAll();
-            Debug.Log("DebugOverlay: JSON data reloaded.");
+            UnityEngine.Debug.Log("DebugOverlay: JSON data reloaded.");
         }
     }
 }

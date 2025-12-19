@@ -12,7 +12,7 @@ namespace TowerConquest.Gameplay
         {
             if (ctx == null || ctx.Run == null)
             {
-                Debug.LogWarning("WaveController.StartWave called without context.");
+                UnityEngine.Debug.LogWarning("WaveController.StartWave called without context.");
                 return;
             }
 
@@ -36,7 +36,7 @@ namespace TowerConquest.Gameplay
             IReadOnlyList<string> unitsToSpawn = ctx.GetWaveUnits();
             if (unitsToSpawn == null || unitsToSpawn.Count == 0)
             {
-                Debug.LogWarning("WaveController: No units configured for this wave.");
+                UnityEngine.Debug.LogWarning("WaveController: No units configured for this wave.");
             }
             else
             {
@@ -44,7 +44,7 @@ namespace TowerConquest.Gameplay
                 {
                     if (ctx.Spawner == null)
                     {
-                        Debug.LogWarning("WaveController: SpawnController missing.");
+                        UnityEngine.Debug.LogWarning("WaveController: SpawnController missing.");
                         break;
                     }
 
