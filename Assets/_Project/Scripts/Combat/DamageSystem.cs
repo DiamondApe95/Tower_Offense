@@ -9,7 +9,7 @@ namespace TowerOffense.Combat
 
         public int Calculate(int baseDamage)
         {
-            Debug.Log("Calculating damage.");
+            UnityEngine.Debug.Log("Calculating damage.");
             return baseDamage;
         }
 

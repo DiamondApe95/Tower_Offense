@@ -9,12 +9,12 @@ namespace TowerOffense.Saving
 
         public void Save()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
         public void Load()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

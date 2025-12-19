@@ -9,7 +9,7 @@ namespace TowerOffense.Gameplay.Cards
 
         public void Shuffle()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

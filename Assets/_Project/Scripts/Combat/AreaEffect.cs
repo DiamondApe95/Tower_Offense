@@ -9,7 +9,7 @@ namespace TowerOffense.Combat
 
         public void Detonate()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

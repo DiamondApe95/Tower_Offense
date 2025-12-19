@@ -9,7 +9,7 @@ namespace TowerOffense.Audio
 
         public void Route(string sfxId)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

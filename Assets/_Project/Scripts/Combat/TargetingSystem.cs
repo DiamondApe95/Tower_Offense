@@ -9,7 +9,7 @@ namespace TowerOffense.Combat
 
         public void AcquireTarget()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

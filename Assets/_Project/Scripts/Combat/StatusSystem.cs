@@ -9,7 +9,7 @@ namespace TowerOffense.Combat
 
         public void ApplyStatus(string statusId)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

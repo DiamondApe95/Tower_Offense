@@ -9,7 +9,7 @@ namespace TowerOffense.Combat
 
         public int Mitigate(int damage)
         {
-            Debug.Log("Mitigating damage.");
+            UnityEngine.Debug.Log("Mitigating damage.");
             return damage;
         }
 

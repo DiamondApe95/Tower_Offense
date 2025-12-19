@@ -9,12 +9,12 @@ namespace TowerOffense.Core
 
         public void Register<T>(T service)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
         public T Resolve<T>()
         {
-            Debug.Log("Resolving service.");
+            UnityEngine.Debug.Log("Resolving service.");
             return default;
         }
 

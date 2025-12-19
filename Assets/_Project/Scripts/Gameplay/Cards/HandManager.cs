@@ -9,7 +9,7 @@ namespace TowerOffense.Gameplay.Cards
 
         public void Draw(int count)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

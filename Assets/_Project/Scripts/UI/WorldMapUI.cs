@@ -9,7 +9,7 @@ namespace TowerOffense.UI
 
         public void Open()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

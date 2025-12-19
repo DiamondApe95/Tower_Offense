@@ -9,12 +9,12 @@ namespace TowerOffense.Gameplay
 
         public void Enter()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
         public void Exit()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

@@ -9,7 +9,7 @@ namespace TowerOffense.Gameplay
 
         public void ChangeState(RunState newState)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

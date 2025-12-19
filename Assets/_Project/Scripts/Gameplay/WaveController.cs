@@ -9,7 +9,7 @@ namespace TowerOffense.Gameplay
 
         public void StartWave(int waveIndex)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

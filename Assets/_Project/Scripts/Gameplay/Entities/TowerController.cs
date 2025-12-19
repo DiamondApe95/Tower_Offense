@@ -9,7 +9,7 @@ namespace TowerOffense.Gameplay.Entities
 
         public void Initialize()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

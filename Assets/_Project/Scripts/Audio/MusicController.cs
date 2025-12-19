@@ -9,7 +9,7 @@ namespace TowerOffense.Audio
 
         public void Crossfade(string musicId)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

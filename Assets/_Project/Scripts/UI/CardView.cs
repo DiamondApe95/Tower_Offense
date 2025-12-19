@@ -10,7 +10,7 @@ namespace TowerOffense.UI
 
         public void Bind(CardViewModel model)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

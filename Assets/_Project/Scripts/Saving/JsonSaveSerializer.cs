@@ -9,13 +9,13 @@ namespace TowerOffense.Saving
 
         public string Serialize(RunSnapshot snapshot)
         {
-            Debug.Log("Serializing snapshot.");
+            UnityEngine.Debug.Log("Serializing snapshot.");
             return string.Empty;
         }
 
         public RunSnapshot Deserialize(string json)
         {
-            Debug.Log("Deserializing snapshot.");
+            UnityEngine.Debug.Log("Deserializing snapshot.");
             return new RunSnapshot();
         }
 
