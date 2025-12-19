@@ -1,23 +1,40 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace TowerOffense.Data
 {
-    public class PrefabRegistry
+    public class PrefabRegistry : MonoBehaviour
     {
-        public string Id { get; set; }
-        public bool IsEnabled { get; set; }
-
-        public void Register(string key, Object prefab)
+        [Serializable]
+        public class IdPrefabPair
         {
-            UnityEngine.Debug.Log("Stub method called.");
+            public string id;
+            public GameObject prefab;
         }
 
-        public Object Get(string key)
+        public List<IdPrefabPair> entries = new();
+
+        public GameObject CreateOrFallback(string id)
         {
-            UnityEngine.Debug.Log($"Fetching prefab {key}.");
-            return null;
+            if (!string.IsNullOrEmpty(id))
+            {
+                foreach (IdPrefabPair entry in entries)
+                {
+                    if (entry != null && entry.id == id && entry.prefab != null)
+                    {
+                        return Instantiate(entry.prefab);
+                    }
+                }
+            }
+
+            GameObject fallback = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            fallback.name = $"{id}_Fallback";
+            return fallback;
         }
 
+        public void RegisterFromScene()
+        {
+        }
     }
 }
