@@ -10,30 +10,104 @@ namespace TowerConquest.Combat
 
         public void ApplyEffects(GameObject source, GameObject target, SpellDefinition.EffectDto[] effects)
         {
-            ApplyEffectsInternal(target, effects, effect => new EffectData(effect));
+            ApplyEffectsInternal(
+                target,
+                effects,
+                effect => effect.effect_type,
+                effect => effect.value,
+                effect => effect.mode,
+                effect => effect.stat,
+                effect => effect.status,
+                status => status.apply,
+                status => status.duration_seconds,
+                status => status.slow_percent,
+                status => status.tick_damage,
+                status => status.tick_interval_seconds);
         }
 
         public void ApplyEffects(GameObject source, GameObject target, UnitDefinition.EffectDto[] effects)
         {
-            ApplyEffectsInternal(target, effects, effect => new EffectData(effect));
+            ApplyEffectsInternal(
+                target,
+                effects,
+                effect => effect.effect_type,
+                effect => effect.value,
+                effect => effect.mode,
+                effect => effect.stat,
+                effect => effect.status,
+                status => status.apply,
+                status => status.duration_seconds,
+                status => status.slow_percent,
+                status => status.tick_damage,
+                status => status.tick_interval_seconds);
         }
 
         public void ApplyEffects(GameObject source, GameObject target, TowerDefinition.EffectDto[] effects)
         {
-            ApplyEffectsInternal(target, effects, effect => new EffectData(effect));
+            ApplyEffectsInternal(
+                target,
+                effects,
+                effect => effect.effect_type,
+                effect => effect.value,
+                effect => effect.mode,
+                effect => effect.stat,
+                effect => effect.status,
+                status => status.apply,
+                status => status.duration_seconds,
+                status => status.slow_percent,
+                status => status.tick_damage,
+                status => status.tick_interval_seconds);
         }
 
         public void ApplyEffects(GameObject source, GameObject target, TrapDefinition.EffectDto[] effects)
         {
-            ApplyEffectsInternal(target, effects, effect => new EffectData(effect));
+            ApplyEffectsInternal(
+                target,
+                effects,
+                effect => effect.effect_type,
+                effect => effect.value,
+                effect => effect.mode,
+                effect => effect.stat,
+                effect => effect.status,
+                status => status.apply,
+                status => status.duration_seconds,
+                status => status.slow_percent,
+                status => status.tick_damage,
+                status => status.tick_interval_seconds);
         }
 
         public void ApplyEffects(GameObject source, GameObject target, HeroDefinition.EffectDto[] effects)
         {
-            ApplyEffectsInternal(target, effects, effect => new EffectData(effect));
+            ApplyEffectsInternal(
+                target,
+                effects,
+                effect => effect.effect_type,
+                effect => effect.value,
+                effect => effect.mode,
+                effect => effect.stat,
+                effect => effect.status,
+                status => status.apply,
+                status => status.duration_seconds,
+                status => status.slow_percent,
+                status => status.tick_damage,
+                status => status.tick_interval_seconds);
         }
 
-        private void ApplyEffectsInternal<TEffect>(GameObject target, TEffect[] effects, Func<TEffect, EffectData> convert)
+        private void ApplyEffectsInternal<TEffect, TStatus>(
+            GameObject target,
+            TEffect[] effects,
+            Func<TEffect, string> effectType,
+            Func<TEffect, float> value,
+            Func<TEffect, string> mode,
+            Func<TEffect, string> stat,
+            Func<TEffect, TStatus> status,
+            Func<TStatus, string> statusApply,
+            Func<TStatus, float> statusDurationSeconds,
+            Func<TStatus, float> statusSlowPercent,
+            Func<TStatus, float> statusTickDamage,
+            Func<TStatus, float> statusTickIntervalSeconds)
+            where TStatus : class
+            where TEffect : class
         {
             if (target == null)
             {
@@ -54,30 +128,41 @@ namespace TowerConquest.Combat
                     continue;
                 }
 
-                EffectData data = convert(effect);
-                if (string.IsNullOrWhiteSpace(data.effectType))
+                string effectTypeValue = effectType(effect);
+                if (string.IsNullOrWhiteSpace(effectTypeValue))
                 {
                     Debug.LogWarning("Effect missing effect_type.");
                     continue;
                 }
 
-                switch (data.effectType)
+                float effectValue = value(effect);
+                string effectMode = mode(effect);
+                string effectStat = stat(effect);
+
+                TStatus statusDto = status(effect);
+                string apply = statusDto != null ? statusApply(statusDto) : null;
+                float durationSeconds = statusDto != null ? statusDurationSeconds(statusDto) : 0f;
+                float slowPercent = statusDto != null ? statusSlowPercent(statusDto) : 0f;
+                float tickDamage = statusDto != null ? statusTickDamage(statusDto) : 0f;
+                float tickIntervalSeconds = statusDto != null ? statusTickIntervalSeconds(statusDto) : 0f;
+
+                switch (effectTypeValue)
                 {
                     case "damage":
-                        ApplyDamage(target, data.value);
+                        ApplyDamage(target, effectValue);
                         break;
                     case "heal":
-                        ApplyHeal(target, data.value);
+                        ApplyHeal(target, effectValue);
                         break;
                     case "status":
                     case "status_on_hit":
-                        ApplyStatus(target, data.status, data.value);
+                        ApplyStatus(target, apply, durationSeconds, slowPercent, tickDamage, tickIntervalSeconds, effectValue);
                         break;
                     case "buff":
-                        Debug.Log($"Buff effect received (mode={data.mode}, stat={data.stat}, value={data.value}).");
+                        Debug.Log($"Buff effect received (mode={effectMode}, stat={effectStat}, value={effectValue}).");
                         break;
                     default:
-                        Debug.LogWarning($"Unknown effect_type '{data.effectType}'.");
+                        Debug.LogWarning($"Unknown effect_type '{effectTypeValue}'.");
                         break;
                 }
             }
@@ -119,136 +204,35 @@ namespace TowerConquest.Combat
             health.Heal(amount);
         }
 
-        private void ApplyStatus(GameObject target, StatusData status, float value)
+        private void ApplyStatus(
+            GameObject target,
+            string apply,
+            float durationSeconds,
+            float slowPercent,
+            float tickDamage,
+            float tickIntervalSeconds,
+            float value)
         {
-            if (string.IsNullOrWhiteSpace(status.apply))
+            if (string.IsNullOrWhiteSpace(apply))
             {
                 Debug.LogWarning("Status effect missing status.apply.");
                 return;
             }
 
-            switch (status.apply)
+            switch (apply)
             {
                 case "slow":
-                    statusSystem.ApplySlow(target, status.slowPercent, status.durationSeconds);
+                    statusSystem.ApplySlow(target, slowPercent, durationSeconds);
                     break;
                 case "burn":
-                    statusSystem.ApplyBurn(target, status.tickDamage, status.tickIntervalSeconds, status.durationSeconds);
+                    statusSystem.ApplyBurn(target, tickDamage, tickIntervalSeconds, durationSeconds);
                     break;
                 case "armor_shred":
-                    statusSystem.ApplyArmorShred(target, value, status.durationSeconds);
+                    statusSystem.ApplyArmorShred(target, value, durationSeconds);
                     break;
                 default:
-                    Debug.LogWarning($"Unknown status apply '{status.apply}'.");
+                    Debug.LogWarning($"Unknown status apply '{apply}'.");
                     break;
-            }
-        }
-
-        private readonly struct EffectData
-        {
-            public readonly string effectType;
-            public readonly string mode;
-            public readonly string stat;
-            public readonly StatusData status;
-
-            public EffectData(SpellDefinition.EffectDto dto)
-            {
-                effectType = dto.effect_type;
-                mode = dto.mode;
-                stat = dto.stat;
-                value = dto.value;
-                status = new StatusData(dto.status);
-            }
-
-            public EffectData(UnitDefinition.EffectDto dto)
-            {
-                effectType = dto.effect_type;
-                mode = dto.mode;
-                stat = dto.stat;
-                value = dto.value;
-                status = new StatusData(dto.status);
-            }
-
-            public EffectData(TowerDefinition.EffectDto dto)
-            {
-                effectType = dto.effect_type;
-                mode = dto.mode;
-                stat = dto.stat;
-                value = dto.value;
-                status = new StatusData(dto.status);
-            }
-
-            public EffectData(TrapDefinition.EffectDto dto)
-            {
-                effectType = dto.effect_type;
-                mode = dto.mode;
-                stat = dto.stat;
-                value = dto.value;
-                status = new StatusData(dto.status);
-            }
-
-            public EffectData(HeroDefinition.EffectDto dto)
-            {
-                effectType = dto.effect_type;
-                mode = dto.mode;
-                stat = dto.stat;
-                value = dto.value;
-                status = new StatusData(dto.status);
-            }
-        }
-
-        private readonly struct StatusData
-        {
-            public readonly string apply;
-            public readonly float durationSeconds;
-            public readonly float slowPercent;
-            public readonly float tickDamage;
-            public readonly float tickIntervalSeconds;
-            public readonly float value;
-
-            public StatusData(SpellDefinition.StatusDto dto)
-            {
-                apply = dto?.apply;
-                durationSeconds = dto?.duration_seconds ?? 0f;
-                slowPercent = dto?.slow_percent ?? 0f;
-                tickDamage = dto?.tick_damage ?? 0f;
-                tickIntervalSeconds = dto?.tick_interval_seconds ?? 0f;
-            }
-
-            public StatusData(UnitDefinition.StatusDto dto)
-            {
-                apply = dto?.apply;
-                durationSeconds = dto?.duration_seconds ?? 0f;
-                slowPercent = dto?.slow_percent ?? 0f;
-                tickDamage = dto?.tick_damage ?? 0f;
-                tickIntervalSeconds = dto?.tick_interval_seconds ?? 0f;
-            }
-
-            public StatusData(TowerDefinition.StatusDto dto)
-            {
-                apply = dto?.apply;
-                durationSeconds = dto?.duration_seconds ?? 0f;
-                slowPercent = dto?.slow_percent ?? 0f;
-                tickDamage = dto?.tick_damage ?? 0f;
-                tickIntervalSeconds = dto?.tick_interval_seconds ?? 0f;
-            }
-
-            public StatusData(TrapDefinition.StatusDto dto)
-            {
-                apply = dto?.apply;
-                durationSeconds = dto?.duration_seconds ?? 0f;
-                slowPercent = dto?.slow_percent ?? 0f;
-                tickDamage = dto?.tick_damage ?? 0f;
-                tickIntervalSeconds = dto?.tick_interval_seconds ?? 0f;
-            }
-
-            public StatusData(HeroDefinition.StatusDto dto)
-            {
-                apply = dto?.apply;
-                durationSeconds = dto?.duration_seconds ?? 0f;
-                slowPercent = dto?.slow_percent ?? 0f;
-                tickDamage = dto?.tick_damage ?? 0f;
-                tickIntervalSeconds = dto?.tick_interval_seconds ?? 0f;
             }
         }
     }

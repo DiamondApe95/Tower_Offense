@@ -364,8 +364,24 @@ namespace TowerConquest.Debug
             spawnedObjects.Add(unitObject);
 
             UnitController unit = unitObject.AddComponent<UnitController>();
-            unit.Initialize("audit_unit", new List<Vector3> { position + new Vector3(1f, 0f, 1f) });
+            BaseController baseController = GetOrCreateBaseController();
+            unit.Initialize("audit_unit", new List<Vector3> { position + new Vector3(1f, 0f, 1f) }, baseController);
             return unit;
+        }
+
+        private BaseController GetOrCreateBaseController()
+        {
+            BaseController baseController = FindAnyObjectByType<BaseController>();
+            if (baseController != null)
+            {
+                return baseController;
+            }
+
+            GameObject baseObject = new GameObject("Audit_BaseController");
+            spawnedObjects.Add(baseObject);
+            baseController = baseObject.AddComponent<BaseController>();
+            baseController.Initialize(1000f, 0f);
+            return baseController;
         }
 
         private SaveManager GetOrCreateSaveManager(out bool registered)
