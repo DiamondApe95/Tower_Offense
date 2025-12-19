@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TowerOffense.Core;
 using TowerOffense.Data;
 using TowerOffense.Gameplay.Cards;
+using TowerOffense.Gameplay.Entities;
 using UnityEngine;
 
 namespace TowerOffense.Gameplay
@@ -34,6 +35,8 @@ namespace TowerOffense.Gameplay
 
             Spawner = new SpawnController();
             Spawner.Initialize(levelDefinition, PathManager);
+
+            SpawnEnemyTowers(levelDefinition);
 
             var testDeck = new List<string>
             {
@@ -111,6 +114,65 @@ namespace TowerOffense.Gameplay
             }
 
             Spawner.SpawnUnit(unitId);
+        }
+
+        private void SpawnEnemyTowers(LevelDefinition levelDefinition)
+        {
+            if (levelDefinition == null || levelDefinition.enemy_defenses == null || levelDefinition.enemy_defenses.towers == null)
+            {
+                return;
+            }
+
+            JsonDatabase database = ServiceLocator.Get<JsonDatabase>();
+
+            foreach (LevelDefinition.TowerPlacementDto placement in levelDefinition.enemy_defenses.towers)
+            {
+                GameObject towerObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                towerObject.name = $"Tower_{placement.instance_id}";
+                towerObject.transform.position = new Vector3(placement.position.x, placement.position.y, placement.position.z);
+                towerObject.transform.rotation = Quaternion.Euler(0f, placement.rotation_y_degrees, 0f);
+
+                TowerController towerController = towerObject.AddComponent<TowerController>();
+
+                TowerDefinition towerDefinition = database.FindTower(placement.tower_id);
+                TowerDefinition.TierDto tierDefinition = GetTowerTier(towerDefinition, placement.tier);
+
+                if (tierDefinition != null && tierDefinition.attack != null)
+                {
+                    if (tierDefinition.attack.range > 0f)
+                    {
+                        towerController.range = tierDefinition.attack.range;
+                    }
+
+                    if (tierDefinition.attack.base_damage > 0f)
+                    {
+                        towerController.damage = tierDefinition.attack.base_damage;
+                    }
+
+                    if (tierDefinition.attack.attacks_per_second > 0f)
+                    {
+                        towerController.attacksPerSecond = tierDefinition.attack.attacks_per_second;
+                    }
+                }
+            }
+        }
+
+        private static TowerDefinition.TierDto GetTowerTier(TowerDefinition towerDefinition, int requestedTier)
+        {
+            if (towerDefinition == null || towerDefinition.tiers == null || towerDefinition.tiers.Length == 0)
+            {
+                return null;
+            }
+
+            foreach (TowerDefinition.TierDto tier in towerDefinition.tiers)
+            {
+                if (tier != null && tier.tier == requestedTier)
+                {
+                    return tier;
+                }
+            }
+
+            return towerDefinition.tiers[0];
         }
     }
 }
