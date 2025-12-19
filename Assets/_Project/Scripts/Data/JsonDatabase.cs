@@ -17,7 +17,7 @@ namespace TowerOffense.Data
             var loader = new JsonLoader();
 
             string unitsPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/units.json");
-            string towersPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/tower.json");
+            string towersPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/towers.json");
             string levelsPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/levels.json");
 
             Units = new List<UnitDefinition>();
@@ -71,6 +71,8 @@ namespace TowerOffense.Data
                     Levels.AddRange(levelsRoot.levels);
                 }
             }
+
+            Debug.Log($"JsonDatabase loaded: Units={Units.Count}, Spells={Spells.Count}, Towers={Towers.Count}, Traps={Traps.Count}, Levels={Levels.Count}.");
         }
 
         public UnitDefinition FindUnit(string id)

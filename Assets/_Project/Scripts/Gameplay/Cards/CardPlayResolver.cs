@@ -19,6 +19,7 @@ namespace TowerOffense.Gameplay.Cards
             if (cardId.StartsWith("unit_"))
             {
                 Debug.Log($"Spawn unit request: {cardId}");
+                SpawnUnit(cardId);
             }
             else if (cardId.StartsWith("spell_"))
             {
@@ -48,6 +49,18 @@ namespace TowerOffense.Gameplay.Cards
             areaEffect.effects = spell.effects;
             areaEffect.radius = ResolveRadius(spell.effects);
             areaEffect.duration = 0.2f;
+        }
+
+        private void SpawnUnit(string unitId)
+        {
+            LevelController levelController = Object.FindObjectOfType<LevelController>();
+            if (levelController == null || levelController.Spawner == null)
+            {
+                Debug.LogWarning("No LevelController/Spawner available to spawn unit.");
+                return;
+            }
+
+            levelController.Spawner.SpawnUnit(unitId);
         }
 
         private Vector3 ResolveTargetPosition()
