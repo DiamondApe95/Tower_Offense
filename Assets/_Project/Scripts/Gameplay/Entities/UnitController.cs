@@ -1,16 +1,37 @@
+using TowerOffense.Combat;
 using UnityEngine;
 
 namespace TowerOffense.Gameplay.Entities
 {
-    public class UnitController
+    [RequireComponent(typeof(HealthComponent))]
+    public class UnitController : MonoBehaviour
     {
-        public string Id { get; set; }
-        public bool IsEnabled { get; set; }
+        private const float DefaultHp = 100f;
 
-        public void Initialize()
+        private HealthComponent health;
+        private bool initialized;
+
+        private void Awake()
         {
-            UnityEngine.Debug.Log("Stub method called.");
+            health = GetComponent<HealthComponent>();
+            if (health == null)
+            {
+                health = gameObject.AddComponent<HealthComponent>();
+            }
         }
 
+        private void Start()
+        {
+            if (!initialized)
+            {
+                Initialize(DefaultHp);
+            }
+        }
+
+        public void Initialize(float hp = DefaultHp)
+        {
+            initialized = true;
+            health.Initialize(hp);
+        }
     }
 }
