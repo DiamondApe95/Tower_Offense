@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using TowerOffense.Core;
+using TowerOffense.Data;
 using TowerOffense.Gameplay.Cards;
 using UnityEngine;
 
@@ -15,6 +17,8 @@ namespace TowerOffense.Gameplay
         public RunState Run { get; private set; }
         public LevelStateMachine Fsm { get; private set; }
         public WaveController Waves { get; private set; }
+        public PathManager PathManager { get; private set; }
+        public SpawnController Spawner { get; private set; }
 
         private void Start()
         {
@@ -23,6 +27,13 @@ namespace TowerOffense.Gameplay
                 levelId = levelId,
                 maxWaves = 5
             };
+
+            LevelDefinition levelDefinition = ServiceLocator.Get<JsonDatabase>().FindLevel(levelId);
+            PathManager = new PathManager();
+            PathManager.InitializeFromLevel(levelDefinition);
+
+            Spawner = new SpawnController();
+            Spawner.Initialize(levelDefinition, PathManager);
 
             var testDeck = new List<string>
             {
@@ -83,6 +94,23 @@ namespace TowerOffense.Gameplay
             hand.PlayCard(cardId, deck, resolver);
             Run.handCardIds = new List<string>(hand.hand);
             Debug.Log($"Hand after play: {string.Join(", ", hand.hand)}");
+        }
+
+        [ContextMenu("DEBUG Spawn Unit")]
+        public void DebugSpawnUnit()
+        {
+            DebugSpawnUnit("unit_tank_legionary");
+        }
+
+        public void DebugSpawnUnit(string unitId)
+        {
+            if (Spawner == null)
+            {
+                Debug.LogWarning("Spawner not initialized.");
+                return;
+            }
+
+            Spawner.SpawnUnit(unitId);
         }
     }
 }

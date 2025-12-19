@@ -1,16 +1,23 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TowerOffense.Gameplay.Entities
 {
-    public class UnitController
+    public class UnitController : MonoBehaviour
     {
-        public string Id { get; set; }
-        public bool IsEnabled { get; set; }
+        public string UnitId { get; private set; }
 
-        public void Initialize()
+        public void Initialize(string unitId, IReadOnlyList<Vector3> path)
         {
-            UnityEngine.Debug.Log("Stub method called.");
-        }
+            UnitId = unitId;
 
+            UnitMover mover = GetComponent<UnitMover>();
+            if (mover == null)
+            {
+                mover = gameObject.AddComponent<UnitMover>();
+            }
+
+            mover.Initialize(path);
+        }
     }
 }
