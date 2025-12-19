@@ -1,16 +1,19 @@
+using System.Collections;
 using UnityEngine;
 
 namespace TowerOffense.Gameplay
 {
-    public class WaveController
+    public class WaveController : MonoBehaviour
     {
-        public string Id { get; set; }
-        public bool IsEnabled { get; set; }
-
-        public void StartWave(int waveIndex)
+        public void StartWave(LevelController ctx)
         {
-            UnityEngine.Debug.Log("Stub method called.");
+            StartCoroutine(SimulateWave(ctx));
         }
 
+        private IEnumerator SimulateWave(LevelController ctx)
+        {
+            yield return new WaitForSeconds(2f);
+            ctx.OnWaveSimulatedEnd();
+        }
     }
 }
