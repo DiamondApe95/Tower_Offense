@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TowerOffense.Combat
+namespace TowerConquest.Combat
 {
     public class StatusSystem
     {
@@ -12,14 +12,15 @@ namespace TowerOffense.Combat
                 return;
             }
 
-            SlowStatus existing = target.GetComponent<SlowStatus>();
-            if (existing != null)
+            SlowStatus slow = target.GetComponent<SlowStatus>();
+            if (slow == null)
             {
-                Object.Destroy(existing);
+                slow = target.AddComponent<SlowStatus>();
+                slow.Initialize(slowPercent, duration);
+                return;
             }
 
-            SlowStatus slow = target.AddComponent<SlowStatus>();
-            slow.Initialize(slowPercent, duration);
+            slow.Refresh(slowPercent, duration);
         }
 
         public void ApplyBurn(GameObject target, float tickDamage, float tickInterval, float duration)
@@ -32,6 +33,25 @@ namespace TowerOffense.Combat
 
             BurnStatus burn = target.AddComponent<BurnStatus>();
             burn.Initialize(tickDamage, tickInterval, duration);
+        }
+
+        public void ApplyArmorShred(GameObject target, float amount, float duration)
+        {
+            if (target == null)
+            {
+                Debug.LogWarning("ApplyArmorShred called with null target.");
+                return;
+            }
+
+            ArmorShredStatus shred = target.GetComponent<ArmorShredStatus>();
+            if (shred == null)
+            {
+                shred = target.AddComponent<ArmorShredStatus>();
+                shred.Initialize(amount, duration);
+                return;
+            }
+
+            shred.Refresh(amount, duration);
         }
     }
 }

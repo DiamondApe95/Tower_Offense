@@ -1,4 +1,4 @@
-namespace TowerOffense.Gameplay.Cards
+namespace TowerConquest.Gameplay.Cards
 {
     public class CardViewModel
     {
@@ -6,5 +6,6 @@ namespace TowerOffense.Gameplay.Cards
         public string displayName;
         public int cost;
         public string group;
+        public bool isPlayable;
     }
 }

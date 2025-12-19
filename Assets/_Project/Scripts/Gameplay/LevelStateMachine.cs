@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TowerOffense.Gameplay
+namespace TowerConquest.Gameplay
 {
     public class LevelStateMachine
     {
@@ -25,6 +25,7 @@ namespace TowerOffense.Gameplay
             run.isAttacking = false;
             run.isFinished = false;
             run.isVictory = false;
+            run.energy = run.maxEnergyPerWave;
             Debug.Log($"LevelStateMachine: Entered planning for level {run.levelId}.");
             OnPlanningStarted?.Invoke();
         }
@@ -50,8 +51,10 @@ namespace TowerOffense.Gameplay
             state = State.Planning;
             run.isPlanning = true;
             run.isAttacking = false;
+            run.energy = run.maxEnergyPerWave;
             Debug.Log($"LevelStateMachine: Wave {run.waveIndex} ended.");
             OnWaveEnded?.Invoke(run.waveIndex);
+            OnPlanningStarted?.Invoke();
         }
 
         public void Finish(RunState run, bool victory)

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TowerOffense.Data
+namespace TowerConquest.Data
 {
     public class DataValidator
     {
@@ -17,6 +17,7 @@ namespace TowerOffense.Data
             ValidateUniqueIds("Tower", db.Towers, tower => tower.id);
             ValidateUniqueIds("Trap", db.Traps, trap => trap.id);
             ValidateUniqueIds("Level", db.Levels, level => level.id);
+            ValidateUniqueIds("Hero", db.Heroes, hero => hero.id);
 
             ValidateLevelReferences(db);
         }
@@ -149,9 +150,14 @@ namespace TowerOffense.Data
                     {
                         for (int heroIndex = 0; heroIndex < heroPool.Length; heroIndex++)
                         {
-                            if (string.IsNullOrWhiteSpace(heroPool[heroIndex]))
+                            string heroId = heroPool[heroIndex];
+                            if (string.IsNullOrWhiteSpace(heroId))
                             {
                                 Debug.LogWarning($"Level '{level.id}' hero_pool entry {heroIndex} is empty.");
+                            }
+                            else if (db.FindHero(heroId) == null)
+                            {
+                                Debug.LogWarning($"Level '{level.id}' references missing hero '{heroId}'.");
                             }
                         }
                     }

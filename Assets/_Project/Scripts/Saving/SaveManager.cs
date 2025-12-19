@@ -1,10 +1,10 @@
 using System;
 using System.IO;
-using TowerOffense.Core;
-using TowerOffense.Data;
+using TowerConquest.Core;
+using TowerConquest.Data;
 using UnityEngine;
 
-namespace TowerOffense.Saving
+namespace TowerConquest.Saving
 {
     public class SaveManager
     {

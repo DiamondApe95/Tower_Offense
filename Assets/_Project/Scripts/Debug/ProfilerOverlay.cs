@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TowerOffense.Debug
+namespace TowerConquest.Debug
 {
     public class ProfilerOverlay
     {

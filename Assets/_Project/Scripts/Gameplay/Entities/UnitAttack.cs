@@ -1,7 +1,7 @@
 using UnityEngine;
-using TowerOffense.Combat;
+using TowerConquest.Combat;
 
-namespace TowerOffense.Gameplay.Entities
+namespace TowerConquest.Gameplay.Entities
 {
     public class UnitAttack
     {

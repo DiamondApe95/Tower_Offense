@@ -1,4 +1,4 @@
-namespace TowerOffense.Data
+namespace TowerConquest.Data
 {
     [System.Serializable]
     public class TowersJsonRoot

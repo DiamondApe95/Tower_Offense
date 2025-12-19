@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace TowerOffense.Combat
+namespace TowerConquest.Combat
 {
     public class BurnStatus : MonoBehaviour
     {

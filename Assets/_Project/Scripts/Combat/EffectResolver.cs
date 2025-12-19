@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
-using TowerOffense.Data;
+using TowerConquest.Data;
 
-namespace TowerOffense.Combat
+namespace TowerConquest.Combat
 {
     public class EffectResolver
     {
@@ -71,7 +71,7 @@ namespace TowerOffense.Combat
                         break;
                     case "status":
                     case "status_on_hit":
-                        ApplyStatus(target, data.status);
+                        ApplyStatus(target, data.status, data.value);
                         break;
                     case "buff":
                         Debug.Log($"Buff effect received (mode={data.mode}, stat={data.stat}, value={data.value}).");
@@ -119,7 +119,7 @@ namespace TowerOffense.Combat
             health.Heal(amount);
         }
 
-        private void ApplyStatus(GameObject target, StatusData status)
+        private void ApplyStatus(GameObject target, StatusData status, float value)
         {
             if (string.IsNullOrWhiteSpace(status.apply))
             {
@@ -135,6 +135,9 @@ namespace TowerOffense.Combat
                 case "burn":
                     statusSystem.ApplyBurn(target, status.tickDamage, status.tickIntervalSeconds, status.durationSeconds);
                     break;
+                case "armor_shred":
+                    statusSystem.ApplyArmorShred(target, value, status.durationSeconds);
+                    break;
                 default:
                     Debug.LogWarning($"Unknown status apply '{status.apply}'.");
                     break;
@@ -146,7 +149,6 @@ namespace TowerOffense.Combat
             public readonly string effectType;
             public readonly string mode;
             public readonly string stat;
-            public readonly float value;
             public readonly StatusData status;
 
             public EffectData(SpellDefinition.EffectDto dto)
@@ -202,6 +204,7 @@ namespace TowerOffense.Combat
             public readonly float slowPercent;
             public readonly float tickDamage;
             public readonly float tickIntervalSeconds;
+            public readonly float value;
 
             public StatusData(SpellDefinition.StatusDto dto)
             {

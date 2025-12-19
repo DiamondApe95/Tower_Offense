@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace TowerOffense.Data
+namespace TowerConquest.Data
 {
     public class JsonDatabase
     {
@@ -11,6 +11,8 @@ namespace TowerOffense.Data
         public List<TowerDefinition> Towers;
         public List<TrapDefinition> Traps;
         public List<LevelDefinition> Levels;
+        public List<HeroDefinition> Heroes;
+        public GlobalRulesDto GlobalRules;
 
         public void LoadAll()
         {
@@ -19,12 +21,15 @@ namespace TowerOffense.Data
             string unitsPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/units.json");
             string towersPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/tower.json");
             string levelsPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/levels.json");
+            string heroesPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/heroes.json");
 
             Units = new List<UnitDefinition>();
             Spells = new List<SpellDefinition>();
             Towers = new List<TowerDefinition>();
             Traps = new List<TrapDefinition>();
             Levels = new List<LevelDefinition>();
+            Heroes = new List<HeroDefinition>();
+            GlobalRules = null;
 
             string unitsText = loader.LoadText(unitsPath);
             if (!string.IsNullOrWhiteSpace(unitsText))
@@ -69,6 +74,21 @@ namespace TowerOffense.Data
                 if (levelsRoot != null && levelsRoot.levels != null)
                 {
                     Levels.AddRange(levelsRoot.levels);
+                }
+
+                if (levelsRoot != null)
+                {
+                    GlobalRules = levelsRoot.global_rules;
+                }
+            }
+
+            string heroesText = loader.LoadText(heroesPath);
+            if (!string.IsNullOrWhiteSpace(heroesText))
+            {
+                var heroesRoot = JsonUtility.FromJson<HeroesJsonRoot>(heroesText);
+                if (heroesRoot != null && heroesRoot.hero_definitions != null)
+                {
+                    Heroes.AddRange(heroesRoot.hero_definitions);
                 }
             }
         }
@@ -170,6 +190,26 @@ namespace TowerOffense.Data
             }
 
             Debug.LogWarning($"Level with id '{id}' was not found.");
+            return null;
+        }
+
+        public HeroDefinition FindHero(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                Debug.LogWarning("FindHero called with empty id.");
+                return null;
+            }
+
+            for (int index = 0; index < Heroes.Count; index++)
+            {
+                if (Heroes[index].id == id)
+                {
+                    return Heroes[index];
+                }
+            }
+
+            Debug.LogWarning($"Hero with id '{id}' was not found.");
             return null;
         }
     }

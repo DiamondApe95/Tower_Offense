@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TowerOffense.Core
+namespace TowerConquest.Core
 {
     public static class ServiceLocator
     {

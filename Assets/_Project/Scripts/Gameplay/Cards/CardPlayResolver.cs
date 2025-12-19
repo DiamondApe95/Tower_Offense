@@ -1,13 +1,19 @@
-using TowerOffense.Combat;
-using TowerOffense.Core;
-using TowerOffense.Data;
-using TowerOffense.Gameplay;
+using TowerConquest.Combat;
+using TowerConquest.Core;
+using TowerConquest.Data;
 using UnityEngine;
 
-namespace TowerOffense.Gameplay.Cards
+namespace TowerConquest.Gameplay.Cards
 {
     public class CardPlayResolver
     {
+        private LevelController levelController;
+
+        public void Initialize(LevelController controller)
+        {
+            levelController = controller;
+        }
+
         public void Play(string cardId)
         {
             if (string.IsNullOrEmpty(cardId))
@@ -18,7 +24,7 @@ namespace TowerOffense.Gameplay.Cards
 
             if (cardId.StartsWith("unit_"))
             {
-                Debug.Log($"Spawn unit request: {cardId}");
+                ResolveUnitCard(cardId);
             }
             else if (cardId.StartsWith("spell_"))
             {
@@ -28,6 +34,31 @@ namespace TowerOffense.Gameplay.Cards
             {
                 Debug.LogWarning($"Unknown card type: {cardId}");
             }
+        }
+
+        private void ResolveUnitCard(string unitId)
+        {
+            if (levelController == null)
+            {
+                Debug.LogWarning($"Unit card '{unitId}' played without LevelController.");
+                return;
+            }
+
+            if (levelController.Run != null && levelController.Run.isPlanning)
+            {
+                levelController.QueueUnitCard(unitId);
+                Debug.Log($"Queued unit card '{unitId}' for next wave.");
+                return;
+            }
+
+            if (levelController.Run != null && levelController.Run.allowMidWaveSpawns)
+            {
+                levelController.Spawner?.SpawnUnitGroup(unitId);
+                Debug.Log($"Spawned unit card '{unitId}' mid-wave.");
+                return;
+            }
+
+            Debug.Log($"Unit card '{unitId}' ignored (not allowed mid-wave).");
         }
 
         private void CastSpell(string spellId)
@@ -66,7 +97,6 @@ namespace TowerOffense.Gameplay.Cards
                 }
             }
 
-            LevelController levelController = Object.FindObjectOfType<LevelController>();
             if (levelController != null)
             {
                 JsonDatabase database = ServiceLocator.Get<JsonDatabase>();
