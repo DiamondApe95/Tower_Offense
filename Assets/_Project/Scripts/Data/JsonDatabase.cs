@@ -19,7 +19,7 @@ namespace TowerConquest.Data
             var loader = new JsonLoader();
 
             string unitsPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/units.json");
-            string towersPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/tower.json");
+            string towersPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/towers.json");
             string levelsPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/levels.json");
             string heroesPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/heroes.json");
 
@@ -91,6 +91,8 @@ namespace TowerConquest.Data
                     Heroes.AddRange(heroesRoot.hero_definitions);
                 }
             }
+
+            Debug.Log($"JsonDatabase loaded: Units={Units.Count}, Spells={Spells.Count}, Towers={Towers.Count}, Traps={Traps.Count}, Levels={Levels.Count}.");
         }
 
         public UnitDefinition FindUnit(string id)
