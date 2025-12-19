@@ -9,7 +9,7 @@ namespace TowerOffense.Debug
 
         public void Toggle()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

@@ -9,7 +9,7 @@ namespace TowerOffense.Data
 
         public void LoadAll()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

@@ -9,7 +9,7 @@ namespace TowerOffense.Gameplay.Cards
 
         public void Resolve(string cardId)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

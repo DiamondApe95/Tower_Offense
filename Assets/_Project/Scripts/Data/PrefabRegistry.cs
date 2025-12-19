@@ -10,12 +10,12 @@ namespace TowerOffense.Data
 
         public void Register(string key, Object prefab)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
         public Object Get(string key)
         {
-            Debug.Log($"Fetching prefab {key}.");
+            UnityEngine.Debug.Log($"Fetching prefab {key}.");
             return null;
         }
 

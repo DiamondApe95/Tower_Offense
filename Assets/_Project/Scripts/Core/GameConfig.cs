@@ -9,7 +9,7 @@ namespace TowerOffense.Core
 
         public void ApplyDefaults()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

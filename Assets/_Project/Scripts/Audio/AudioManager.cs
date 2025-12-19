@@ -9,12 +9,12 @@ namespace TowerOffense.Audio
 
         public void PlaySfx(string sfxId)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
         public void PlayMusic(string musicId)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

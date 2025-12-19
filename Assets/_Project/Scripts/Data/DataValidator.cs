@@ -9,7 +9,7 @@ namespace TowerOffense.Data
 
         public bool Validate()
         {
-            Debug.Log("Validating data.");
+            UnityEngine.Debug.Log("Validating data.");
             return true;
         }
 

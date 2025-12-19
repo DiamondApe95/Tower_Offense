@@ -9,12 +9,12 @@ namespace TowerOffense.Core
 
         public void Publish(string eventName)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
         public void Subscribe(string eventName)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

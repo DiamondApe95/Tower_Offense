@@ -9,7 +9,7 @@ namespace TowerOffense.Core
 
         public void Tick(float deltaTime)
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }

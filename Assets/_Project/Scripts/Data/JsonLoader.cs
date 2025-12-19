@@ -9,7 +9,7 @@ namespace TowerOffense.Data
 
         public string LoadText(string path)
         {
-            Debug.Log($"Loading text from {path}.");
+            UnityEngine.Debug.Log($"Loading text from {path}.");
             return string.Empty;
         }
 

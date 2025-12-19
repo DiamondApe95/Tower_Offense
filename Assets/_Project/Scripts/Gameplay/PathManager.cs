@@ -9,7 +9,7 @@ namespace TowerOffense.Gameplay
 
         public void RebuildPaths()
         {
-            Debug.Log("Stub method called.");
+            UnityEngine.Debug.Log("Stub method called.");
         }
 
     }
