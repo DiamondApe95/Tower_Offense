@@ -85,7 +85,6 @@ namespace TowerConquest.Gameplay.Cards
 
         private void SpawnUnit(string unitId)
         {
-            LevelController levelController = Object.FindObjectOfType<LevelController>();
             if (levelController == null || levelController.Spawner == null)
             {
                 UnityEngine.Debug.LogWarning("No LevelController/Spawner available to spawn unit.");

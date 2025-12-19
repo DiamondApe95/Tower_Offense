@@ -42,11 +42,34 @@ namespace TowerConquest.Gameplay
 
         private void Start()
         {
+            if (hud == null)
+            {
+                UnityEngine.Debug.LogError("LevelController: LevelHUD reference is missing! Please assign it in the inspector.");
+            }
+
+            if (resultScreen == null)
+            {
+                UnityEngine.Debug.LogError("LevelController: ResultScreenView reference is missing! Please assign it in the inspector.");
+            }
+
+            SaveManager saveManager = ServiceLocator.Get<SaveManager>();
+            PlayerProgress progress = saveManager.GetOrCreateProgress();
+            if (!string.IsNullOrWhiteSpace(progress.lastSelectedLevelId))
+            {
+                levelId = progress.lastSelectedLevelId;
+                UnityEngine.Debug.Log($"Loading level from PlayerProgress: {levelId}");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"No level selected in PlayerProgress, using default: {levelId}");
+            }
+
             JsonDatabase database = ServiceLocator.Get<JsonDatabase>();
             levelDefinition = database.FindLevel(levelId);
             if (levelDefinition == null)
             {
-                UnityEngine.Debug.LogWarning($"LevelController: Level '{levelId}' not found.");
+                UnityEngine.Debug.LogError($"LevelController: Level '{levelId}' not found in database. Cannot start level.");
+                enabled = false;
                 return;
             }
 

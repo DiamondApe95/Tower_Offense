@@ -1,6 +1,7 @@
 using TowerConquest.Core;
 using TowerConquest.Saving;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace TowerConquest.UI
 {
@@ -35,6 +36,20 @@ namespace TowerConquest.UI
 
             saveManager.SaveProgress(progress);
             UnityEngine.Debug.Log($"Debug selected level: {levelId}");
+
+            LoadLevelGameplay();
+        }
+
+        private void LoadLevelGameplay()
+        {
+            if (Application.CanStreamedLevelBeLoaded("LevelGameplay"))
+            {
+                SceneManager.LoadScene("LevelGameplay");
+            }
+            else
+            {
+                UnityEngine.Debug.LogError("LevelGameplay scene not found in build settings!");
+            }
         }
 
         public void Open()
