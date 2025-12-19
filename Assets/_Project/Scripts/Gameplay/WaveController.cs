@@ -7,6 +7,21 @@ namespace TowerOffense.Gameplay
     {
         public void StartWave(LevelController ctx)
         {
+            if (ctx != null && ctx.Run != null)
+            {
+                RunState run = ctx.Run;
+                run.heroAvailableThisWave = run.heroEveryNWaves > 0 && run.waveIndex % run.heroEveryNWaves == 0;
+                if (run.heroAvailableThisWave)
+                {
+                    if (string.IsNullOrWhiteSpace(run.selectedHeroId))
+                    {
+                        run.selectedHeroId = "hero_legatus";
+                    }
+
+                    ctx.SpawnHero(run.selectedHeroId);
+                }
+            }
+
             StartCoroutine(SimulateWave(ctx));
         }
 

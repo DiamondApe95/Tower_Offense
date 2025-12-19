@@ -4,13 +4,34 @@ namespace TowerOffense.Combat
 {
     public class StatusSystem
     {
-        public string Id { get; set; }
-        public bool IsEnabled { get; set; }
-
-        public void ApplyStatus(string statusId)
+        public void ApplySlow(GameObject target, float slowPercent, float duration)
         {
-            UnityEngine.Debug.Log("Stub method called.");
+            if (target == null)
+            {
+                Debug.LogWarning("ApplySlow called with null target.");
+                return;
+            }
+
+            SlowStatus existing = target.GetComponent<SlowStatus>();
+            if (existing != null)
+            {
+                Object.Destroy(existing);
+            }
+
+            SlowStatus slow = target.AddComponent<SlowStatus>();
+            slow.Initialize(slowPercent, duration);
         }
 
+        public void ApplyBurn(GameObject target, float tickDamage, float tickInterval, float duration)
+        {
+            if (target == null)
+            {
+                Debug.LogWarning("ApplyBurn called with null target.");
+                return;
+            }
+
+            BurnStatus burn = target.AddComponent<BurnStatus>();
+            burn.Initialize(tickDamage, tickInterval, duration);
+        }
     }
 }

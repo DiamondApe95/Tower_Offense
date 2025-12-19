@@ -6,6 +6,7 @@ namespace TowerOffense.Gameplay.Entities
     public class UnitMover : MonoBehaviour
     {
         public float moveSpeed = 2.5f;
+        public float moveSpeedMultiplier = 1f;
 
         private IReadOnlyList<Vector3> path;
         private int waypointIndex;
@@ -31,7 +32,7 @@ namespace TowerOffense.Gameplay.Entities
             }
 
             Vector3 target = path[waypointIndex];
-            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * moveSpeedMultiplier * Time.deltaTime);
 
             if (Vector3.Distance(transform.position, target) <= 0.01f)
             {
