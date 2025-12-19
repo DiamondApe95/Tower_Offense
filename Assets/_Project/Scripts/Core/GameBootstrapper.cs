@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerOffense.Data;
 
 namespace TowerOffense.Core
 {
@@ -9,7 +10,11 @@ namespace TowerOffense.Core
 
         public void Initialize()
         {
-            UnityEngine.Debug.Log("Stub method called.");
+            var db = new JsonDatabase();
+            db.LoadAll();
+            DataValidator.ValidateAll(db);
+
+            Debug.Log($"Loaded Units: {db.Units.Count}, Spells: {db.Spells.Count}, Towers: {db.Towers.Count}, Traps: {db.Traps.Count}, Levels: {db.Levels.Count}.");
         }
 
         public void Shutdown()

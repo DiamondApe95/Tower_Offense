@@ -1,17 +1,35 @@
+using System;
+using System.IO;
 using UnityEngine;
 
 namespace TowerOffense.Data
 {
     public class JsonLoader
     {
-        public string Id { get; set; }
-        public bool IsEnabled { get; set; }
-
-        public string LoadText(string path)
+        public string LoadText(string absolutePath)
         {
-            UnityEngine.Debug.Log($"Loading text from {path}.");
-            return string.Empty;
-        }
+            try
+            {
+                if (string.IsNullOrWhiteSpace(absolutePath))
+                {
+                    Debug.LogWarning("JsonLoader.LoadText called with empty path.");
+                    return string.Empty;
+                }
 
+                if (!File.Exists(absolutePath))
+                {
+                    Debug.LogWarning($"JsonLoader could not find file at {absolutePath}.");
+                    return string.Empty;
+                }
+
+                Debug.Log($"Loading text from {absolutePath}.");
+                return File.ReadAllText(absolutePath);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogWarning($"JsonLoader failed to load {absolutePath}. Exception: {exception.Message}");
+                return string.Empty;
+            }
+        }
     }
 }
