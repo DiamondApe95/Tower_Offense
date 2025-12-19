@@ -47,7 +47,7 @@ namespace TowerConquest.Gameplay.Entities
                     effectResolver.ApplyEffects(gameObject, currentTarget.gameObject, effects);
                 }
 
-                Debug.Log($"Tower hit unit {currentTarget.UnitId}");
+                UnityEngine.Debug.Log($"Tower hit unit {currentTarget.UnitId}");
             }
         }
 

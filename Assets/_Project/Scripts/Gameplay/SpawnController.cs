@@ -58,7 +58,7 @@ namespace TowerConquest.Gameplay
             var spawned = new List<UnitController>();
             if (string.IsNullOrWhiteSpace(unitId))
             {
-                Debug.LogWarning("SpawnUnitGroup called with empty unit id.");
+                UnityEngine.Debug.LogWarning("SpawnUnitGroup called with empty unit id.");
                 return spawned;
             }
 

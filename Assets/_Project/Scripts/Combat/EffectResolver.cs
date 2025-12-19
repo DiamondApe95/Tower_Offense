@@ -111,13 +111,13 @@ namespace TowerConquest.Combat
         {
             if (target == null)
             {
-                Debug.LogWarning("ApplyEffects called with null target.");
+                UnityEngine.Debug.LogWarning("ApplyEffects called with null target.");
                 return;
             }
 
             if (effects == null || effects.Length == 0)
             {
-                Debug.LogWarning("ApplyEffects called with no effects.");
+                UnityEngine.Debug.LogWarning("ApplyEffects called with no effects.");
                 return;
             }
 
@@ -131,7 +131,7 @@ namespace TowerConquest.Combat
                 string effectTypeValue = effectType(effect);
                 if (string.IsNullOrWhiteSpace(effectTypeValue))
                 {
-                    Debug.LogWarning("Effect missing effect_type.");
+                    UnityEngine.Debug.LogWarning("Effect missing effect_type.");
                     continue;
                 }
 
@@ -159,10 +159,10 @@ namespace TowerConquest.Combat
                         ApplyStatus(target, apply, durationSeconds, slowPercent, tickDamage, tickIntervalSeconds, effectValue);
                         break;
                     case "buff":
-                        Debug.Log($"Buff effect received (mode={effectMode}, stat={effectStat}, value={effectValue}).");
+                        UnityEngine.Debug.Log($"Buff effect received (mode={effectMode}, stat={effectStat}, value={effectValue}).");
                         break;
                     default:
-                        Debug.LogWarning($"Unknown effect_type '{effectTypeValue}'.");
+                        UnityEngine.Debug.LogWarning($"Unknown effect_type '{effectTypeValue}'.");
                         break;
                 }
             }
@@ -172,14 +172,14 @@ namespace TowerConquest.Combat
         {
             if (amount <= 0f)
             {
-                Debug.LogWarning("Damage effect missing or non-positive value.");
+                UnityEngine.Debug.LogWarning("Damage effect missing or non-positive value.");
                 return;
             }
 
             HealthComponent health = target.GetComponent<HealthComponent>();
             if (health == null)
             {
-                Debug.LogWarning("Damage effect target has no HealthComponent.");
+                UnityEngine.Debug.LogWarning("Damage effect target has no HealthComponent.");
                 return;
             }
 
@@ -190,14 +190,14 @@ namespace TowerConquest.Combat
         {
             if (amount <= 0f)
             {
-                Debug.LogWarning("Heal effect missing or non-positive value.");
+                UnityEngine.Debug.LogWarning("Heal effect missing or non-positive value.");
                 return;
             }
 
             HealthComponent health = target.GetComponent<HealthComponent>();
             if (health == null)
             {
-                Debug.LogWarning("Heal effect target has no HealthComponent.");
+                UnityEngine.Debug.LogWarning("Heal effect target has no HealthComponent.");
                 return;
             }
 
@@ -215,7 +215,7 @@ namespace TowerConquest.Combat
         {
             if (string.IsNullOrWhiteSpace(apply))
             {
-                Debug.LogWarning("Status effect missing status.apply.");
+                UnityEngine.Debug.LogWarning("Status effect missing status.apply.");
                 return;
             }
 
@@ -231,7 +231,7 @@ namespace TowerConquest.Combat
                     statusSystem.ApplyArmorShred(target, value, durationSeconds);
                     break;
                 default:
-                    Debug.LogWarning($"Unknown status apply '{apply}'.");
+                    UnityEngine.Debug.LogWarning($"Unknown status apply '{apply}'.");
                     break;
             }
         }

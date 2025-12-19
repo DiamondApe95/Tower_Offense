@@ -100,7 +100,7 @@ namespace TowerConquest.Debug
 
             CleanupSpawnedObjects();
 
-            Debug.Log($"[AUDIT SUMMARY] Total={total}, Passed={passed}, Failed={failed}");
+            UnityEngine.Debug.Log($"[AUDIT SUMMARY] Total={total}, Passed={passed}, Failed={failed}");
         }
 
         private void ResetCounters()
@@ -116,12 +116,12 @@ namespace TowerConquest.Debug
             if (success)
             {
                 passed++;
-                Debug.Log($"[AUDIT PASS] {testName}");
+                UnityEngine.Debug.Log($"[AUDIT PASS] {testName}");
             }
             else
             {
                 failed++;
-                Debug.LogWarning(details == null
+                UnityEngine.Debug.LogWarning(details == null
                     ? $"[AUDIT FAIL] {testName}"
                     : $"[AUDIT FAIL] {testName} :: {details}");
             }

@@ -13,7 +13,7 @@ namespace TowerConquest.Gameplay
         {
             if (supportedSpeeds == null || supportedSpeeds.Length == 0)
             {
-                Debug.LogWarning("SpeedController has no supported speeds configured.");
+                UnityEngine.Debug.LogWarning("SpeedController has no supported speeds configured.");
                 return;
             }
 
@@ -27,7 +27,7 @@ namespace TowerConquest.Gameplay
                 }
             }
 
-            Debug.LogWarning($"SpeedController: speed {speed} not supported.");
+            UnityEngine.Debug.LogWarning($"SpeedController: speed {speed} not supported.");
         }
 
         public void Toggle()

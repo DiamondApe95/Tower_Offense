@@ -21,7 +21,7 @@ namespace TowerConquest.Gameplay
             currentHp = maxHp;
             armor = Mathf.Clamp01(armorValue);
             isDestroyed = false;
-            Debug.Log($"BaseController: Initialized HP {currentHp}/{maxHp}, armor {armor:0.##}.");
+            UnityEngine.Debug.Log($"BaseController: Initialized HP {currentHp}/{maxHp}, armor {armor:0.##}.");
         }
 
         public void ApplyDamage(float amount)
@@ -33,18 +33,18 @@ namespace TowerConquest.Gameplay
 
             if (amount <= 0f)
             {
-                Debug.LogWarning("BaseController.ApplyDamage called with non-positive damage.");
+                UnityEngine.Debug.LogWarning("BaseController.ApplyDamage called with non-positive damage.");
                 return;
             }
 
             float mitigated = Mathf.Max(0f, amount * (1f - armor));
             currentHp = Mathf.Max(0f, currentHp - mitigated);
-            Debug.Log($"BaseController: Took {mitigated:0.##} damage (raw {amount:0.##}). HP {currentHp:0.##}/{maxHp:0.##}.");
+            UnityEngine.Debug.Log($"BaseController: Took {mitigated:0.##} damage (raw {amount:0.##}). HP {currentHp:0.##}/{maxHp:0.##}.");
 
             if (currentHp <= 0f && !isDestroyed)
             {
                 isDestroyed = true;
-                Debug.Log("BaseController: Base destroyed.");
+                UnityEngine.Debug.Log("BaseController: Base destroyed.");
                 OnBaseDestroyed?.Invoke(this);
             }
         }

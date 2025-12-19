@@ -46,7 +46,7 @@ namespace TowerConquest.Gameplay
             levelDefinition = database.FindLevel(levelId);
             if (levelDefinition == null)
             {
-                Debug.LogWarning($"LevelController: Level '{levelId}' not found.");
+                UnityEngine.Debug.LogWarning($"LevelController: Level '{levelId}' not found.");
                 return;
             }
 
@@ -142,7 +142,7 @@ namespace TowerConquest.Gameplay
 
             if (!Run.isPlanning)
             {
-                Debug.LogWarning("StartWave called outside planning phase.");
+                UnityEngine.Debug.LogWarning("StartWave called outside planning phase.");
                 return;
             }
 
@@ -155,7 +155,7 @@ namespace TowerConquest.Gameplay
         {
             if (speedController == null)
             {
-                Debug.LogWarning("SpeedController not initialized.");
+                UnityEngine.Debug.LogWarning("SpeedController not initialized.");
                 return;
             }
 
@@ -168,31 +168,31 @@ namespace TowerConquest.Gameplay
         {
             if (hand == null || deck == null || resolver == null)
             {
-                Debug.LogWarning("Cannot play card - hand/deck/resolver not ready.");
+                UnityEngine.Debug.LogWarning("Cannot play card - hand/deck/resolver not ready.");
                 return;
             }
 
             if (!IsCardPlayableNow(cardId))
             {
-                Debug.Log($"Card '{cardId}' cannot be played in the current phase.");
+                UnityEngine.Debug.Log($"Card '{cardId}' cannot be played in the current phase.");
                 return;
             }
 
             if (!TryGetCardCost(cardId, out int cost))
             {
-                Debug.LogWarning($"Card '{cardId}' cost not found.");
+                UnityEngine.Debug.LogWarning($"Card '{cardId}' cost not found.");
                 return;
             }
 
             if (Run.energy < cost)
             {
-                Debug.Log($"Not enough energy for card '{cardId}'. {Run.energy}/{cost}");
+                UnityEngine.Debug.Log($"Not enough energy for card '{cardId}'. {Run.energy}/{cost}");
                 return;
             }
 
             if (!hand.PlayCard(cardId, deck, resolver))
             {
-                Debug.LogWarning($"Card '{cardId}' not found in hand.");
+                UnityEngine.Debug.LogWarning($"Card '{cardId}' not found in hand.");
                 return;
             }
 
@@ -261,7 +261,7 @@ namespace TowerConquest.Gameplay
         {
             if (string.IsNullOrWhiteSpace(heroId))
             {
-                Debug.LogWarning("SpawnHero called with empty hero id.");
+                UnityEngine.Debug.LogWarning("SpawnHero called with empty hero id.");
                 return;
             }
 

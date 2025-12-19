@@ -30,7 +30,7 @@ namespace TowerConquest.Gameplay.Entities
 
             if (waypointIndex >= path.Count)
             {
-                Debug.Log("UnitMover: Reached end/base.");
+                UnityEngine.Debug.Log("UnitMover: Reached end/base.");
                 if (baseController != null)
                 {
                     baseController.ApplyDamage(baseDamage);
