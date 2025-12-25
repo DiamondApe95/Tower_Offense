@@ -7,11 +7,19 @@ namespace TowerConquest.Gameplay.Entities
 {
     public class TowerController : MonoBehaviour
     {
+        [Header("Tower Stats")]
         public float range = 6f;
         public float damage = 20f;
         public float attacksPerSecond = 1f;
         public TowerDefinition.EffectDto[] effects;
+
+        [Header("Economy")]
+        public int buildCost = 50;
+        public int upgradeCost = 30;
+
         public float EstimatedDps { get; private set; }
+        public int BuildCost => buildCost;
+        public int UpgradeCost => upgradeCost;
 
         private float scanTimer;
         private float attackTimer;

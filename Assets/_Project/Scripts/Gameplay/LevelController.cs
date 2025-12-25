@@ -7,15 +7,29 @@ using TowerConquest.Gameplay.Entities;
 using TowerConquest.Saving;
 using TowerConquest.UI;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TowerConquest.Gameplay
 {
     public class LevelController : MonoBehaviour
     {
+        [Header("Level Settings")]
         public string levelId = "lvl_01_etruria_outpost";
+
+        [Header("UI References")]
         public LevelHUD hud;
         public ResultScreenView resultScreen;
         public LevelSpawner levelSpawner;
+
+        [Header("Wave Settings")]
+        [Tooltip("Automatisch die erste Welle starten nach einer Verzögerung")]
+        public bool autoStartFirstWave = false;
+        [Tooltip("Verzögerung in Sekunden bevor die erste Welle automatisch startet")]
+        public float autoStartDelay = 3f;
+        [Tooltip("Automatisch nächste Welle starten nach Ende der vorherigen")]
+        public bool autoStartNextWave = false;
+        [Tooltip("Verzögerung zwischen Wellen bei Autostart")]
+        public float waveTransitionDelay = 2f;
 
         public DeckManager deck;
         public HandManager hand;
@@ -41,6 +55,9 @@ namespace TowerConquest.Gameplay
         private readonly List<string> defenseWaveUnits = new List<string>();
         private readonly List<HeroController> activeHeroes = new List<HeroController>();
         private bool hudInitialized;
+        private float autoStartTimer;
+        private bool autoStartPending;
+        private Coroutine autoStartCoroutine;
 
         private void Start()
         {
@@ -151,13 +168,31 @@ namespace TowerConquest.Gameplay
 
             Fsm.EnterPlanning(Run);
             RefreshHud();
+
+            // Autostart erste Welle
+            if (autoStartFirstWave)
+            {
+                ScheduleAutoStart(autoStartDelay);
+            }
         }
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.H))
+            // Neues Input System für Hero-Skill Aktivierung
+            if (Keyboard.current != null && Keyboard.current.hKey.wasPressedThisFrame)
             {
                 ActivateHeroSkill();
+            }
+
+            // Autostart Timer verarbeiten
+            if (autoStartPending && Run != null && Run.isPlanning && !Run.isFinished)
+            {
+                autoStartTimer -= Time.deltaTime;
+                if (autoStartTimer <= 0f)
+                {
+                    autoStartPending = false;
+                    StartWave();
+                }
             }
         }
 
@@ -296,7 +331,29 @@ namespace TowerConquest.Gameplay
             }
 
             RefreshHud();
+
+            // Autostart nächste Welle
+            if (autoStartNextWave)
+            {
+                ScheduleAutoStart(waveTransitionDelay);
+            }
         }
+
+        public void ScheduleAutoStart(float delay)
+        {
+            autoStartTimer = Mathf.Max(0.1f, delay);
+            autoStartPending = true;
+            UnityEngine.Debug.Log($"LevelController: Wave auto-start scheduled in {delay} seconds.");
+        }
+
+        public void CancelAutoStart()
+        {
+            autoStartPending = false;
+            autoStartTimer = 0f;
+        }
+
+        public bool IsAutoStartPending => autoStartPending;
+        public float AutoStartTimeRemaining => autoStartPending ? autoStartTimer : 0f;
 
         public void SpawnHero(string heroId)
         {
