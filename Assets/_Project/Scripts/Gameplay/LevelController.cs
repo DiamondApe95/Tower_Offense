@@ -59,6 +59,25 @@ namespace TowerConquest.Gameplay
         private bool autoStartPending;
         private Coroutine autoStartCoroutine;
 
+        private void Awake()
+        {
+            // Ensure GameBootstrapper exists before LevelController starts
+            EnsureGameBootstrapper();
+        }
+
+        private void EnsureGameBootstrapper()
+        {
+            // Check if GameBootstrapper already exists
+            GameBootstrapper bootstrapper = FindFirstObjectByType<GameBootstrapper>();
+            if (bootstrapper == null)
+            {
+                // Create GameBootstrapper if it doesn't exist
+                GameObject bootstrapperGO = new GameObject("GameBootstrapper");
+                bootstrapper = bootstrapperGO.AddComponent<GameBootstrapper>();
+                UnityEngine.Debug.Log("LevelController: Created GameBootstrapper automatically.");
+            }
+        }
+
         private void Start()
         {
             if (hud == null)
