@@ -17,14 +17,19 @@ public class EnemySpawner : MonoBehaviour
     public LevelController levelController;
 
     private Transform[] cachedWaypoints;
+    private bool waypointsCached = false;
 
     private void Awake()
     {
-        CacheWaypoints();
+        // Don't cache in Awake - fields might not be set yet when added via AddComponent
+        // CacheWaypoints will be called later when needed
     }
 
     private void CacheWaypoints()
     {
+        if (waypointsCached)
+            return;
+
         if (pathWaypointsRoot == null)
         {
             Debug.LogError("EnemySpawner: pathWaypointsRoot missing!");
@@ -36,6 +41,8 @@ public class EnemySpawner : MonoBehaviour
 
         for (int i = 0; i < count; i++)
             cachedWaypoints[i] = pathWaypointsRoot.GetChild(i);
+
+        waypointsCached = true;
     }
 
     [Header("Auto Start")]
@@ -44,6 +51,9 @@ public class EnemySpawner : MonoBehaviour
 
     private void Start()
     {
+        // Cache waypoints in Start (after fields are set)
+        CacheWaypoints();
+
         // Nur für Testzwecke - normalerweise wird StartWave() vom LevelController aufgerufen
         if (autoStartWave)
         {
@@ -53,6 +63,9 @@ public class EnemySpawner : MonoBehaviour
 
     public void StartWave()
     {
+        // Ensure waypoints are cached
+        CacheWaypoints();
+
         if (enemyPrefab == null || spawnPoint == null || cachedWaypoints == null || cachedWaypoints.Length == 0)
         {
             Debug.LogError("EnemySpawner: Missing references or waypoints.");

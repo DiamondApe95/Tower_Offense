@@ -59,7 +59,10 @@ public class AutoLevelGenerator : MonoBehaviour
         SetupLighting();
 
 #if UNITY_EDITOR
-        EditorSceneManager.MarkSceneDirty(gameObject.scene);
+        if (!Application.isPlaying)
+        {
+            EditorSceneManager.MarkSceneDirty(gameObject.scene);
+        }
 #endif
 
         Debug.Log("AutoLevelGenerator: ★ Complete Scene Setup finished! Scene is ready to play.");
@@ -383,7 +386,10 @@ public class AutoLevelGenerator : MonoBehaviour
             CreateOrUpdateBuildManager();
 
 #if UNITY_EDITOR
-        EditorSceneManager.MarkSceneDirty(gameObject.scene);
+        if (!Application.isPlaying)
+        {
+            EditorSceneManager.MarkSceneDirty(gameObject.scene);
+        }
 #endif
 
         Debug.Log($"AutoLevelGenerator: Generated grid={width}x{height}, spawns={spawnPoints.Count}, lanes={waypointsRoots.Count}, goals={goalPoints.Count}");
@@ -1235,6 +1241,9 @@ public class AutoLevelGenerator : MonoBehaviour
         // Graphic Raycaster für Interaktion
         canvasGO.AddComponent<GraphicRaycaster>();
 
+        // Ensure Canvas is active
+        canvasGO.SetActive(true);
+
         // EventSystem mit Input System UI Input Module erstellen falls nicht vorhanden
         var existingEventSystem = FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>();
         if (existingEventSystem == null)
@@ -1335,6 +1344,9 @@ public class AutoLevelGenerator : MonoBehaviour
         hlg.childForceExpandHeight = false;
 
         generatedHUD.handContainer = handContainer.transform;
+
+        // Ensure HUD is active
+        hudGO.SetActive(true);
 
         Debug.Log("AutoLevelGenerator: LevelHUD created with all UI elements.");
     }
