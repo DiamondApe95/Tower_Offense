@@ -82,37 +82,68 @@ namespace TowerConquest.Gameplay
         {
             if (hud == null)
             {
-                UnityEngine.Debug.LogError("LevelController: LevelHUD reference is missing! Please assign it in the inspector.");
+                // Versuche HUD automatisch zu finden
+                hud = FindFirstObjectByType<LevelHUD>();
+                if (hud == null)
+                {
+                    UnityEngine.Debug.LogWarning("LevelController: LevelHUD reference is missing! UI may not work properly.");
+                }
             }
 
             if (resultScreen == null)
             {
-                UnityEngine.Debug.LogError("LevelController: ResultScreenView reference is missing! Please assign it in the inspector.");
+                // Versuche ResultScreen automatisch zu finden
+                resultScreen = FindFirstObjectByType<ResultScreenView>();
+                if (resultScreen == null)
+                {
+                    UnityEngine.Debug.LogWarning("LevelController: ResultScreenView reference is missing.");
+                }
             }
 
             // EntityRegistry für Performance-optimierte Entity-Abfragen
             ServiceLocator.TryGet(out entityRegistry);
 
+            JsonDatabase database = ServiceLocator.Get<JsonDatabase>();
+
+            // Versuche Level-ID aus PlayerProgress zu laden
             SaveManager saveManager = ServiceLocator.Get<SaveManager>();
             PlayerProgress progress = saveManager.GetOrCreateProgress();
+
+            // Priorität: 1. PlayerProgress, 2. Inspector-Wert, 3. Erstes Level aus Datenbank
+            string targetLevelId = levelId;
             if (!string.IsNullOrWhiteSpace(progress.lastSelectedLevelId))
             {
-                levelId = progress.lastSelectedLevelId;
-                UnityEngine.Debug.Log($"Loading level from PlayerProgress: {levelId}");
-            }
-            else
-            {
-                UnityEngine.Debug.Log($"No level selected in PlayerProgress, using default: {levelId}");
+                targetLevelId = progress.lastSelectedLevelId;
+                UnityEngine.Debug.Log($"Loading level from PlayerProgress: {targetLevelId}");
             }
 
-            JsonDatabase database = ServiceLocator.Get<JsonDatabase>();
-            levelDefinition = database.FindLevel(levelId);
+            // Versuche das Level zu finden
+            levelDefinition = database.FindLevel(targetLevelId);
+
+            // Fallback auf erstes verfügbares Level
+            if (levelDefinition == null && database.Levels != null && database.Levels.Count > 0)
+            {
+                levelDefinition = database.Levels[0];
+                targetLevelId = levelDefinition.id;
+                UnityEngine.Debug.LogWarning($"LevelController: Level '{levelId}' not found. Using first available level: {targetLevelId}");
+
+                // Speichere das korrigierte Level
+                progress.lastSelectedLevelId = targetLevelId;
+                if (!progress.unlockedLevelIds.Contains(targetLevelId))
+                {
+                    progress.unlockedLevelIds.Add(targetLevelId);
+                }
+                saveManager.SaveProgress(progress);
+            }
+
             if (levelDefinition == null)
             {
-                UnityEngine.Debug.LogError($"LevelController: Level '{levelId}' not found in database. Cannot start level.");
-                enabled = false;
-                return;
+                // Erstelle ein minimales Fallback-Level für generierte Szenen
+                UnityEngine.Debug.LogWarning($"LevelController: No levels in database. Creating fallback level definition.");
+                levelDefinition = CreateFallbackLevelDefinition();
             }
+
+            levelId = targetLevelId;
 
             globalRules = database.GlobalRules;
 
@@ -651,6 +682,60 @@ namespace TowerConquest.Gameplay
 
             string heroId = levelDefinition.player_rules.hero_pool[0];
             return string.IsNullOrWhiteSpace(heroId) ? "hero_legatus" : heroId;
+        }
+
+        private LevelDefinition CreateFallbackLevelDefinition()
+        {
+            return new LevelDefinition
+            {
+                id = "generated_level",
+                display_name = "Generated Level",
+                region_id = "region_generated",
+                recommended_power = 1,
+                estimated_duration_seconds = 180,
+                win_condition = new LevelDefinition.ConditionDto { type = "destroy_base" },
+                lose_condition = new LevelDefinition.ConditionDto { type = "all_waves_failed" },
+                @base = new LevelDefinition.BaseDto
+                {
+                    id = "base_generated",
+                    hp = 1000,
+                    armor = 0.1f,
+                    position = new LevelDefinition.PositionDto { x = 0, y = 0, z = 0 }
+                },
+                spawn_points = new[]
+                {
+                    new LevelDefinition.SpawnPointDto
+                    {
+                        id = "sp_generated",
+                        position = new LevelDefinition.PositionDto { x = -10, y = 0, z = 0 }
+                    }
+                },
+                paths = new[]
+                {
+                    new LevelDefinition.PathDto
+                    {
+                        id = "path_generated",
+                        from_spawn_id = "sp_generated",
+                        to_base_id = "base_generated",
+                        waypoints = new[]
+                        {
+                            new LevelDefinition.PositionDto { x = -8, y = 0, z = 0 },
+                            new LevelDefinition.PositionDto { x = -4, y = 0, z = 0 },
+                            new LevelDefinition.PositionDto { x = 0, y = 0, z = 0 }
+                        }
+                    }
+                },
+                player_rules = new LevelDefinition.PlayerRulesDto
+                {
+                    max_waves = 5,
+                    hero_pool = new[] { "hero_legatus" },
+                    starting_deck = new LevelDefinition.StartingDeckDto
+                    {
+                        unit_cards = new[] { "unit_tank_legionary", "unit_swarm_auxilia" },
+                        spell_cards = new[] { "spell_fire_pot" }
+                    }
+                }
+            };
         }
     }
 }

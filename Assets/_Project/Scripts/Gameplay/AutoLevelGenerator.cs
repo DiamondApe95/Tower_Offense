@@ -221,6 +221,7 @@ public class AutoLevelGenerator : MonoBehaviour
     public string pathLayerName = "Path";
     public string blockedLayerName = "Block";
     public string enemyLayerName = "Enemy";
+    public string towerLayerName = "Tower";
 
     [Header("Auto Setup Toggles")]
     public bool autoCreateEnemySpawners = true;
@@ -272,6 +273,7 @@ public class AutoLevelGenerator : MonoBehaviour
         EnsureProjectLayer(pathLayerName);
         EnsureProjectLayer(blockedLayerName);
         EnsureProjectLayer(enemyLayerName);
+        EnsureProjectLayer(towerLayerName);
 
         // 2) Auto-load prefabs from Assets/Prefab
         AutoLoadPrefabsEditorOnly();
@@ -457,11 +459,29 @@ public class AutoLevelGenerator : MonoBehaviour
         if (bm.towerPrefab == null && towerPrefab != null)
             bm.towerPrefab = towerPrefab;
 
+        // Füge towerPrefab zu availableTowerPrefabs hinzu
+        if (towerPrefab != null && !bm.availableTowerPrefabs.Contains(towerPrefab))
+        {
+            bm.availableTowerPrefabs.Add(towerPrefab);
+        }
+
         int buildLayer = LayerMask.NameToLayer(buildLayerName);
         if (buildLayer >= 0)
+        {
             bm.buildTileMask = 1 << buildLayer;
+            Debug.Log($"AutoLevelGenerator: BuildManager.buildTileMask set to layer '{buildLayerName}' ({buildLayer})");
+        }
         else
+        {
             Debug.LogWarning($"AutoLevelGenerator: Layer '{buildLayerName}' not found. BuildManager.buildTileMask not set.");
+        }
+
+        int towerLayer = LayerMask.NameToLayer(towerLayerName);
+        if (towerLayer >= 0)
+        {
+            bm.towerMask = 1 << towerLayer;
+            Debug.Log($"AutoLevelGenerator: BuildManager.towerMask set to layer '{towerLayerName}' ({towerLayer})");
+        }
     }
 
     // =========================================================
@@ -1313,13 +1333,48 @@ public class AutoLevelGenerator : MonoBehaviour
         generatedHUD.speedButton = speedBtn.GetComponent<Button>();
         generatedHUD.speedText = speedBtn.GetComponentInChildren<Text>();
 
-        // === START WAVE BUTTON (unten rechts) ===
-        var startBtn = CreateUIButton("StartWaveButton", hudGO.transform, "START WAVE 1",
-            new Vector2(1, 0), new Vector2(1, 0),
-            new Vector2(-170, 100), new Vector2(150, 60),
-            new Color(0.2f, 0.6f, 0.2f, 1f));
-        generatedHUD.startWaveButton = startBtn.GetComponent<Button>();
-        generatedHUD.startWaveButtonText = startBtn.GetComponentInChildren<Text>();
+        // === START WAVE BUTTON (unten rechts) - sichtbar und klickbar ===
+        var startBtnGO = new GameObject("StartWaveButton");
+        startBtnGO.transform.SetParent(hudGO.transform, false);
+
+        var startBtnRect = startBtnGO.AddComponent<RectTransform>();
+        startBtnRect.anchorMin = new Vector2(1, 0);
+        startBtnRect.anchorMax = new Vector2(1, 0);
+        startBtnRect.pivot = new Vector2(1, 0);
+        startBtnRect.anchoredPosition = new Vector2(-20, 130);
+        startBtnRect.sizeDelta = new Vector2(200, 60);
+
+        var startBtnImage = startBtnGO.AddComponent<Image>();
+        startBtnImage.color = new Color(0.2f, 0.6f, 0.2f, 1f);
+        startBtnImage.raycastTarget = true;
+
+        var startButton = startBtnGO.AddComponent<Button>();
+        startButton.targetGraphic = startBtnImage;
+        var btnColors = startButton.colors;
+        btnColors.normalColor = new Color(0.2f, 0.6f, 0.2f, 1f);
+        btnColors.highlightedColor = new Color(0.3f, 0.7f, 0.3f, 1f);
+        btnColors.pressedColor = new Color(0.15f, 0.5f, 0.15f, 1f);
+        startButton.colors = btnColors;
+
+        // Text für Button
+        var startBtnTextGO = new GameObject("Text");
+        startBtnTextGO.transform.SetParent(startBtnGO.transform, false);
+        var startBtnTextRect = startBtnTextGO.AddComponent<RectTransform>();
+        startBtnTextRect.anchorMin = Vector2.zero;
+        startBtnTextRect.anchorMax = Vector2.one;
+        startBtnTextRect.offsetMin = Vector2.zero;
+        startBtnTextRect.offsetMax = Vector2.zero;
+
+        var startBtnText = startBtnTextGO.AddComponent<Text>();
+        startBtnText.text = "START WAVE 1";
+        startBtnText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        startBtnText.fontSize = 22;
+        startBtnText.fontStyle = FontStyle.Bold;
+        startBtnText.color = Color.white;
+        startBtnText.alignment = TextAnchor.MiddleCenter;
+
+        generatedHUD.startWaveButton = startButton;
+        generatedHUD.startWaveButtonText = startBtnText;
 
         // === BASE HP TEXT (oben rechts neben Speed) ===
         var baseHpText = CreateUIText("BaseHpText", topBar.transform, "Base HP: 100",
@@ -1586,7 +1641,22 @@ public class AutoLevelGenerator : MonoBehaviour
         mainCam.nearClipPlane = 0.3f;
         mainCam.farClipPlane = 500f;
 
-        Debug.Log($"AutoLevelGenerator: Camera positioned for {width}x{height} level.");
+        // CameraController hinzufügen für Bewegung und Zoom
+        CameraController camController = mainCam.GetComponent<CameraController>();
+        if (camController == null)
+        {
+            camController = mainCam.gameObject.AddComponent<CameraController>();
+        }
+
+        // Kamera-Bewegungsgrenzen basierend auf Level-Größe setzen
+        camController.minX = -levelWidth * 0.6f;
+        camController.maxX = levelWidth * 0.6f;
+        camController.minZ = -levelHeight * 0.6f;
+        camController.maxZ = levelHeight * 0.6f;
+        camController.minHeight = 5f;
+        camController.maxHeight = cameraHeight * 1.5f;
+
+        Debug.Log($"AutoLevelGenerator: Camera positioned and CameraController configured for {width}x{height} level.");
     }
 
     // =========================================================
@@ -1625,7 +1695,36 @@ public class AutoLevelGenerator : MonoBehaviour
         }
         lc.levelSpawner = spawner;
 
-        Debug.Log("AutoLevelGenerator: LevelController fully configured.");
+        // Setze Level-ID auf erstes verfügbares Level aus der Datenbank
+        // oder auf "generated_level" wenn keine Datenbank vorhanden
+        lc.levelId = "lvl_01_etruria_outpost";
+
+        // Welle automatisch starten aktivieren für besseres Testing
+        lc.autoStartFirstWave = true;
+        lc.autoStartDelay = 3f;
+
+        // EnemySpawner-Referenzen auf LevelController setzen
+        var enemySpawners = FindObjectsByType<EnemySpawner>(FindObjectsSortMode.None);
+        foreach (var es in enemySpawners)
+        {
+            if (es != null)
+            {
+                es.levelController = lc;
+            }
+        }
+
+        Debug.Log($"AutoLevelGenerator: LevelController fully configured with {enemySpawners.Length} EnemySpawners.");
+
+        // DefenseAutoBuildController für Defense-Modus hinzufügen
+        DefenseAutoBuildController autoBuild = lc.GetComponent<DefenseAutoBuildController>();
+        if (autoBuild == null)
+        {
+            autoBuild = lc.gameObject.AddComponent<DefenseAutoBuildController>();
+        }
+        autoBuild.buildManager = FindFirstObjectByType<BuildManager>();
+        autoBuild.levelController = lc;
+
+        Debug.Log("AutoLevelGenerator: DefenseAutoBuildController added.");
     }
 
     // =========================================================

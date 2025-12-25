@@ -60,6 +60,40 @@ public class BuildManager : MonoBehaviour
         {
             availableTowerPrefabs.Add(towerPrefab);
         }
+
+        // Auto-Setup Layer Masks wenn nicht gesetzt
+        AutoSetupLayerMasks();
+    }
+
+    private void AutoSetupLayerMasks()
+    {
+        // BuildTile Layer automatisch finden
+        if (buildTileMask == 0)
+        {
+            int buildLayer = LayerMask.NameToLayer("BuildTile");
+            if (buildLayer >= 0)
+            {
+                buildTileMask = 1 << buildLayer;
+                Debug.Log($"BuildManager: Auto-set buildTileMask to layer 'BuildTile' ({buildLayer})");
+            }
+            else
+            {
+                // Fallback: verwende Default layer
+                buildTileMask = 1; // Default layer
+                Debug.LogWarning("BuildManager: 'BuildTile' layer not found. Using Default layer.");
+            }
+        }
+
+        // Tower Layer automatisch finden
+        if (towerMask == 0)
+        {
+            int towerLayer = LayerMask.NameToLayer("Tower");
+            if (towerLayer >= 0)
+            {
+                towerMask = 1 << towerLayer;
+                Debug.Log($"BuildManager: Auto-set towerMask to layer 'Tower' ({towerLayer})");
+            }
+        }
     }
 
     private void Update()
