@@ -18,7 +18,7 @@ namespace TowerConquest.Combat
         // Events
         public event Action<HealthComponent> OnDied;
         public event Action OnDeath;
-        public event Action<float> OnDamaged;
+        public event Action<float, string, GameObject> OnDamaged;
         public event Action<float> OnHealed;
 
         public void Initialize(float hp)
@@ -33,7 +33,7 @@ namespace TowerConquest.Combat
             armor = Mathf.Clamp01(armorValue);
         }
 
-        public void ApplyDamage(float dmg)
+        public void TakeDamage(float dmg, string damageType, GameObject source)
         {
             if (currentHp <= 0f)
             {
@@ -43,7 +43,7 @@ namespace TowerConquest.Combat
             float mitigated = Mathf.Max(0f, dmg * (1f - armor));
             currentHp -= mitigated;
 
-            OnDamaged?.Invoke(mitigated);
+            OnDamaged?.Invoke(mitigated, damageType, source);
 
             if (currentHp <= 0f)
             {
@@ -53,6 +53,11 @@ namespace TowerConquest.Combat
                 OnDeath?.Invoke();
                 Destroy(gameObject);
             }
+        }
+
+        public void ApplyDamage(float dmg)
+        {
+            TakeDamage(dmg, "physical", null);
         }
 
         public void Heal(float amount)

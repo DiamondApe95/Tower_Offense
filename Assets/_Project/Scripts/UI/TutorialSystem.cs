@@ -138,7 +138,7 @@ namespace TowerConquest.UI
         {
             if (tutorialSteps.Count == 0)
             {
-                Debug.LogWarning("TutorialSystem: No tutorial steps defined.");
+                UnityEngine.Debug.LogWarning("TutorialSystem: No tutorial steps defined.");
                 return;
             }
 

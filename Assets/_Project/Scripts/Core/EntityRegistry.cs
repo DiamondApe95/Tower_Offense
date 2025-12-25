@@ -50,6 +50,8 @@ namespace TowerConquest.Core
             return cachedUnits;
         }
 
+        public UnitController[] GetUnits() => GetAllUnits();
+
         public bool HasActiveUnits() => units.Count > 0;
 
         // === TOWERS ===
@@ -81,6 +83,8 @@ namespace TowerConquest.Core
             }
             return cachedTowers;
         }
+
+        public TowerController[] GetTowers() => GetAllTowers();
 
         // === HEROES ===
         public void RegisterHero(HeroController hero)

@@ -408,7 +408,7 @@ public class AutoLevelGenerator : MonoBehaviour
             return;
         }
 
-        LevelController lc = FindObjectOfType<LevelController>();
+        LevelController lc = FindFirstObjectByType<LevelController>();
 
         for (int i = 0; i < spawnPoints.Count; i++)
         {
@@ -1584,7 +1584,7 @@ public class AutoLevelGenerator : MonoBehaviour
     private void SetupLevelController()
     {
         // Suche oder erstelle LevelController
-        LevelController lc = FindObjectOfType<LevelController>();
+        LevelController lc = FindFirstObjectByType<LevelController>();
         if (lc == null)
         {
             var lcGO = new GameObject("LevelController");
