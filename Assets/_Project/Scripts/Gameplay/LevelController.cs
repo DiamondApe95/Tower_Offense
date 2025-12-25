@@ -30,8 +30,10 @@ namespace TowerConquest.Gameplay
         public BaseController BaseController { get; private set; }
 
         public float BaseHp => BaseController != null ? BaseController.currentHp : 0f;
-        public int ActiveUnits => FindObjectsByType<UnitController>(FindObjectsSortMode.None).Length;
+        public int ActiveUnits => GetActiveUnitCount();
         public float EstimatedDps => CalculateEstimatedDps();
+
+        private EntityRegistry entityRegistry;
 
         private LevelDefinition levelDefinition;
         private GlobalRulesDto globalRules;
@@ -51,6 +53,9 @@ namespace TowerConquest.Gameplay
             {
                 UnityEngine.Debug.LogError("LevelController: ResultScreenView reference is missing! Please assign it in the inspector.");
             }
+
+            // EntityRegistry für Performance-optimierte Entity-Abfragen
+            ServiceLocator.TryGet(out entityRegistry);
 
             SaveManager saveManager = ServiceLocator.Get<SaveManager>();
             PlayerProgress progress = saveManager.GetOrCreateProgress();
@@ -253,7 +258,20 @@ namespace TowerConquest.Gameplay
 
         public bool HasActiveUnits()
         {
+            if (entityRegistry != null)
+            {
+                return entityRegistry.HasActiveUnits();
+            }
             return FindObjectsByType<UnitController>(FindObjectsSortMode.None).Length > 0;
+        }
+
+        private int GetActiveUnitCount()
+        {
+            if (entityRegistry != null)
+            {
+                return entityRegistry.UnitCount;
+            }
+            return FindObjectsByType<UnitController>(FindObjectsSortMode.None).Length;
         }
 
         public bool IsBaseDestroyed()
@@ -489,6 +507,11 @@ namespace TowerConquest.Gameplay
 
         private float CalculateEstimatedDps()
         {
+            if (entityRegistry != null)
+            {
+                return entityRegistry.CalculateTotalTowerDps();
+            }
+
             TowerController[] towers = FindObjectsByType<TowerController>(FindObjectsSortMode.None);
             float sum = 0f;
             foreach (TowerController tower in towers)

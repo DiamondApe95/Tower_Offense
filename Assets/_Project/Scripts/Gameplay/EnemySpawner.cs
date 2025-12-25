@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using TowerConquest.Gameplay;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class EnemySpawner : MonoBehaviour
     [Header("Wave Settings")]
     public int enemiesPerWave = 10;
     public float spawnInterval = 0.8f;
+
+    [Header("Level Integration")]
+    public LevelController levelController;
 
     private Transform[] cachedWaypoints;
 
@@ -34,10 +38,17 @@ public class EnemySpawner : MonoBehaviour
             cachedWaypoints[i] = pathWaypointsRoot.GetChild(i);
     }
 
-    // Zum Test: starte Wave automatisch
+    [Header("Auto Start")]
+    [Tooltip("Wenn aktiviert, startet die Wave automatisch beim Spielstart (nur für Testzwecke)")]
+    public bool autoStartWave = false;
+
     private void Start()
     {
-        StartWave();
+        // Nur für Testzwecke - normalerweise wird StartWave() vom LevelController aufgerufen
+        if (autoStartWave)
+        {
+            StartWave();
+        }
     }
 
     public void StartWave()

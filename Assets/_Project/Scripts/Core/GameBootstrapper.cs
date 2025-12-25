@@ -27,6 +27,7 @@ namespace TowerConquest.Core
             ServiceLocator.Register(new EventBus());
             ServiceLocator.Register(new GameTime());
             ServiceLocator.Register(new SaveManager());
+            ServiceLocator.Register(new EntityRegistry());
 
             var db = new JsonDatabase();
             db.LoadAll();
