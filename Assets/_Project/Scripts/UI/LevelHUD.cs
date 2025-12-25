@@ -10,20 +10,34 @@ namespace TowerConquest.UI
 {
     public class LevelHUD : MonoBehaviour
     {
+        [Header("Wave Controls")]
         public Button startWaveButton;
+        public Text startWaveButtonText;
         public Button speedButton;
+        public Text speedText;
+
+        [Header("Info Display")]
+        public Text waveText;
+        public Text energyText;
+        public Text autoStartTimerText;
+        public Text baseHpText;
+
+        [Header("Card System")]
         public Transform handContainer;
         public CardView cardViewPrefab;
-        public Text waveText;
-        public Text speedText;
-        public Text energyText;
+
+        [Header("Visual Settings")]
+        public Color startButtonActiveColor = new Color(0.2f, 0.6f, 0.2f);
+        public Color startButtonDisabledColor = new Color(0.4f, 0.4f, 0.4f);
+        public Color autoStartColor = new Color(0.6f, 0.5f, 0.2f);
 
         private LevelController level;
         private readonly CardHandView handView = new CardHandView();
+        private Image startWaveButtonImage;
 
-        public void Initialize(LevelController level)
+        public void Initialize(LevelController controller)
         {
-            this.level = level;
+            level = controller;
             handView.handContainer = handContainer;
             handView.cardViewPrefab = cardViewPrefab;
 
@@ -31,6 +45,13 @@ namespace TowerConquest.UI
             {
                 startWaveButton.onClick.RemoveAllListeners();
                 startWaveButton.onClick.AddListener(OnStartWaveClicked);
+                startWaveButtonImage = startWaveButton.GetComponent<Image>();
+
+                // Finde Button-Text falls nicht zugewiesen
+                if (startWaveButtonText == null)
+                {
+                    startWaveButtonText = startWaveButton.GetComponentInChildren<Text>();
+                }
             }
 
             if (speedButton != null)
@@ -42,6 +63,15 @@ namespace TowerConquest.UI
             Refresh();
         }
 
+        private void Update()
+        {
+            // Aktualisiere Autostart-Timer in Echtzeit
+            if (level != null && level.IsAutoStartPending)
+            {
+                UpdateAutoStartDisplay();
+            }
+        }
+
         public void Refresh()
         {
             if (level == null || level.Run == null)
@@ -49,31 +79,137 @@ namespace TowerConquest.UI
                 return;
             }
 
+            RefreshWaveInfo();
+            RefreshSpeedDisplay();
+            RefreshEnergyDisplay();
+            RefreshBaseHpDisplay();
+            RefreshStartWaveButton();
+            RefreshAutoStartDisplay();
+            RefreshHandCards();
+        }
+
+        private void RefreshWaveInfo()
+        {
             if (waveText != null)
             {
-                int currentWave = Mathf.Clamp(level.Run.waveIndex + 1, 1, level.Run.maxWaves);
-                waveText.text = $"Wave {currentWave}/{level.Run.maxWaves}";
+                int displayWave = level.Run.isPlanning
+                    ? Mathf.Clamp(level.Run.waveIndex + 1, 1, level.Run.maxWaves)
+                    : level.Run.waveIndex;
+                waveText.text = $"Wave {displayWave}/{level.Run.maxWaves}";
             }
+        }
 
+        private void RefreshSpeedDisplay()
+        {
             if (speedText != null)
             {
                 float speedValue = level.speedController != null ? level.speedController.CurrentSpeed : 1f;
                 speedText.text = $"{speedValue:0.#}x";
             }
+        }
 
+        private void RefreshEnergyDisplay()
+        {
             if (energyText != null)
             {
                 energyText.text = $"Energy {level.Run.energy}/{level.Run.maxEnergyPerWave}";
             }
+        }
 
+        private void RefreshBaseHpDisplay()
+        {
+            if (baseHpText != null)
+            {
+                float hp = level.BaseHp;
+                baseHpText.text = $"Base HP: {hp:F0}";
+            }
+        }
+
+        private void RefreshStartWaveButton()
+        {
+            if (startWaveButton == null) return;
+
+            bool canStart = level.Run.isPlanning && !level.Run.isFinished;
+            startWaveButton.interactable = canStart;
+
+            // Button-Text aktualisieren
+            if (startWaveButtonText != null)
+            {
+                if (level.Run.isFinished)
+                {
+                    startWaveButtonText.text = level.Run.isVictory ? "VICTORY" : "DEFEAT";
+                }
+                else if (level.Run.isAttacking)
+                {
+                    startWaveButtonText.text = "WAVE ACTIVE";
+                }
+                else if (level.IsAutoStartPending)
+                {
+                    float remaining = level.AutoStartTimeRemaining;
+                    startWaveButtonText.text = $"AUTO ({remaining:F1}s)";
+                }
+                else
+                {
+                    int nextWave = level.Run.waveIndex + 1;
+                    startWaveButtonText.text = $"START WAVE {nextWave}";
+                }
+            }
+
+            // Button-Farbe aktualisieren
+            if (startWaveButtonImage != null)
+            {
+                if (level.IsAutoStartPending)
+                {
+                    startWaveButtonImage.color = autoStartColor;
+                }
+                else if (canStart)
+                {
+                    startWaveButtonImage.color = startButtonActiveColor;
+                }
+                else
+                {
+                    startWaveButtonImage.color = startButtonDisabledColor;
+                }
+            }
+        }
+
+        private void RefreshAutoStartDisplay()
+        {
+            if (autoStartTimerText == null) return;
+
+            if (level.IsAutoStartPending)
+            {
+                autoStartTimerText.gameObject.SetActive(true);
+                float remaining = level.AutoStartTimeRemaining;
+                autoStartTimerText.text = $"Auto-Start in {remaining:F1}s";
+            }
+            else
+            {
+                autoStartTimerText.gameObject.SetActive(false);
+            }
+        }
+
+        private void UpdateAutoStartDisplay()
+        {
+            RefreshStartWaveButton();
+            RefreshAutoStartDisplay();
+        }
+
+        private void RefreshHandCards()
+        {
             List<CardViewModel> handCards = BuildHandModels();
             handView.Render(handCards, OnCardClicked);
         }
 
         private void OnStartWaveClicked()
         {
-            if (level == null)
+            if (level == null) return;
+
+            // Wenn Autostart aktiv, abbrechen statt starten
+            if (level.IsAutoStartPending)
             {
+                level.CancelAutoStart();
+                Refresh();
                 return;
             }
 
@@ -83,10 +219,7 @@ namespace TowerConquest.UI
 
         private void OnSpeedClicked()
         {
-            if (level == null)
-            {
-                return;
-            }
+            if (level == null) return;
 
             level.ToggleSpeed();
             Refresh();
@@ -94,10 +227,7 @@ namespace TowerConquest.UI
 
         private void OnCardClicked(string cardId)
         {
-            if (level == null)
-            {
-                return;
-            }
+            if (level == null) return;
 
             level.PlayCard(cardId);
             Refresh();
@@ -106,6 +236,12 @@ namespace TowerConquest.UI
         private List<CardViewModel> BuildHandModels()
         {
             var models = new List<CardViewModel>();
+
+            if (level?.hand == null && level?.Run?.handCardIds == null)
+            {
+                return models;
+            }
+
             List<string> handCards = level.hand != null ? level.hand.hand : level.Run.handCardIds;
             if (handCards == null)
             {
@@ -150,10 +286,11 @@ namespace TowerConquest.UI
 
             return models;
         }
+
+        public void ShowMessage(string message, float duration = 2f)
+        {
+            Debug.Log($"HUD Message: {message}");
+            // Hier könnte ein Toast-System implementiert werden
+        }
     }
 }
-
-// Setup-Anleitung:
-// 1. Canvas erstellen und Buttons/Text/HandContainer hinzufügen.
-// 2. CardView Prefab mit Button + Label-Text anlegen.
-// 3. LevelHUD-Komponente hinzufügen und Referenzen (Buttons, Texts, HandContainer, CardView Prefab) setzen.

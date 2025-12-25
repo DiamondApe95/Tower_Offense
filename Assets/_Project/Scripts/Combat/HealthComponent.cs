@@ -10,7 +10,16 @@ namespace TowerConquest.Combat
         [Range(0f, 1f)]
         public float armor;
 
+        public float CurrentHp => currentHp;
+        public float MaxHp => maxHp;
+        public float HealthPercent => maxHp > 0f ? currentHp / maxHp : 0f;
+        public bool IsDead => currentHp <= 0f;
+
+        // Events
         public event Action<HealthComponent> OnDied;
+        public event Action OnDeath;
+        public event Action<float> OnDamaged;
+        public event Action<float> OnHealed;
 
         public void Initialize(float hp)
         {
@@ -33,12 +42,15 @@ namespace TowerConquest.Combat
 
             float mitigated = Mathf.Max(0f, dmg * (1f - armor));
             currentHp -= mitigated;
-            UnityEngine.Debug.Log($"{name} took {mitigated:0.##} damage (raw {dmg:0.##}). HP: {currentHp:0.##}/{maxHp:0.##}");
+
+            OnDamaged?.Invoke(mitigated);
 
             if (currentHp <= 0f)
             {
+                currentHp = 0f;
                 UnityEngine.Debug.Log($"{name} died.");
                 OnDied?.Invoke(this);
+                OnDeath?.Invoke();
                 Destroy(gameObject);
             }
         }
@@ -50,14 +62,19 @@ namespace TowerConquest.Combat
                 return;
             }
 
+            float healedAmount = Mathf.Min(maxHp - currentHp, amount);
             currentHp = Mathf.Min(maxHp, currentHp + amount);
-            UnityEngine.Debug.Log($"{name} healed {amount}. HP: {currentHp}/{maxHp}");
+            OnHealed?.Invoke(healedAmount);
         }
 
         public void ApplyArmorModifier(float amount)
         {
             armor = Mathf.Clamp01(armor + amount);
-            UnityEngine.Debug.Log($"{name} armor modified by {amount:0.##}. Armor now {armor:0.##}");
+        }
+
+        public void ResetHealth()
+        {
+            currentHp = maxHp;
         }
     }
 }

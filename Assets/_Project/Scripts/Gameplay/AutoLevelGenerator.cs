@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem.UI;
 using TowerConquest.Gameplay;
 using TowerConquest.UI;
 
@@ -24,10 +26,22 @@ public class AutoLevelGenerator : MonoBehaviour
     [Tooltip("Erstellt Level + GUI + Controller + Kamera - alles in einem Klick!")]
     public bool autoSetupOnPlay = false;
 
+    [Header("Cleanup Settings")]
+    [Tooltip("Automatisch alle vorherigen generierten Objekte entfernen")]
+    public bool autoCleanupPrevious = true;
+    [Tooltip("Auch BuildManager und LevelController entfernen wenn sie nicht auf diesem Generator sind")]
+    public bool cleanupManagers = true;
+
     [ContextMenu("★ Complete Scene Setup (One-Click)")]
     public void CompleteSceneSetup()
     {
         Debug.Log("AutoLevelGenerator: Starting Complete Scene Setup...");
+
+        // 0. Cleanup vorheriger Level-Objekte
+        if (autoCleanupPrevious)
+        {
+            CleanupPreviousLevel();
+        }
 
         // 1. Generate Level Geometry
         Generate();
@@ -49,6 +63,95 @@ public class AutoLevelGenerator : MonoBehaviour
 #endif
 
         Debug.Log("AutoLevelGenerator: ★ Complete Scene Setup finished! Scene is ready to play.");
+    }
+
+    [ContextMenu("Cleanup Previous Level")]
+    public void CleanupPreviousLevel()
+    {
+        Debug.Log("AutoLevelGenerator: Cleaning up previous level objects...");
+
+        int cleanedCount = 0;
+
+        // Entferne alte generierte Objekte
+        string[] objectsToClean = new[]
+        {
+            "GeneratedCanvas",
+            "EventSystem",
+            "BuildManager",
+            "UnitPool"
+        };
+
+        foreach (string objName in objectsToClean)
+        {
+            var obj = GameObject.Find(objName);
+            if (obj != null && obj != gameObject)
+            {
+                DestroyImmediate(obj);
+                cleanedCount++;
+            }
+        }
+
+        // Entferne alte Spawner, Controller, etc. wenn nicht auf diesem Objekt
+        if (cleanupManagers)
+        {
+            var oldLevelControllers = FindObjectsByType<LevelController>(FindObjectsSortMode.None);
+            foreach (var lc in oldLevelControllers)
+            {
+                if (lc != null && lc.gameObject != gameObject)
+                {
+                    DestroyImmediate(lc.gameObject);
+                    cleanedCount++;
+                }
+            }
+
+            var oldBuildManagers = FindObjectsByType<BuildManager>(FindObjectsSortMode.None);
+            foreach (var bm in oldBuildManagers)
+            {
+                if (bm != null && bm.gameObject != gameObject)
+                {
+                    DestroyImmediate(bm.gameObject);
+                    cleanedCount++;
+                }
+            }
+        }
+
+        // Entferne alle alten Spawner (die nicht an SpawnPoints hängen)
+        var oldSpawners = FindObjectsByType<EnemySpawner>(FindObjectsSortMode.None);
+        foreach (var spawner in oldSpawners)
+        {
+            if (spawner != null && !spawner.name.Contains("SpawnPoint"))
+            {
+                DestroyImmediate(spawner.gameObject);
+                cleanedCount++;
+            }
+        }
+
+        // Entferne alle Units und Enemies
+        var oldEnemies = FindObjectsByType<EnemyMover>(FindObjectsSortMode.None);
+        foreach (var enemy in oldEnemies)
+        {
+            if (enemy != null)
+            {
+                DestroyImmediate(enemy.gameObject);
+                cleanedCount++;
+            }
+        }
+
+        // Entferne alle alten generierten Marker
+        var markers = FindObjectsByType<Transform>(FindObjectsSortMode.None);
+        foreach (var marker in markers)
+        {
+            if (marker != null && (marker.name.Contains("GoalPoint_") || marker.name.Contains("SpawnPoint_")))
+            {
+                if (marker.parent != transform)
+                {
+                    DestroyImmediate(marker.gameObject);
+                    cleanedCount++;
+                }
+            }
+        }
+
+        Debug.Log($"AutoLevelGenerator: Cleaned up {cleanedCount} previous objects.");
     }
 
     [Header("Generate Level Only")]
@@ -1132,15 +1235,32 @@ public class AutoLevelGenerator : MonoBehaviour
         // Graphic Raycaster für Interaktion
         canvasGO.AddComponent<GraphicRaycaster>();
 
-        // EventSystem erstellen falls nicht vorhanden
-        if (FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
+        // EventSystem mit Input System UI Input Module erstellen falls nicht vorhanden
+        var existingEventSystem = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
+        if (existingEventSystem == null)
         {
             var eventSystemGO = new GameObject("EventSystem");
             eventSystemGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
-            eventSystemGO.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            // Verwende InputSystemUIInputModule statt StandaloneInputModule für das neue Input System
+            eventSystemGO.AddComponent<InputSystemUIInputModule>();
+        }
+        else
+        {
+            // Prüfe ob das existierende EventSystem das richtige Input Module hat
+            var standaloneModule = existingEventSystem.GetComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            if (standaloneModule != null)
+            {
+                // Ersetze StandaloneInputModule durch InputSystemUIInputModule
+                DestroyImmediate(standaloneModule);
+                if (existingEventSystem.GetComponent<InputSystemUIInputModule>() == null)
+                {
+                    existingEventSystem.gameObject.AddComponent<InputSystemUIInputModule>();
+                }
+                Debug.Log("AutoLevelGenerator: Replaced StandaloneInputModule with InputSystemUIInputModule.");
+            }
         }
 
-        Debug.Log("AutoLevelGenerator: Canvas created.");
+        Debug.Log("AutoLevelGenerator: Canvas created with Input System support.");
     }
 
     private void CreateLevelHUD()
@@ -1185,11 +1305,18 @@ public class AutoLevelGenerator : MonoBehaviour
         generatedHUD.speedText = speedBtn.GetComponentInChildren<Text>();
 
         // === START WAVE BUTTON (unten rechts) ===
-        var startBtn = CreateUIButton("StartWaveButton", hudGO.transform, "START WAVE",
+        var startBtn = CreateUIButton("StartWaveButton", hudGO.transform, "START WAVE 1",
             new Vector2(1, 0), new Vector2(1, 0),
             new Vector2(-170, 100), new Vector2(150, 60),
             new Color(0.2f, 0.6f, 0.2f, 1f));
         generatedHUD.startWaveButton = startBtn.GetComponent<Button>();
+        generatedHUD.startWaveButtonText = startBtn.GetComponentInChildren<Text>();
+
+        // === BASE HP TEXT (oben rechts neben Speed) ===
+        var baseHpText = CreateUIText("BaseHpText", topBar.transform, "Base HP: 100",
+            new Vector2(1, 0.5f), new Vector2(1, 0.5f),
+            new Vector2(-250, 0), new Vector2(120, 40), 20);
+        generatedHUD.baseHpText = baseHpText;
 
         // === HAND CONTAINER (unten) ===
         var handContainer = CreateUIPanel("HandContainer", hudGO.transform,
