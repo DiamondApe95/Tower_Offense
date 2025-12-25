@@ -289,7 +289,7 @@ namespace TowerConquest.UI
 
         public void ShowMessage(string message, float duration = 2f)
         {
-            Debug.Log($"HUD Message: {message}");
+            UnityEngine.Debug.Log($"HUD Message: {message}");
             // Hier könnte ein Toast-System implementiert werden
         }
     }

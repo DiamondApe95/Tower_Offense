@@ -438,7 +438,7 @@ public class AutoLevelGenerator : MonoBehaviour
     // =========================================================
     private void CreateOrUpdateBuildManager()
     {
-        BuildManager bm = FindObjectOfType<BuildManager>();
+        BuildManager bm = FindFirstObjectByType<BuildManager>();
         if (bm == null)
         {
             GameObject go = new GameObject("BuildManager");
@@ -1236,7 +1236,7 @@ public class AutoLevelGenerator : MonoBehaviour
         canvasGO.AddComponent<GraphicRaycaster>();
 
         // EventSystem mit Input System UI Input Module erstellen falls nicht vorhanden
-        var existingEventSystem = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
+        var existingEventSystem = FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>();
         if (existingEventSystem == null)
         {
             var eventSystemGO = new GameObject("EventSystem");

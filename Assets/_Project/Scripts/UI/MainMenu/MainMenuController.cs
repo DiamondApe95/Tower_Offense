@@ -241,7 +241,7 @@ namespace TowerConquest.UI.MainMenu
             }
             else
             {
-                Debug.LogWarning("MainMenuController: No gameplay scene found to load.");
+                UnityEngine.Debug.LogWarning("MainMenuController: No gameplay scene found to load.");
             }
         }
 

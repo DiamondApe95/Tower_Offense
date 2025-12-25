@@ -17,7 +17,6 @@ namespace TowerConquest.Gameplay
         private readonly Dictionary<string, Queue<GameObject>> unitPools = new Dictionary<string, Queue<GameObject>>();
         private readonly Dictionary<string, GameObject> prefabCache = new Dictionary<string, GameObject>();
         private Transform poolParent;
-        private int defaultPoolSize = 10;
 
         // Statistics
         public int TotalSpawned { get; private set; }

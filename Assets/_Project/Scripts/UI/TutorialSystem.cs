@@ -246,7 +246,7 @@ namespace TowerConquest.UI
             GameObject target = GameObject.Find(targetName);
             if (target == null)
             {
-                Debug.LogWarning($"TutorialSystem: Target '{targetName}' not found.");
+                UnityEngine.Debug.LogWarning($"TutorialSystem: Target '{targetName}' not found.");
                 return;
             }
 
@@ -347,7 +347,7 @@ namespace TowerConquest.UI
             }
 
             OnTutorialCompleted?.Invoke();
-            Debug.Log("TutorialSystem: Tutorial completed.");
+            UnityEngine.Debug.Log("TutorialSystem: Tutorial completed.");
         }
 
         private void HideTutorial()

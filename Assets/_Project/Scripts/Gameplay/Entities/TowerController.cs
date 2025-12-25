@@ -7,6 +7,9 @@ namespace TowerConquest.Gameplay.Entities
 {
     public class TowerController : MonoBehaviour
     {
+        [Header("Tower Info")]
+        public string towerId = "tower_basic";
+
         [Header("Tower Stats")]
         public float range = 6f;
         public float damage = 20f;

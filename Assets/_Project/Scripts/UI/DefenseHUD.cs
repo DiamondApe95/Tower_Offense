@@ -58,7 +58,7 @@ namespace TowerConquest.UI
 
         private void Start()
         {
-            buildManager = FindObjectOfType<BuildManager>();
+            buildManager = FindFirstObjectByType<BuildManager>();
 
             if (buildManager != null)
             {
@@ -315,7 +315,7 @@ namespace TowerConquest.UI
         private void OnUpgradeClicked()
         {
             // TODO: Upgrade-System implementieren
-            Debug.Log("DefenseHUD: Upgrade clicked (not implemented)");
+            UnityEngine.Debug.Log("DefenseHUD: Upgrade clicked (not implemented)");
         }
 
         private void OnSellClicked()
@@ -329,7 +329,7 @@ namespace TowerConquest.UI
         private void OnStartWaveClicked()
         {
             // Trigger Wave Start
-            var levelController = FindObjectOfType<TowerConquest.Gameplay.LevelController>();
+            var levelController = FindFirstObjectByType<TowerConquest.Gameplay.LevelController>();
             if (levelController != null)
             {
                 levelController.StartWave();

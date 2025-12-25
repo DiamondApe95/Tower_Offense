@@ -434,7 +434,7 @@ namespace TowerConquest.Combat
                 var mover = target.GetComponent<UnitMover>();
                 if (mover == null) continue;
 
-                float progress = mover.pathProgress;
+                float progress = mover.Progress;
                 bool isBetter = first ? (progress > bestProgress) : (progress < bestProgress);
 
                 if (isBetter)

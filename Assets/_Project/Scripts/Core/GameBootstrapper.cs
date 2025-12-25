@@ -43,7 +43,7 @@ namespace TowerConquest.Core
 
         private void RegisterPrefabRegistry()
         {
-            PrefabRegistry registry = FindObjectOfType<PrefabRegistry>();
+            PrefabRegistry registry = FindFirstObjectByType<PrefabRegistry>();
             if (registry != null)
             {
                 ServiceLocator.Register(registry);

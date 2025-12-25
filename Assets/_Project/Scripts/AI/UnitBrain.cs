@@ -335,7 +335,7 @@ namespace TowerConquest.AI
 
                 if (showDebugInfo)
                 {
-                    Debug.Log($"UnitBrain: {name} attacks {CurrentTarget.name} for {damage} damage.");
+                    UnityEngine.Debug.Log($"UnitBrain: {name} attacks {CurrentTarget.name} for {damage} damage.");
                 }
             }
         }
