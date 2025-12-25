@@ -11,6 +11,22 @@ namespace TowerConquest.Gameplay.Entities
         public string UnitId { get; private set; }
         public float BaseDamage { get; private set; } = 50f;
 
+        private void OnEnable()
+        {
+            if (ServiceLocator.TryGet(out EntityRegistry registry))
+            {
+                registry.RegisterUnit(this);
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (ServiceLocator.TryGet(out EntityRegistry registry))
+            {
+                registry.UnregisterUnit(this);
+            }
+        }
+
         public void Initialize(string unitId, IReadOnlyList<Vector3> path, BaseController baseController)
         {
             UnitId = unitId;

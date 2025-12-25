@@ -1,4 +1,5 @@
 using TowerConquest.Combat;
+using TowerConquest.Core;
 using TowerConquest.Data;
 using UnityEngine;
 
@@ -16,10 +17,28 @@ namespace TowerConquest.Gameplay.Entities
         private float attackTimer;
         private UnitController currentTarget;
         private readonly EffectResolver effectResolver = new EffectResolver();
+        private EntityRegistry entityRegistry;
 
         private void Awake()
         {
             UpdateDpsCache();
+            ServiceLocator.TryGet(out entityRegistry);
+        }
+
+        private void OnEnable()
+        {
+            if (ServiceLocator.TryGet(out EntityRegistry registry))
+            {
+                registry.RegisterTower(this);
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (ServiceLocator.TryGet(out EntityRegistry registry))
+            {
+                registry.UnregisterTower(this);
+            }
         }
 
         private void Update()
@@ -53,7 +72,16 @@ namespace TowerConquest.Gameplay.Entities
 
         private void AcquireTarget()
         {
-            UnitController[] units = FindObjectsByType<UnitController>(FindObjectsSortMode.None);
+            UnitController[] units;
+            if (entityRegistry != null)
+            {
+                units = entityRegistry.GetAllUnits();
+            }
+            else
+            {
+                units = FindObjectsByType<UnitController>(FindObjectsSortMode.None);
+            }
+
             UnitController closest = null;
             float closestDistance = float.MaxValue;
 

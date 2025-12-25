@@ -2,21 +2,59 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
+using TowerConquest.Gameplay;
+using TowerConquest.UI;
 
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
 #endif
 
+/// <summary>
+/// AutoLevelGenerator: Generiert komplette spielbare Levels mit einem Klick.
+/// Erstellt Grid, Pfade, Spawner, GUI und alle notwendigen Komponenten.
+/// </summary>
 public class AutoLevelGenerator : MonoBehaviour
 {
     public enum Difficulty { Easy, Normal, Hard, Insane }
     public enum Complexity { Simple, Medium, Complex, Extreme }
 
-    [Header("Generate")]
+    [Header("=== ONE-CLICK COMPLETE SETUP ===")]
+    [Tooltip("Erstellt Level + GUI + Controller + Kamera - alles in einem Klick!")]
+    public bool autoSetupOnPlay = false;
+
+    [ContextMenu("★ Complete Scene Setup (One-Click)")]
+    public void CompleteSceneSetup()
+    {
+        Debug.Log("AutoLevelGenerator: Starting Complete Scene Setup...");
+
+        // 1. Generate Level Geometry
+        Generate();
+
+        // 2. Setup Camera
+        SetupCamera();
+
+        // 3. Create GUI (Canvas, HUD, ResultScreen)
+        CreateCompleteGUI();
+
+        // 4. Setup LevelController with all references
+        SetupLevelController();
+
+        // 5. Configure Lighting
+        SetupLighting();
+
+#if UNITY_EDITOR
+        EditorSceneManager.MarkSceneDirty(gameObject.scene);
+#endif
+
+        Debug.Log("AutoLevelGenerator: ★ Complete Scene Setup finished! Scene is ready to play.");
+    }
+
+    [Header("Generate Level Only")]
     public bool generateOnPlay = false;
 
-    [ContextMenu("Generate Now")]
+    [ContextMenu("Generate Level Only")]
     public void GenerateNow() => Generate();
 
     [Header("Prefabs (Auto-load in Editor from Assets/Prefab)")]
@@ -107,8 +145,14 @@ public class AutoLevelGenerator : MonoBehaviour
 
     private void Start()
     {
-        if (generateOnPlay)
+        if (autoSetupOnPlay)
+        {
+            CompleteSceneSetup();
+        }
+        else if (generateOnPlay)
+        {
             Generate();
+        }
     }
 
     [ContextMenu("Generate")]
@@ -1014,5 +1058,467 @@ public class AutoLevelGenerator : MonoBehaviour
 
         res.Add(path[^1]);
         return res;
+    }
+
+    // =========================================================
+    // GUI GENERATION: Complete UI Setup
+    // =========================================================
+
+    private Canvas generatedCanvas;
+    private LevelHUD generatedHUD;
+    private ResultScreenView generatedResultScreen;
+    private GameObject generatedCardViewPrefab;
+
+    /// <summary>
+    /// Erstellt die komplette GUI für das Level:
+    /// - Canvas mit EventSystem
+    /// - LevelHUD mit Buttons und Texten
+    /// - ResultScreen für Sieg/Niederlage
+    /// - CardView Template für Handkarten
+    /// </summary>
+    private void CreateCompleteGUI()
+    {
+        Debug.Log("AutoLevelGenerator: Creating Complete GUI...");
+
+        // Entferne alte GUI falls vorhanden
+        CleanupOldGUI();
+
+        // 1. Canvas erstellen
+        CreateCanvas();
+
+        // 2. LevelHUD erstellen
+        CreateLevelHUD();
+
+        // 3. ResultScreen erstellen
+        CreateResultScreen();
+
+        // 4. CardView Prefab erstellen (als Template im Container)
+        CreateCardViewTemplate();
+
+        Debug.Log("AutoLevelGenerator: GUI creation complete.");
+    }
+
+    private void CleanupOldGUI()
+    {
+        // Suche und entferne alte generierte GUI
+        var oldCanvas = GameObject.Find("GeneratedCanvas");
+        if (oldCanvas != null)
+            DestroyImmediate(oldCanvas);
+
+        var oldEventSystem = GameObject.Find("EventSystem");
+        if (oldEventSystem != null && oldEventSystem.GetComponent<UnityEngine.EventSystems.EventSystem>() != null)
+        {
+            // Nur entfernen wenn es keine anderen gibt
+            var allEventSystems = FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsSortMode.None);
+            if (allEventSystems.Length <= 1)
+                DestroyImmediate(oldEventSystem);
+        }
+    }
+
+    private void CreateCanvas()
+    {
+        // Canvas GameObject
+        var canvasGO = new GameObject("GeneratedCanvas");
+        generatedCanvas = canvasGO.AddComponent<Canvas>();
+        generatedCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        generatedCanvas.sortingOrder = 100;
+
+        // Canvas Scaler für responsive UI
+        var scaler = canvasGO.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.matchWidthOrHeight = 0.5f;
+
+        // Graphic Raycaster für Interaktion
+        canvasGO.AddComponent<GraphicRaycaster>();
+
+        // EventSystem erstellen falls nicht vorhanden
+        if (FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
+        {
+            var eventSystemGO = new GameObject("EventSystem");
+            eventSystemGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            eventSystemGO.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+        }
+
+        Debug.Log("AutoLevelGenerator: Canvas created.");
+    }
+
+    private void CreateLevelHUD()
+    {
+        if (generatedCanvas == null) return;
+
+        // HUD Container
+        var hudGO = new GameObject("LevelHUD");
+        hudGO.transform.SetParent(generatedCanvas.transform, false);
+        generatedHUD = hudGO.AddComponent<LevelHUD>();
+
+        var hudRect = hudGO.AddComponent<RectTransform>();
+        hudRect.anchorMin = Vector2.zero;
+        hudRect.anchorMax = Vector2.one;
+        hudRect.offsetMin = Vector2.zero;
+        hudRect.offsetMax = Vector2.zero;
+
+        // === TOP BAR ===
+        var topBar = CreateUIPanel("TopBar", hudGO.transform,
+            new Vector2(0, 1), new Vector2(1, 1),
+            new Vector2(0, -10), new Vector2(0, -60),
+            new Color(0.1f, 0.1f, 0.1f, 0.8f));
+
+        // Wave Text (links oben)
+        var waveText = CreateUIText("WaveText", topBar.transform, "Wave 1/5",
+            new Vector2(0, 0.5f), new Vector2(0, 0.5f),
+            new Vector2(20, 0), new Vector2(200, 40), 24);
+        generatedHUD.waveText = waveText;
+
+        // Energy Text (mitte)
+        var energyText = CreateUIText("EnergyText", topBar.transform, "Energy 10/10",
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+            new Vector2(-100, 0), new Vector2(200, 40), 24);
+        generatedHUD.energyText = energyText;
+
+        // Speed Button (rechts)
+        var speedBtn = CreateUIButton("SpeedButton", topBar.transform, "1x",
+            new Vector2(1, 0.5f), new Vector2(1, 0.5f),
+            new Vector2(-120, 0), new Vector2(80, 40),
+            new Color(0.3f, 0.3f, 0.6f, 1f));
+        generatedHUD.speedButton = speedBtn.GetComponent<Button>();
+        generatedHUD.speedText = speedBtn.GetComponentInChildren<Text>();
+
+        // === START WAVE BUTTON (unten rechts) ===
+        var startBtn = CreateUIButton("StartWaveButton", hudGO.transform, "START WAVE",
+            new Vector2(1, 0), new Vector2(1, 0),
+            new Vector2(-170, 100), new Vector2(150, 60),
+            new Color(0.2f, 0.6f, 0.2f, 1f));
+        generatedHUD.startWaveButton = startBtn.GetComponent<Button>();
+
+        // === HAND CONTAINER (unten) ===
+        var handContainer = CreateUIPanel("HandContainer", hudGO.transform,
+            new Vector2(0, 0), new Vector2(0.7f, 0),
+            new Vector2(20, 20), new Vector2(-20, 120),
+            new Color(0.15f, 0.15f, 0.15f, 0.7f));
+
+        // Horizontal Layout für Karten
+        var hlg = handContainer.AddComponent<HorizontalLayoutGroup>();
+        hlg.spacing = 10;
+        hlg.padding = new RectOffset(10, 10, 10, 10);
+        hlg.childAlignment = TextAnchor.MiddleLeft;
+        hlg.childControlWidth = false;
+        hlg.childControlHeight = false;
+        hlg.childForceExpandWidth = false;
+        hlg.childForceExpandHeight = false;
+
+        generatedHUD.handContainer = handContainer.transform;
+
+        Debug.Log("AutoLevelGenerator: LevelHUD created with all UI elements.");
+    }
+
+    private void CreateResultScreen()
+    {
+        if (generatedCanvas == null) return;
+
+        // Result Screen Container (standardmäßig deaktiviert)
+        var resultGO = new GameObject("ResultScreen");
+        resultGO.transform.SetParent(generatedCanvas.transform, false);
+        generatedResultScreen = resultGO.AddComponent<ResultScreenView>();
+
+        var resultRect = resultGO.AddComponent<RectTransform>();
+        resultRect.anchorMin = Vector2.zero;
+        resultRect.anchorMax = Vector2.one;
+        resultRect.offsetMin = Vector2.zero;
+        resultRect.offsetMax = Vector2.zero;
+
+        // Root ist der Container selbst
+        generatedResultScreen.root = resultGO;
+
+        // Dunkler Overlay-Hintergrund
+        var overlay = CreateUIPanel("Overlay", resultGO.transform,
+            Vector2.zero, Vector2.one,
+            Vector2.zero, Vector2.zero,
+            new Color(0, 0, 0, 0.75f));
+
+        // Zentriertes Panel
+        var centerPanel = CreateUIPanel("CenterPanel", resultGO.transform,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+            new Vector2(-200, -150), new Vector2(200, 150),
+            new Color(0.2f, 0.2f, 0.25f, 0.95f));
+
+        // Result Label
+        var resultLabel = CreateUIText("ResultLabel", centerPanel.transform, "VICTORY",
+            new Vector2(0.5f, 0.7f), new Vector2(0.5f, 0.7f),
+            new Vector2(-150, -30), new Vector2(150, 30), 48);
+        resultLabel.alignment = TextAnchor.MiddleCenter;
+        resultLabel.fontStyle = FontStyle.Bold;
+        generatedResultScreen.resultLabel = resultLabel;
+
+        // Next Level Button
+        var nextBtn = CreateUIButton("NextLevelButton", centerPanel.transform, "NEXT LEVEL",
+            new Vector2(0.5f, 0.3f), new Vector2(0.5f, 0.3f),
+            new Vector2(-75, -25), new Vector2(75, 25),
+            new Color(0.2f, 0.5f, 0.7f, 1f));
+        generatedResultScreen.nextLevelButton = nextBtn.GetComponent<Button>();
+
+        // Standardmäßig deaktiviert
+        resultGO.SetActive(false);
+
+        Debug.Log("AutoLevelGenerator: ResultScreen created.");
+    }
+
+    private void CreateCardViewTemplate()
+    {
+        if (generatedCanvas == null || generatedHUD == null) return;
+
+        // CardView als Template erstellen (wird im HandContainer geklont)
+        var cardGO = new GameObject("CardViewTemplate");
+        cardGO.transform.SetParent(generatedCanvas.transform, false);
+
+        var cardView = cardGO.AddComponent<CardView>();
+
+        var cardRect = cardGO.AddComponent<RectTransform>();
+        cardRect.sizeDelta = new Vector2(120, 80);
+
+        // Card Background
+        var bgImage = cardGO.AddComponent<Image>();
+        bgImage.color = new Color(0.25f, 0.25f, 0.3f, 1f);
+
+        // Card Button
+        var cardButton = cardGO.AddComponent<Button>();
+        cardButton.targetGraphic = bgImage;
+        var colors = cardButton.colors;
+        colors.normalColor = new Color(0.25f, 0.25f, 0.3f, 1f);
+        colors.highlightedColor = new Color(0.35f, 0.35f, 0.45f, 1f);
+        colors.pressedColor = new Color(0.2f, 0.2f, 0.25f, 1f);
+        colors.disabledColor = new Color(0.15f, 0.15f, 0.15f, 0.5f);
+        cardButton.colors = colors;
+
+        cardView.button = cardButton;
+
+        // Card Label
+        var labelGO = new GameObject("Label");
+        labelGO.transform.SetParent(cardGO.transform, false);
+        var labelRect = labelGO.AddComponent<RectTransform>();
+        labelRect.anchorMin = new Vector2(0, 0.3f);
+        labelRect.anchorMax = new Vector2(1, 1);
+        labelRect.offsetMin = new Vector2(5, 0);
+        labelRect.offsetMax = new Vector2(-5, -5);
+
+        var labelText = labelGO.AddComponent<Text>();
+        labelText.text = "Card Name";
+        labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        labelText.fontSize = 14;
+        labelText.alignment = TextAnchor.MiddleCenter;
+        labelText.color = Color.white;
+        cardView.label = labelText;
+
+        // Cost Label
+        var costGO = new GameObject("CostLabel");
+        costGO.transform.SetParent(cardGO.transform, false);
+        var costRect = costGO.AddComponent<RectTransform>();
+        costRect.anchorMin = Vector2.zero;
+        costRect.anchorMax = new Vector2(1, 0.3f);
+        costRect.offsetMin = new Vector2(5, 5);
+        costRect.offsetMax = new Vector2(-5, 0);
+
+        var costText = costGO.AddComponent<Text>();
+        costText.text = "3";
+        costText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        costText.fontSize = 18;
+        costText.fontStyle = FontStyle.Bold;
+        costText.alignment = TextAnchor.MiddleCenter;
+        costText.color = new Color(1f, 0.85f, 0.3f, 1f);
+        cardView.costLabel = costText;
+
+        // Template deaktivieren und als Prefab-Ersatz nutzen
+        cardGO.SetActive(false);
+        generatedHUD.cardViewPrefab = cardView;
+
+        Debug.Log("AutoLevelGenerator: CardView template created.");
+    }
+
+    // =========================================================
+    // HELPER: UI Element Creation
+    // =========================================================
+
+    private GameObject CreateUIPanel(string name, Transform parent,
+        Vector2 anchorMin, Vector2 anchorMax,
+        Vector2 offsetMin, Vector2 offsetMax, Color color)
+    {
+        var panelGO = new GameObject(name);
+        panelGO.transform.SetParent(parent, false);
+
+        var rect = panelGO.AddComponent<RectTransform>();
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.offsetMin = offsetMin;
+        rect.offsetMax = offsetMax;
+
+        var image = panelGO.AddComponent<Image>();
+        image.color = color;
+
+        return panelGO;
+    }
+
+    private Text CreateUIText(string name, Transform parent, string text,
+        Vector2 anchorMin, Vector2 anchorMax,
+        Vector2 offsetMin, Vector2 offsetMax, int fontSize)
+    {
+        var textGO = new GameObject(name);
+        textGO.transform.SetParent(parent, false);
+
+        var rect = textGO.AddComponent<RectTransform>();
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.offsetMin = offsetMin;
+        rect.offsetMax = offsetMax;
+
+        var textComp = textGO.AddComponent<Text>();
+        textComp.text = text;
+        textComp.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        textComp.fontSize = fontSize;
+        textComp.color = Color.white;
+        textComp.alignment = TextAnchor.MiddleLeft;
+
+        return textComp;
+    }
+
+    private GameObject CreateUIButton(string name, Transform parent, string text,
+        Vector2 anchorMin, Vector2 anchorMax,
+        Vector2 offsetMin, Vector2 offsetMax, Color bgColor)
+    {
+        var btnGO = new GameObject(name);
+        btnGO.transform.SetParent(parent, false);
+
+        var rect = btnGO.AddComponent<RectTransform>();
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.offsetMin = offsetMin;
+        rect.offsetMax = offsetMax;
+
+        var image = btnGO.AddComponent<Image>();
+        image.color = bgColor;
+
+        var button = btnGO.AddComponent<Button>();
+        button.targetGraphic = image;
+
+        // Text als Kind
+        var textGO = new GameObject("Text");
+        textGO.transform.SetParent(btnGO.transform, false);
+        var textRect = textGO.AddComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.offsetMin = Vector2.zero;
+        textRect.offsetMax = Vector2.zero;
+
+        var textComp = textGO.AddComponent<Text>();
+        textComp.text = text;
+        textComp.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        textComp.fontSize = 18;
+        textComp.color = Color.white;
+        textComp.alignment = TextAnchor.MiddleCenter;
+
+        return btnGO;
+    }
+
+    // =========================================================
+    // CAMERA SETUP
+    // =========================================================
+
+    private void SetupCamera()
+    {
+        Camera mainCam = Camera.main;
+        if (mainCam == null)
+        {
+            var camGO = new GameObject("Main Camera");
+            camGO.tag = "MainCamera";
+            mainCam = camGO.AddComponent<Camera>();
+            camGO.AddComponent<AudioListener>();
+        }
+
+        // Positioniere Kamera für Top-Down-Ansicht des Levels
+        float levelWidth = width * tileSize;
+        float levelHeight = height * tileSize;
+        float maxDimension = Mathf.Max(levelWidth, levelHeight);
+        float cameraHeight = maxDimension * 0.8f + 5f;
+
+        mainCam.transform.position = new Vector3(0, cameraHeight, -maxDimension * 0.3f);
+        mainCam.transform.rotation = Quaternion.Euler(60f, 0f, 0f);
+
+        mainCam.clearFlags = CameraClearFlags.SolidColor;
+        mainCam.backgroundColor = new Color(0.1f, 0.12f, 0.15f);
+        mainCam.nearClipPlane = 0.3f;
+        mainCam.farClipPlane = 500f;
+
+        Debug.Log($"AutoLevelGenerator: Camera positioned for {width}x{height} level.");
+    }
+
+    // =========================================================
+    // LEVEL CONTROLLER SETUP
+    // =========================================================
+
+    private void SetupLevelController()
+    {
+        // Suche oder erstelle LevelController
+        LevelController lc = FindObjectOfType<LevelController>();
+        if (lc == null)
+        {
+            var lcGO = new GameObject("LevelController");
+            lc = lcGO.AddComponent<LevelController>();
+        }
+
+        // Setze HUD-Referenz
+        if (generatedHUD != null)
+        {
+            lc.hud = generatedHUD;
+            Debug.Log("AutoLevelGenerator: LevelController.hud assigned.");
+        }
+
+        // Setze ResultScreen-Referenz
+        if (generatedResultScreen != null)
+        {
+            lc.resultScreen = generatedResultScreen;
+            Debug.Log("AutoLevelGenerator: LevelController.resultScreen assigned.");
+        }
+
+        // LevelSpawner hinzufügen falls nicht vorhanden
+        var spawner = lc.GetComponent<LevelSpawner>();
+        if (spawner == null)
+        {
+            spawner = lc.gameObject.AddComponent<LevelSpawner>();
+        }
+        lc.levelSpawner = spawner;
+
+        Debug.Log("AutoLevelGenerator: LevelController fully configured.");
+    }
+
+    // =========================================================
+    // LIGHTING SETUP
+    // =========================================================
+
+    private void SetupLighting()
+    {
+        // Suche oder erstelle Directional Light
+        Light dirLight = null;
+        var lights = FindObjectsByType<Light>(FindObjectsSortMode.None);
+        foreach (var l in lights)
+        {
+            if (l.type == LightType.Directional)
+            {
+                dirLight = l;
+                break;
+            }
+        }
+
+        if (dirLight == null)
+        {
+            var lightGO = new GameObject("Directional Light");
+            dirLight = lightGO.AddComponent<Light>();
+            dirLight.type = LightType.Directional;
+        }
+
+        dirLight.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+        dirLight.color = new Color(1f, 0.96f, 0.9f);
+        dirLight.intensity = 1.2f;
+        dirLight.shadows = LightShadows.Soft;
+
+        Debug.Log("AutoLevelGenerator: Lighting configured.");
     }
 }
