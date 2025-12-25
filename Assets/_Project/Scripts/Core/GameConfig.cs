@@ -222,7 +222,7 @@ namespace TowerConquest.Core
             infiniteEnergy = false;
             instantKill = false;
 
-            Debug.Log("GameConfig: Defaults applied.");
+            UnityEngine.Debug.Log("GameConfig: Defaults applied.");
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace TowerConquest.Core
                     break;
             }
 
-            Debug.Log($"GameConfig: Applied {difficulty} difficulty.");
+            UnityEngine.Debug.Log($"GameConfig: Applied {difficulty} difficulty.");
         }
 
         /// <summary>
@@ -331,19 +331,19 @@ namespace TowerConquest.Core
 
             if (defaultHandSize <= 0)
             {
-                Debug.LogError("GameConfig: defaultHandSize must be positive.");
+                UnityEngine.Debug.LogError("GameConfig: defaultHandSize must be positive.");
                 valid = false;
             }
 
             if (defaultMaxWaves <= 0)
             {
-                Debug.LogError("GameConfig: defaultMaxWaves must be positive.");
+                UnityEngine.Debug.LogError("GameConfig: defaultMaxWaves must be positive.");
                 valid = false;
             }
 
             if (availableSpeedModes == null || availableSpeedModes.Length == 0)
             {
-                Debug.LogError("GameConfig: availableSpeedModes must have at least one value.");
+                UnityEngine.Debug.LogError("GameConfig: availableSpeedModes must have at least one value.");
                 valid = false;
             }
 

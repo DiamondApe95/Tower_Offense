@@ -287,7 +287,7 @@ namespace TowerConquest.AI
                 var mover = unit.GetComponent<UnitMover>();
                 if (mover == null) continue;
 
-                float progress = mover.pathProgress;
+                float progress = mover.Progress;
                 bool better = first ? (progress > targetProgress) : (progress < targetProgress);
                 if (better)
                 {
@@ -351,7 +351,7 @@ namespace TowerConquest.AI
 
             if (showDebugInfo)
             {
-                Debug.Log($"TowerBrain: {name} attacks {CurrentTarget.name} for {damage} damage.");
+                UnityEngine.Debug.Log($"TowerBrain: {name} attacks {CurrentTarget.name} for {damage} damage.");
             }
         }
 
@@ -397,7 +397,7 @@ namespace TowerConquest.AI
 
             if (showDebugInfo)
             {
-                Debug.Log($"TowerBrain: {name} AoE attack at {center} with radius {aoeRadius}.");
+                UnityEngine.Debug.Log($"TowerBrain: {name} AoE attack at {center} with radius {aoeRadius}.");
             }
         }
 

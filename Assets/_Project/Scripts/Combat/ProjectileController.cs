@@ -343,27 +343,26 @@ namespace TowerConquest.Combat
         {
             if (effectsOnHit == null || effectsOnHit.Length == 0) return;
 
-            var statusSystem = target.GetComponent<StatusSystem>();
-            if (statusSystem == null) return;
+            var statusSystem = new StatusSystem();
 
             foreach (string effectId in effectsOnHit)
             {
                 switch (effectId.ToLower())
                 {
                     case "slow":
-                        statusSystem.ApplySlow(0.5f, effectDuration);
+                        statusSystem.ApplySlow(target.gameObject, 0.5f, effectDuration);
                         break;
 
                     case "burn":
-                        statusSystem.ApplyBurn(damage * 0.1f, effectDuration);
+                        statusSystem.ApplyBurn(target.gameObject, damage * 0.1f, 0.5f, effectDuration);
                         break;
 
                     case "freeze":
-                        statusSystem.ApplySlow(0.9f, effectDuration);
+                        statusSystem.ApplySlow(target.gameObject, 0.9f, effectDuration);
                         break;
 
                     case "stun":
-                        statusSystem.ApplySlow(1f, effectDuration * 0.5f);
+                        statusSystem.ApplySlow(target.gameObject, 1f, effectDuration * 0.5f);
                         break;
                 }
             }

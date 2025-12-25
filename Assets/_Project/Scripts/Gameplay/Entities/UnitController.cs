@@ -11,7 +11,13 @@ namespace TowerConquest.Gameplay.Entities
     {
         public string UnitId { get; private set; }
         public float BaseDamage { get; private set; } = 50f;
+        public float AttacksPerSecond { get; private set; } = 1f;
         public bool IsAlive { get; private set; } = true;
+
+        // Compatibility properties for AI systems
+        public float damage => BaseDamage;
+        public float attacksPerSecond => AttacksPerSecond;
+        public float moveSpeed => unitMover != null ? unitMover.moveSpeed : 0f;
 
         // Events
         public event Action<UnitController> OnUnitDestroyed;
@@ -50,6 +56,7 @@ namespace TowerConquest.Gameplay.Entities
             float size = definition?.stats?.size ?? 1f;
 
             BaseDamage = definition?.attack?.base_damage > 0f ? definition.attack.base_damage : 50f;
+            AttacksPerSecond = definition?.attack?.attacks_per_second > 0f ? definition.attack.attacks_per_second : 1f;
 
             transform.localScale = Vector3.one * Mathf.Max(0.5f, size);
 
@@ -85,7 +92,7 @@ namespace TowerConquest.Gameplay.Entities
             OnUnitDestroyed?.Invoke(this);
         }
 
-        private void HandleDamage(float damage)
+        private void HandleDamage(float damage, string damageType, GameObject source)
         {
             OnDamageTaken?.Invoke(this, damage);
         }
