@@ -239,7 +239,7 @@ namespace TowerConquest.UI
                 var heroDef = database?.FindHero(heroId);
                 if (heroNameText != null)
                 {
-                    heroNameText.text = heroDef?.name ?? heroId;
+                    heroNameText.text = heroDef?.display_name ?? heroId;
                 }
             }
         }

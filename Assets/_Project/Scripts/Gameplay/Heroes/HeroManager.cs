@@ -159,7 +159,7 @@ namespace TowerConquest.Gameplay
 
             // Add NavMeshAgent for movement
             var agent = heroObj.AddComponent<UnityEngine.AI.NavMeshAgent>();
-            agent.speed = heroDef.stats?.speed ?? 4f;
+            agent.speed = heroDef.stats?.move_speed ?? 4f;
             agent.stoppingDistance = 1.5f;
 
             return heroObj;

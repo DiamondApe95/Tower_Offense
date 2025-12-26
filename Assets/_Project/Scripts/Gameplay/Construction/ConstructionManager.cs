@@ -29,7 +29,9 @@ namespace TowerConquest.Gameplay
         [Tooltip("Number of builders required for towers")]
         [SerializeField] private int towerBuilderCount = 3;
         [Tooltip("Number of builders required for traps")]
+        #pragma warning disable 0414 // Field assigned but never used (reserved for future configuration)
         [SerializeField] private int trapBuilderCount = 1;
+        #pragma warning restore 0414
 
         [Header("Spawn Points")]
         [SerializeField] private Transform playerBuilderSpawnPoint;

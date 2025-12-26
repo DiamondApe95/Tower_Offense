@@ -26,8 +26,10 @@ namespace TowerConquest.Gameplay.Economy
         [SerializeField] private int minKillsForCombo = 2;
 
         [Header("Visual Feedback")]
+        #pragma warning disable 0414 // Field assigned but never used (reserved for future UI implementation)
         [SerializeField] private bool showComboUI = true;
         [SerializeField] private float comboDisplayDuration = 2f;
+        #pragma warning restore 0414
 
         [Header("Runtime")]
         [SerializeField] private int currentCombo;

@@ -145,7 +145,7 @@ namespace TowerConquest.UI.WorldMap
                     id = defaultLevels[i],
                     display_name = $"Level {i + 1}",
                     description = $"Battle in the {defaultLevels[i].Replace("lvl_0" + (i + 1) + "_", "").Replace("_", " ")}",
-                    difficulty = i < 2 ? "Easy" : (i < 4 ? "Normal" : "Hard")
+                    aiDifficulty = i < 2 ? "easy" : (i < 4 ? "normal" : "hard")
                 };
 
                 CreateLevelButton(levelDef);
@@ -322,7 +322,7 @@ namespace TowerConquest.UI.WorldMap
 
             if (levelDifficultyText != null)
             {
-                levelDifficultyText.text = $"Difficulty: {level?.difficulty ?? "Normal"}";
+                levelDifficultyText.text = $"Difficulty: {level?.aiDifficulty ?? "normal"}";
             }
 
             if (playButton != null)
