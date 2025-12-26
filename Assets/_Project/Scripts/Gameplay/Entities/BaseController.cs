@@ -151,5 +151,13 @@ namespace TowerConquest.Gameplay.Entities
 
             currentHp = Mathf.Min(maxHp, currentHp + amount);
         }
+
+        /// <summary>
+        /// Apply damage to the base (wrapper for TakeDamage)
+        /// </summary>
+        public void ApplyDamage(float damage)
+        {
+            TakeDamage(damage);
+        }
     }
 }

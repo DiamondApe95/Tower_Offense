@@ -71,6 +71,12 @@ namespace TowerConquest.Gameplay
         private bool autoStartPending;
         private EntityRegistry entityRegistry;
 
+        // Battle Statistics
+        private int playerUnitsSpawned;
+        private int playerEnemiesKilled;
+        private int playerTowersBuilt;
+        private int playerGoldEarned;
+
         private void Awake()
         {
             EnsureGameBootstrapper();
@@ -444,11 +450,12 @@ namespace TowerConquest.Gameplay
 
             Debug.Log($"LiveBattleLevelController: Battle ended! Player {(playerWins ? "wins" : "loses")}");
 
-            // Award fame
+            // Calculate fame reward
+            int fameEarned = 0;
             if (levelDefinition?.fameReward != null && ServiceLocator.TryGet(out Progression.FameManager fameManager))
             {
-                int fameReward = playerWins ? levelDefinition.fameReward.victory : levelDefinition.fameReward.defeat;
-                fameManager.AddFame(fameReward);
+                fameEarned = playerWins ? levelDefinition.fameReward.victory : levelDefinition.fameReward.defeat;
+                fameManager.AddFame(fameEarned);
             }
 
             // Save progress
@@ -465,10 +472,11 @@ namespace TowerConquest.Gameplay
 
             OnBattleEnded?.Invoke(playerWins);
 
-            // Show result screen
+            // Show result screen with statistics
             if (resultScreen != null)
             {
-                resultScreen.ShowResults(playerWins, false);
+                BattleStats stats = GetBattleStats();
+                resultScreen.ShowResults(playerWins, playerWins, fameEarned, stats);
             }
         }
 
@@ -591,5 +599,56 @@ namespace TowerConquest.Gameplay
         {
             return IsBattleActive && !IsBattleEnded && !IsCountingDown;
         }
+
+        #region Statistics Tracking
+
+        /// <summary>
+        /// Record that the player spawned a unit
+        /// </summary>
+        public void RecordUnitSpawned()
+        {
+            playerUnitsSpawned++;
+        }
+
+        /// <summary>
+        /// Record that an enemy was killed
+        /// </summary>
+        public void RecordEnemyKilled()
+        {
+            playerEnemiesKilled++;
+        }
+
+        /// <summary>
+        /// Record that a tower was built
+        /// </summary>
+        public void RecordTowerBuilt()
+        {
+            playerTowersBuilt++;
+        }
+
+        /// <summary>
+        /// Record gold earned
+        /// </summary>
+        public void RecordGoldEarned(int amount)
+        {
+            playerGoldEarned += amount;
+        }
+
+        /// <summary>
+        /// Get the current battle statistics
+        /// </summary>
+        public BattleStats GetBattleStats()
+        {
+            return new BattleStats(
+                playerUnitsSpawned,
+                playerEnemiesKilled,
+                playerTowersBuilt,
+                BattleTime,
+                GetPlayerBaseHPPercent(),
+                playerGoldEarned
+            );
+        }
+
+        #endregion
     }
 }

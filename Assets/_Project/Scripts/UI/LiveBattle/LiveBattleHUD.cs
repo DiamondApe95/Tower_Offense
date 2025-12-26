@@ -311,6 +311,9 @@ namespace TowerConquest.UI
             // Update hero button
             UpdateHeroButton();
 
+            // Update ability button
+            UpdateAbilityButton();
+
             // Update status
             if (statusText != null)
             {
@@ -371,6 +374,48 @@ namespace TowerConquest.UI
                 if (cooldown > 0)
                 {
                     heroCooldownText.text = $"{Mathf.CeilToInt(cooldown)}s";
+                }
+            }
+        }
+
+        private void UpdateAbilityButton()
+        {
+            if (abilityButton == null) return;
+
+            bool canUse = levelController.CanUseAbility();
+            float cooldown = levelController.GetAbilityCooldown();
+
+            abilityButton.interactable = canUse && levelController.IsBattleActive;
+
+            // Update ability name if not set
+            if (abilityNameText != null && string.IsNullOrEmpty(abilityNameText.text))
+            {
+                string abilityName = levelController.GetAbilityName();
+                if (!string.IsNullOrEmpty(abilityName))
+                {
+                    abilityNameText.text = abilityName;
+                }
+            }
+
+            // Update cooldown overlay
+            if (abilityCooldownOverlay != null)
+            {
+                bool onCooldown = cooldown > 0;
+                abilityCooldownOverlay.gameObject.SetActive(onCooldown);
+                if (onCooldown && levelController.PlayerAbility != null)
+                {
+                    abilityCooldownOverlay.fillAmount = cooldown / levelController.PlayerAbility.CooldownDuration;
+                }
+            }
+
+            // Update cooldown text
+            if (abilityCooldownText != null)
+            {
+                bool onCooldown = cooldown > 0;
+                abilityCooldownText.gameObject.SetActive(onCooldown);
+                if (onCooldown)
+                {
+                    abilityCooldownText.text = $"{Mathf.CeilToInt(cooldown)}s";
                 }
             }
         }
