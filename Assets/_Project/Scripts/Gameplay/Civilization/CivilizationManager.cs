@@ -303,20 +303,5 @@ namespace TowerConquest.Gameplay
             return civilizations.Values.FirstOrDefault();
         }
 
-        /// <summary>
-        /// Check if a civilization is unlocked for the player
-        /// </summary>
-        public bool IsCivilizationUnlocked(string civId)
-        {
-            var civ = GetCivilization(civId);
-            if (civ == null) return false;
-
-            // Free civilizations are always unlocked
-            if (civ.unlockCost == 0) return true;
-
-            // TODO: Check against PlayerProgress to see if purchased
-            // For now, assume only free civs are unlocked
-            return false;
-        }
     }
 }
