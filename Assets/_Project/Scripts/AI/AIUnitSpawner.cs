@@ -15,7 +15,7 @@ namespace TowerConquest.AI
         private Transform aiBase;
 
         private CostSystem costSystem;
-        private SpawnController spawnController;
+        private LiveBattleSpawnController liveBattleSpawner;
 
         public void Initialize(AICommander cmd, GoldManager gold, JsonDatabase db, Transform baseTransform)
         {
@@ -27,13 +27,14 @@ namespace TowerConquest.AI
             costSystem = new CostSystem(database);
         }
 
-        public void SetSpawnController(SpawnController spawner)
+        public void SetLiveBattleSpawner(LiveBattleSpawnController spawner)
         {
-            spawnController = spawner;
+            liveBattleSpawner = spawner;
         }
 
         /// <summary>
-        /// Attempt to spawn a unit
+        /// Attempt to spawn a unit (for AI)
+        /// Note: AI bypasses normal cooldown system - uses decision timing instead
         /// </summary>
         public bool TrySpawnUnit(string unitId)
         {
@@ -50,33 +51,42 @@ namespace TowerConquest.AI
                 return false;
             }
 
-            // Purchase unit
-            if (!costSystem.TryPurchaseUnit(goldManager, unitId))
+            // Find slot index in AI deck for this unit
+            int slotIndex = FindUnitSlotIndex(unitId);
+            if (slotIndex < 0)
             {
+                Debug.LogWarning($"[AIUnitSpawner] Unit {unitId} not in AI deck");
                 return false;
             }
 
-            // Spawn unit at AI base
-            SpawnUnit(unitId);
+            // Use spawner to spawn unit (handles gold, cooldown, and instantiation)
+            if (liveBattleSpawner != null && liveBattleSpawner.TrySpawnUnit(slotIndex))
+            {
+                Debug.Log($"[AIUnitSpawner] Spawned {unitId} from slot {slotIndex}");
+                return true;
+            }
 
-            Debug.Log($"[AIUnitSpawner] Spawned {unitId}");
-            return true;
+            Debug.LogWarning($"[AIUnitSpawner] Failed to spawn {unitId}");
+            return false;
         }
 
-        private void SpawnUnit(string unitId)
+        /// <summary>
+        /// Find the slot index of a unit in the AI deck
+        /// </summary>
+        private int FindUnitSlotIndex(string unitId)
         {
-            // TODO: Integrate with SpawnController
-            // For now, just log
+            var deck = commander.GetDeck();
+            if (deck == null || deck.SelectedUnits == null) return -1;
 
-            if (spawnController != null)
+            for (int i = 0; i < deck.SelectedUnits.Count; i++)
             {
-                // Use spawn controller to spawn unit
-                // spawnController.SpawnUnit(unitId, aiBase.position, GoldManager.Team.AI);
+                if (deck.SelectedUnits[i] == unitId)
+                {
+                    return i;
+                }
             }
-            else
-            {
-                Debug.Log($"[AIUnitSpawner] Would spawn {unitId} at {aiBase.position}");
-            }
+
+            return -1;
         }
     }
 }

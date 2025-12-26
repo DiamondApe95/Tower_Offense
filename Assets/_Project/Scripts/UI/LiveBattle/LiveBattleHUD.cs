@@ -50,6 +50,10 @@ namespace TowerConquest.UI
         private LiveBattleLevelController levelController;
         private JsonDatabase database;
 
+        // Performance optimization: throttle refresh
+        private float refreshTimer;
+        private const float REFRESH_INTERVAL = 0.1f; // Update UI 10 times per second instead of 60
+
         public void Initialize(LiveBattleLevelController controller)
         {
             levelController = controller;
@@ -60,6 +64,20 @@ namespace TowerConquest.UI
             {
                 controller.PlayerGold.OnGoldChanged += OnGoldChanged;
             }
+
+            // Subscribe to base damage events for immediate HP updates
+            if (controller.PlayerBase != null)
+            {
+                controller.PlayerBase.OnDamageTaken += OnPlayerBaseDamaged;
+            }
+            if (controller.EnemyBase != null)
+            {
+                controller.EnemyBase.OnDamageTaken += OnEnemyBaseDamaged;
+            }
+
+            // Subscribe to battle state events
+            controller.OnBattleStarted += OnBattleStateChanged;
+            controller.OnBattleEnded += OnBattleEnded;
 
             // Create unit buttons
             CreateUnitButtons();
@@ -270,66 +288,87 @@ namespace TowerConquest.UI
             }
         }
 
+        private void OnPlayerBaseDamaged(BaseController baseController, float damage)
+        {
+            UpdatePlayerBaseHP();
+        }
+
+        private void OnEnemyBaseDamaged(BaseController baseController, float damage)
+        {
+            UpdateEnemyBaseHP();
+        }
+
+        private void OnBattleStateChanged()
+        {
+            UpdateStatus();
+        }
+
+        private void OnBattleEnded(bool playerVictory)
+        {
+            UpdateStatus();
+        }
+
+        private void UpdatePlayerBaseHP()
+        {
+            if (playerBaseHPSlider != null && levelController != null)
+            {
+                playerBaseHPSlider.value = levelController.GetPlayerBaseHPPercent();
+            }
+            if (playerBaseHPText != null && levelController?.PlayerBase != null)
+            {
+                playerBaseHPText.text = $"{Mathf.CeilToInt(levelController.PlayerBase.currentHp)}";
+            }
+        }
+
+        private void UpdateEnemyBaseHP()
+        {
+            if (enemyBaseHPSlider != null && levelController != null)
+            {
+                enemyBaseHPSlider.value = levelController.GetEnemyBaseHPPercent();
+            }
+            if (enemyBaseHPText != null && levelController?.EnemyBase != null)
+            {
+                enemyBaseHPText.text = $"{Mathf.CeilToInt(levelController.EnemyBase.currentHp)}";
+            }
+        }
+
+        private void UpdateStatus()
+        {
+            if (statusText == null || levelController == null) return;
+
+            if (!levelController.IsBattleActive && !levelController.IsBattleEnded)
+            {
+                statusText.text = "Preparing...";
+            }
+            else if (levelController.IsBattleActive)
+            {
+                statusText.text = "Battle!";
+            }
+            else
+            {
+                statusText.text = levelController.PlayerVictory ? "Victory!" : "Defeat";
+            }
+        }
+
         public void Refresh()
         {
             if (levelController == null) return;
 
-            // Update gold
+            // Update gold (also handled by OnGoldChanged event)
             if (goldText != null && levelController.PlayerGold != null)
             {
                 goldText.text = $"{levelController.PlayerGold.CurrentGold}";
             }
 
-            // Update time
-            if (battleTimeText != null)
-            {
-                battleTimeText.text = levelController.GetFormattedBattleTime();
-            }
+            // Update base HP (also handled by damage events)
+            UpdatePlayerBaseHP();
+            UpdateEnemyBaseHP();
 
-            // Update base HP
-            if (playerBaseHPSlider != null)
-            {
-                playerBaseHPSlider.value = levelController.GetPlayerBaseHPPercent();
-            }
-            if (playerBaseHPText != null && levelController.PlayerBase != null)
-            {
-                playerBaseHPText.text = $"{Mathf.CeilToInt(levelController.PlayerBase.currentHp)}";
-            }
+            // Update status (also handled by battle state events)
+            UpdateStatus();
 
-            if (enemyBaseHPSlider != null)
-            {
-                enemyBaseHPSlider.value = levelController.GetEnemyBaseHPPercent();
-            }
-            if (enemyBaseHPText != null && levelController.EnemyBase != null)
-            {
-                enemyBaseHPText.text = $"{Mathf.CeilToInt(levelController.EnemyBase.currentHp)}";
-            }
-
-            // Update unit buttons
-            UpdateUnitButtons();
-
-            // Update hero button
-            UpdateHeroButton();
-
-            // Update ability button
-            UpdateAbilityButton();
-
-            // Update status
-            if (statusText != null)
-            {
-                if (!levelController.IsBattleActive && !levelController.IsBattleEnded)
-                {
-                    statusText.text = "Preparing...";
-                }
-                else if (levelController.IsBattleActive)
-                {
-                    statusText.text = "Battle!";
-                }
-                else
-                {
-                    statusText.text = levelController.PlayerVictory ? "Victory!" : "Defeat";
-                }
-            }
+            // Update dynamic elements
+            RefreshDynamicElements();
         }
 
         private void UpdateUnitButtons()
@@ -422,17 +461,65 @@ namespace TowerConquest.UI
 
         private void Update()
         {
-            // Continuously refresh (can be optimized with events)
-            Refresh();
+            // Performance optimization: Only refresh UI at 10 FPS instead of 60 FPS
+            refreshTimer += Time.deltaTime;
+            if (refreshTimer >= REFRESH_INTERVAL)
+            {
+                refreshTimer = 0f;
+                RefreshDynamicElements();
+            }
+        }
+
+        /// <summary>
+        /// Refreshes only the dynamic elements that change frequently (cooldowns, time)
+        /// Static elements (gold, base HP) are updated via events
+        /// </summary>
+        private void RefreshDynamicElements()
+        {
+            if (levelController == null) return;
+
+            // Update time (changes every frame)
+            if (battleTimeText != null)
+            {
+                battleTimeText.text = levelController.GetFormattedBattleTime();
+            }
+
+            // Update unit button cooldowns
+            UpdateUnitButtons();
+
+            // Update hero button cooldown
+            UpdateHeroButton();
+
+            // Update ability button cooldown
+            UpdateAbilityButton();
         }
 
         private void OnDestroy()
         {
+            // Unsubscribe from gold events
             if (levelController?.PlayerGold != null)
             {
                 levelController.PlayerGold.OnGoldChanged -= OnGoldChanged;
             }
 
+            // Unsubscribe from base events
+            if (levelController?.PlayerBase != null)
+            {
+                levelController.PlayerBase.OnDamageTaken -= OnPlayerBaseDamaged;
+            }
+            if (levelController?.EnemyBase != null)
+            {
+                levelController.EnemyBase.OnDamageTaken -= OnEnemyBaseDamaged;
+            }
+
+            // Unsubscribe from battle state events
+            if (levelController != null)
+            {
+                levelController.OnBattleStarted -= OnBattleStateChanged;
+                levelController.OnBattleEnded -= OnBattleEnded;
+            }
+
+            // Unsubscribe from unit buttons
             foreach (var btn in unitButtons)
             {
                 if (btn != null)
