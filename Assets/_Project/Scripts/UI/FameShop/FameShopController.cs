@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using TowerConquest.Core;
 using TowerConquest.Data;
@@ -218,7 +219,7 @@ namespace TowerConquest.UI.FameShop
 
             foreach (var hero in heroes)
             {
-                CreateUpgradeItem(hero.id, hero.name, GetUpgradeLevel(hero.id), GetMaxLevel(hero.id));
+                CreateUpgradeItem(hero.id, hero.display_name, GetUpgradeLevel(hero.id), GetMaxLevel(hero.id));
             }
         }
 
@@ -410,7 +411,7 @@ namespace TowerConquest.UI.FameShop
 
             if (currentLevel >= maxLevel)
             {
-                Debug.Log("[FameShop] Already at max level");
+                Log.Info("[FameShop] Already at max level");
                 return;
             }
 
@@ -430,13 +431,13 @@ namespace TowerConquest.UI.FameShop
                     upgraded = upgradeSystem?.UpgradeTower(selectedItemId, towerCost) ?? false;
                     break;
                 default:
-                    Debug.Log($"[FameShop] Upgrade for {currentCategory} not yet implemented");
+                    Log.Info($"[FameShop] Upgrade for {currentCategory} not yet implemented");
                     return;
             }
 
             if (!upgraded)
             {
-                Debug.Log("[FameShop] Upgrade failed (not enough fame or already max level)");
+                Log.Info("[FameShop] Upgrade failed (not enough fame or already max level)");
                 return;
             }
 
@@ -445,7 +446,7 @@ namespace TowerConquest.UI.FameShop
             RefreshCurrentCategory();
             ShowItemInfo(selectedItemId);
 
-            Debug.Log($"[FameShop] Upgraded {selectedItemId} to level {currentLevel + 1}");
+            Log.Info($"[FameShop] Upgraded {selectedItemId} to level {currentLevel + 1}");
         }
 
         private void UpdateFameDisplay()

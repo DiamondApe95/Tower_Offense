@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem.UI;
@@ -61,7 +62,7 @@ namespace TowerConquest.UI.MainMenu
         [ContextMenu("★ Generate Complete Menu (One-Click)")]
         public void GenerateCompleteMenu()
         {
-            UnityEngine.Debug.Log("AutoMenuGenerator: Starting Complete Menu Generation...");
+            Log.Info("AutoMenuGenerator: Starting Complete Menu Generation...");
 
             CleanupOldMenu();
             CreateCanvas();
@@ -76,7 +77,7 @@ namespace TowerConquest.UI.MainMenu
             EditorSceneManager.MarkSceneDirty(gameObject.scene);
 #endif
 
-            UnityEngine.Debug.Log("AutoMenuGenerator: ★ Complete Menu Generation finished! Menu is ready.");
+            Log.Info("AutoMenuGenerator: ★ Complete Menu Generation finished! Menu is ready.");
         }
 
         [ContextMenu("Cleanup Old Menu")]
@@ -100,7 +101,7 @@ namespace TowerConquest.UI.MainMenu
                 DestroyImmediate(oldController.gameObject);
             }
 
-            UnityEngine.Debug.Log("AutoMenuGenerator: Cleaned up old menu objects.");
+            Log.Info("AutoMenuGenerator: Cleaned up old menu objects.");
         }
 
         private void CreateCanvas()
@@ -146,7 +147,7 @@ namespace TowerConquest.UI.MainMenu
                 bgImage.color = backgroundColor;
             }
 
-            UnityEngine.Debug.Log("AutoMenuGenerator: Canvas created.");
+            Log.Info("AutoMenuGenerator: Canvas created.");
         }
 
         private void CreateMainPanel()
@@ -224,7 +225,7 @@ namespace TowerConquest.UI.MainMenu
             versionText.color = new Color(1, 1, 1, 0.5f);
             menuController.versionText = versionText;
 
-            UnityEngine.Debug.Log("AutoMenuGenerator: Main panel created.");
+            Log.Info("AutoMenuGenerator: Main panel created.");
         }
 
         private void CreateSettingsPanel()
@@ -299,7 +300,7 @@ namespace TowerConquest.UI.MainMenu
             menuController.applySettingsButton = applyBtn.GetComponent<Button>();
             menuController.backToMainButton = backBtn.GetComponent<Button>();
 
-            UnityEngine.Debug.Log("AutoMenuGenerator: Settings panel created.");
+            Log.Info("AutoMenuGenerator: Settings panel created.");
         }
 
         private void CreateLevelSelectPanel()
@@ -354,7 +355,7 @@ namespace TowerConquest.UI.MainMenu
             menuController.defenseModeButton = defenseCard.GetComponentInChildren<Button>();
             menuController.backFromLevelSelectButton = backBtn.GetComponent<Button>();
 
-            UnityEngine.Debug.Log("AutoMenuGenerator: Level select panel created.");
+            Log.Info("AutoMenuGenerator: Level select panel created.");
         }
 
         private void CreateCreditsPanel()
@@ -408,7 +409,7 @@ namespace TowerConquest.UI.MainMenu
             menuController.creditsPanel = creditsPanel;
             menuController.backFromCreditsButton = backBtn.GetComponent<Button>();
 
-            UnityEngine.Debug.Log("AutoMenuGenerator: Credits panel created.");
+            Log.Info("AutoMenuGenerator: Credits panel created.");
         }
 
         private void SetupMenuController()
@@ -422,7 +423,7 @@ namespace TowerConquest.UI.MainMenu
                 }
             }
 
-            UnityEngine.Debug.Log("AutoMenuGenerator: Menu controller configured.");
+            Log.Info("AutoMenuGenerator: Menu controller configured.");
         }
 
         private void SetupCamera()
@@ -441,7 +442,7 @@ namespace TowerConquest.UI.MainMenu
             mainCam.orthographic = true;
             mainCam.transform.position = new Vector3(0, 0, -10);
 
-            UnityEngine.Debug.Log("AutoMenuGenerator: Camera configured.");
+            Log.Info("AutoMenuGenerator: Camera configured.");
         }
 
         // =========================================================

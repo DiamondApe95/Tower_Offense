@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using TowerConquest.Combat;
 using UnityEngine;
 
@@ -206,8 +207,8 @@ namespace TowerConquest.Gameplay.Entities
             var health = target.GetComponent<HealthComponent>();
             if (health != null)
             {
-                health.TakeDamage(baseDamage, DamageSystem.DamageType.Physical, gameObject);
-                Debug.Log($"[UnitCombatBrain] {gameObject.name} attacked {target.name} for {baseDamage} damage");
+                health.TakeDamage(baseDamage, "Physical", gameObject);
+                Log.Info($"[UnitCombatBrain] {gameObject.name} attacked {target.name} for {baseDamage} damage");
             }
 
             // Also check for specific component types
@@ -325,7 +326,7 @@ namespace TowerConquest.Gameplay.Entities
             {
                 wasAttackedByTower = true;
                 lastTowerAttacker = source.transform;
-                Debug.Log($"[UnitCombatBrain] {gameObject.name} was attacked by tower {source.name}");
+                Log.Info($"[UnitCombatBrain] {gameObject.name} was attacked by tower {source.name}");
             }
         }
 

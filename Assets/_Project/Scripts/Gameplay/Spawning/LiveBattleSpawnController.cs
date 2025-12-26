@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using TowerConquest.Core;
 using TowerConquest.Data;
@@ -87,7 +88,7 @@ namespace TowerConquest.Gameplay
                 FindTargetBase();
             }
 
-            Debug.Log($"[LiveBattleSpawnController] Initialized for {team}");
+            Log.Info($"[LiveBattleSpawnController] Initialized for {team}");
         }
 
         private void FindSpawnPoint()
@@ -145,7 +146,7 @@ namespace TowerConquest.Gameplay
             // This handles edge cases where the hero GameObject was destroyed without firing OnHeroDied
             if (heroAlive && (currentHero == null || currentHero.gameObject == null))
             {
-                Debug.LogWarning($"[LiveBattleSpawnController] Hero was destroyed without firing death event for {team}. Triggering cooldown.");
+                Log.Warning($"[LiveBattleSpawnController] Hero was destroyed without firing death event for {team}. Triggering cooldown.");
                 heroAlive = false;
                 heroOnCooldown = true;
                 heroCooldownTimer = heroRespawnTime;
@@ -227,7 +228,7 @@ namespace TowerConquest.Gameplay
 
             if (unitObject == null)
             {
-                Debug.LogError($"[LiveBattleSpawnController] Failed to create unit: {unitId}");
+                Log.Error($"[LiveBattleSpawnController] Failed to create unit: {unitId}");
                 return null;
             }
 
@@ -265,7 +266,7 @@ namespace TowerConquest.Gameplay
             // Subscribe to destruction for gold reward
             controller.OnUnitDestroyed += HandleUnitDestroyed;
 
-            Debug.Log($"[LiveBattleSpawnController] Spawned unit: {unitId} for {team}");
+            Log.Info($"[LiveBattleSpawnController] Spawned unit: {unitId} for {team}");
             return controller;
         }
 
@@ -345,7 +346,7 @@ namespace TowerConquest.Gameplay
             GameObject heroObject = CreateHeroObject(heroId);
             if (heroObject == null)
             {
-                Debug.LogError($"[LiveBattleSpawnController] Failed to create hero: {heroId}");
+                Log.Error($"[LiveBattleSpawnController] Failed to create hero: {heroId}");
                 return null;
             }
 
@@ -364,7 +365,7 @@ namespace TowerConquest.Gameplay
             // Subscribe to death
             controller.OnHeroDied += HandleHeroDied;
 
-            Debug.Log($"[LiveBattleSpawnController] Spawned hero: {heroId} for {team}");
+            Log.Info($"[LiveBattleSpawnController] Spawned hero: {heroId} for {team}");
             return controller;
         }
 
@@ -378,7 +379,7 @@ namespace TowerConquest.Gameplay
             heroCooldownTimer = heroRespawnTime;
             currentHero = null; // Clear hero reference
 
-            Debug.Log($"[LiveBattleSpawnController] Hero died for {team}. Respawn in {heroRespawnTime}s");
+            Log.Info($"[LiveBattleSpawnController] Hero died for {team}. Respawn in {heroRespawnTime}s");
         }
 
         private GameObject CreateUnitObject(string unitId)

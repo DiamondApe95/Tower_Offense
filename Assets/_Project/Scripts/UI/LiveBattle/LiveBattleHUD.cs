@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using TowerConquest.Core;
 using TowerConquest.Data;
 using TowerConquest.Gameplay;
@@ -90,7 +91,7 @@ namespace TowerConquest.UI
             SetupAbilityButton();
 
             Refresh();
-            Debug.Log("[LiveBattleHUD] Initialized");
+            Log.Info("[LiveBattleHUD] Initialized");
         }
 
         private void CreateUnitButtons()

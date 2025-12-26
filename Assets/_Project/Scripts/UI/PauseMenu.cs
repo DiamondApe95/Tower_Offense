@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TowerConquest.Core;
@@ -125,7 +126,7 @@ namespace TowerConquest.UI
                 eventBus.Publish(new GamePausedEvent(true));
             }
 
-            UnityEngine.Debug.Log("PauseMenu: Game paused.");
+            Log.Info("PauseMenu: Game paused.");
         }
 
         public void Resume()
@@ -152,7 +153,7 @@ namespace TowerConquest.UI
                 eventBus.Publish(new GamePausedEvent(false));
             }
 
-            UnityEngine.Debug.Log("PauseMenu: Game resumed.");
+            Log.Info("PauseMenu: Game resumed.");
         }
 
         public void OpenSettings()

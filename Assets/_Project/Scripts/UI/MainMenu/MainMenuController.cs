@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TowerConquest.Core;
@@ -252,7 +253,7 @@ namespace TowerConquest.UI.MainMenu
             }
             else
             {
-                UnityEngine.Debug.LogWarning("MainMenuController: No gameplay scene found to load.");
+                Log.Warning("MainMenuController: No gameplay scene found to load.");
             }
         }
 

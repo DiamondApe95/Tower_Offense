@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,7 +40,7 @@ public class AutoLevelGenerator : MonoBehaviour
     [ContextMenu("★ Complete Scene Setup (One-Click)")]
     public void CompleteSceneSetup()
     {
-        Debug.Log("AutoLevelGenerator: Starting Complete Scene Setup...");
+        Log.Info("AutoLevelGenerator: Starting Complete Scene Setup...");
 
         // 0. Cleanup vorheriger Level-Objekte
         if (autoCleanupPrevious)
@@ -79,13 +80,13 @@ public class AutoLevelGenerator : MonoBehaviour
         }
 #endif
 
-        Debug.Log("AutoLevelGenerator: ★ Complete Scene Setup finished! Scene is ready to play.");
+        Log.Info("AutoLevelGenerator: ★ Complete Scene Setup finished! Scene is ready to play.");
     }
 
     [ContextMenu("Cleanup Previous Level")]
     public void CleanupPreviousLevel()
     {
-        Debug.Log("AutoLevelGenerator: Cleaning up previous level objects...");
+        Log.Info("AutoLevelGenerator: Cleaning up previous level objects...");
 
         int cleanedCount = 0;
 
@@ -158,7 +159,7 @@ public class AutoLevelGenerator : MonoBehaviour
             }
         }
 
-        Debug.Log($"AutoLevelGenerator: Cleaned up {cleanedCount} previous objects.");
+        Log.Info($"AutoLevelGenerator: Cleaned up {cleanedCount} previous objects.");
     }
 
     [Header("Generate Level Only")]
@@ -327,7 +328,7 @@ public class AutoLevelGenerator : MonoBehaviour
         var backbone = CarvePathRandomAStar(primarySpawn, mainGoal);
         if (backbone == null || backbone.Count < 3)
         {
-            Debug.LogError("AutoLevelGenerator: Failed to create backbone path.");
+            Log.Error("AutoLevelGenerator: Failed to create backbone path.");
             return;
         }
 
@@ -396,7 +397,7 @@ public class AutoLevelGenerator : MonoBehaviour
         }
 #endif
 
-        Debug.Log($"AutoLevelGenerator: Generated grid={width}x{height}, spawns={spawnPoints.Count}, lanes={waypointsRoots.Count}, goals={goalPoints.Count}");
+        Log.Info($"AutoLevelGenerator: Generated grid={width}x{height}, spawns={spawnPoints.Count}, lanes={waypointsRoots.Count}, goals={goalPoints.Count}");
     }
 
     // =========================================================
@@ -406,7 +407,7 @@ public class AutoLevelGenerator : MonoBehaviour
     {
         if (enemyPrefab == null)
         {
-            Debug.LogError("AutoLevelGenerator: enemyPrefab is null. Put Enemy.prefab in Assets/Prefab or assign manually.");
+            Log.Error("AutoLevelGenerator: enemyPrefab is null. Put Enemy.prefab in Assets/Prefab or assign manually.");
             return;
         }
 
@@ -414,7 +415,7 @@ public class AutoLevelGenerator : MonoBehaviour
         Transform defaultWaypoints = waypointsRoots != null && waypointsRoots.Count > 0 ? waypointsRoots[0] : null;
         if (defaultWaypoints == null)
         {
-            Debug.LogError("AutoLevelGenerator: No PathWaypoints_00 found. Cannot configure EnemySpawners.");
+            Log.Error("AutoLevelGenerator: No PathWaypoints_00 found. Cannot configure EnemySpawners.");
             return;
         }
 
@@ -435,7 +436,7 @@ public class AutoLevelGenerator : MonoBehaviour
             spawner.spawnInterval = spawnInterval;
         }
 
-        Debug.Log($"AutoLevelGenerator: Added/Configured EnemySpawner on {spawnPoints.Count} SpawnPoints (using {defaultWaypoints.name}).");
+        Log.Info($"AutoLevelGenerator: Added/Configured EnemySpawner on {spawnPoints.Count} SpawnPoints (using {defaultWaypoints.name}).");
     }
 
     // =========================================================
@@ -460,7 +461,7 @@ public class AutoLevelGenerator : MonoBehaviour
         if (buildLayer >= 0)
             bm.buildTileMask = 1 << buildLayer;
         else
-            Debug.LogWarning($"AutoLevelGenerator: Layer '{buildLayerName}' not found. BuildManager.buildTileMask not set.");
+            Log.Warning($"AutoLevelGenerator: Layer '{buildLayerName}' not found. BuildManager.buildTileMask not set.");
     }
 
     // =========================================================
@@ -473,9 +474,9 @@ public class AutoLevelGenerator : MonoBehaviour
         towerPrefab ??= LoadPrefabByName("TowerPrefab");
         projectilePrefab ??= LoadPrefabByName("Projectile");
 
-        if (enemyPrefab == null) Debug.LogWarning("AutoLevelGenerator(Editor): Could not auto-load Enemy.prefab from Assets/Prefab.");
-        if (towerPrefab == null) Debug.LogWarning("AutoLevelGenerator(Editor): Could not auto-load TowerPrefab.prefab from Assets/Prefab.");
-        if (projectilePrefab == null) Debug.LogWarning("AutoLevelGenerator(Editor): Could not auto-load Projectile.prefab from Assets/Prefab.");
+        if (enemyPrefab == null) Log.Warning("AutoLevelGenerator(Editor): Could not auto-load Enemy.prefab from Assets/Prefab.");
+        if (towerPrefab == null) Log.Warning("AutoLevelGenerator(Editor): Could not auto-load TowerPrefab.prefab from Assets/Prefab.");
+        if (projectilePrefab == null) Log.Warning("AutoLevelGenerator(Editor): Could not auto-load Projectile.prefab from Assets/Prefab.");
     }
 
     private GameObject LoadPrefabByName(string prefabNameNoExt)
@@ -609,12 +610,12 @@ public class AutoLevelGenerator : MonoBehaviour
             {
                 sp.stringValue = layerName;
                 tagManager.ApplyModifiedProperties();
-                Debug.Log($"AutoLevelGenerator(Editor): Created layer '{layerName}' at index {i}.");
+                Log.Info($"AutoLevelGenerator(Editor): Created layer '{layerName}' at index {i}.");
                 return;
             }
         }
 
-        Debug.LogWarning($"AutoLevelGenerator(Editor): Could not create layer '{layerName}'. No free user layer slots (8..31).");
+        Log.Warning($"AutoLevelGenerator(Editor): Could not create layer '{layerName}'. No free user layer slots (8..31).");
     }
 #endif
 
@@ -1035,9 +1036,9 @@ public class AutoLevelGenerator : MonoBehaviour
         int pathLayer = LayerMask.NameToLayer(pathLayerName);
         int blockedLayer = LayerMask.NameToLayer(blockedLayerName);
 
-        if (buildLayer < 0) Debug.LogWarning($"Layer '{buildLayerName}' missing. Build tiles may be on Default.");
-        if (pathLayer < 0) Debug.LogWarning($"Layer '{pathLayerName}' missing. Path tiles may be on Default.");
-        if (blockedLayer < 0) Debug.LogWarning($"Layer '{blockedLayerName}' missing. Blocked tiles may be on Default.");
+        if (buildLayer < 0) Log.Warning($"Layer '{buildLayerName}' missing. Build tiles may be on Default.");
+        if (pathLayer < 0) Log.Warning($"Layer '{pathLayerName}' missing. Path tiles may be on Default.");
+        if (blockedLayer < 0) Log.Warning($"Layer '{blockedLayerName}' missing. Blocked tiles may be on Default.");
 
         // set parent layers too (helps debugging in hierarchy)
         if (buildLayer >= 0) buildParent.gameObject.layer = buildLayer;
@@ -1186,7 +1187,7 @@ public class AutoLevelGenerator : MonoBehaviour
     /// </summary>
     private void CreateCompleteGUI()
     {
-        Debug.Log("AutoLevelGenerator: Creating Complete GUI...");
+        Log.Info("AutoLevelGenerator: Creating Complete GUI...");
 
         // Entferne alte GUI falls vorhanden
         CleanupOldGUI();
@@ -1203,7 +1204,7 @@ public class AutoLevelGenerator : MonoBehaviour
         // 4. CardView Prefab erstellen (als Template im Container)
         CreateCardViewTemplate();
 
-        Debug.Log("AutoLevelGenerator: GUI creation complete.");
+        Log.Info("AutoLevelGenerator: GUI creation complete.");
     }
 
     private void CleanupOldGUI()
@@ -1264,11 +1265,11 @@ public class AutoLevelGenerator : MonoBehaviour
                 {
                     existingEventSystem.gameObject.AddComponent<InputSystemUIInputModule>();
                 }
-                Debug.Log("AutoLevelGenerator: Replaced StandaloneInputModule with InputSystemUIInputModule.");
+                Log.Info("AutoLevelGenerator: Replaced StandaloneInputModule with InputSystemUIInputModule.");
             }
         }
 
-        Debug.Log("AutoLevelGenerator: Canvas created with Input System support.");
+        Log.Info("AutoLevelGenerator: Canvas created with Input System support.");
     }
 
     private void CreateLevelHUD()
@@ -1296,35 +1297,35 @@ public class AutoLevelGenerator : MonoBehaviour
         var waveText = CreateUIText("WaveText", topBar.transform, "Wave 1/5",
             new Vector2(0, 0.5f), new Vector2(0, 0.5f),
             new Vector2(20, 0), new Vector2(200, 40), 24);
-        generatedHUD.waveText = waveText;
+        // generatedHUD.waveText = waveText; // DEPRECATED: Property removed in refactor
 
         // Energy Text (mitte)
         var energyText = CreateUIText("EnergyText", topBar.transform, "Energy 10/10",
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
             new Vector2(-100, 0), new Vector2(200, 40), 24);
-        generatedHUD.energyText = energyText;
+        // generatedHUD.energyText = energyText; // DEPRECATED: Property removed in refactor
 
         // Speed Button (rechts)
         var speedBtn = CreateUIButton("SpeedButton", topBar.transform, "1x",
             new Vector2(1, 0.5f), new Vector2(1, 0.5f),
             new Vector2(-120, 0), new Vector2(80, 40),
             new Color(0.3f, 0.3f, 0.6f, 1f));
-        generatedHUD.speedButton = speedBtn.GetComponent<Button>();
-        generatedHUD.speedText = speedBtn.GetComponentInChildren<Text>();
+        // generatedHUD.speedButton = speedBtn.GetComponent<Button>(); // DEPRECATED: Property removed in refactor
+        // generatedHUD.speedText = speedBtn.GetComponentInChildren<Text>(); // DEPRECATED: Property removed in refactor
 
         // === START WAVE BUTTON (unten rechts) ===
         var startBtn = CreateUIButton("StartWaveButton", hudGO.transform, "START WAVE 1",
             new Vector2(1, 0), new Vector2(1, 0),
             new Vector2(-170, 100), new Vector2(150, 60),
             new Color(0.2f, 0.6f, 0.2f, 1f));
-        generatedHUD.startWaveButton = startBtn.GetComponent<Button>();
-        generatedHUD.startWaveButtonText = startBtn.GetComponentInChildren<Text>();
+        // generatedHUD.startWaveButton = startBtn.GetComponent<Button>(); // DEPRECATED: Property removed in refactor
+        // generatedHUD.startWaveButtonText = startBtn.GetComponentInChildren<Text>(); // DEPRECATED: Property removed in refactor
 
         // === BASE HP TEXT (oben rechts neben Speed) ===
         var baseHpText = CreateUIText("BaseHpText", topBar.transform, "Base HP: 100",
             new Vector2(1, 0.5f), new Vector2(1, 0.5f),
             new Vector2(-250, 0), new Vector2(120, 40), 20);
-        generatedHUD.baseHpText = baseHpText;
+        // generatedHUD.baseHpText = baseHpText; // DEPRECATED: Property removed in refactor
 
         // === HAND CONTAINER (unten) ===
         var handContainer = CreateUIPanel("HandContainer", hudGO.transform,
@@ -1342,12 +1343,12 @@ public class AutoLevelGenerator : MonoBehaviour
         hlg.childForceExpandWidth = false;
         hlg.childForceExpandHeight = false;
 
-        generatedHUD.handContainer = handContainer.transform;
+        // generatedHUD.handContainer = handContainer.transform; // DEPRECATED: Property removed in refactor
 
         // Ensure HUD is active
         hudGO.SetActive(true);
 
-        Debug.Log("AutoLevelGenerator: LevelHUD created with all UI elements.");
+        Log.Info("AutoLevelGenerator: LevelHUD created with all UI elements.");
     }
 
     private void CreateResultScreen()
@@ -1398,78 +1399,79 @@ public class AutoLevelGenerator : MonoBehaviour
         // Standardmäßig deaktiviert
         resultGO.SetActive(false);
 
-        Debug.Log("AutoLevelGenerator: ResultScreen created.");
+        Log.Info("AutoLevelGenerator: ResultScreen created.");
     }
 
     private void CreateCardViewTemplate()
     {
         if (generatedCanvas == null || generatedHUD == null) return;
 
+        // DEPRECATED: CardView template creation disabled - CardView type no longer exists
         // CardView als Template erstellen (wird im HandContainer geklont)
-        var cardGO = new GameObject("CardViewTemplate");
-        cardGO.transform.SetParent(generatedCanvas.transform, false);
+        // var cardGO = new GameObject("CardViewTemplate");
+        // cardGO.transform.SetParent(generatedCanvas.transform, false);
+        //
+        // var cardView = cardGO.AddComponent<CardView>();
+        //
+        // var cardRect = cardGO.AddComponent<RectTransform>();
+        // cardRect.sizeDelta = new Vector2(120, 80);
+        //
+        // // Card Background
+        // var bgImage = cardGO.AddComponent<Image>();
+        // bgImage.color = new Color(0.25f, 0.25f, 0.3f, 1f);
+        //
+        // // Card Button
+        // var cardButton = cardGO.AddComponent<Button>();
+        // cardButton.targetGraphic = bgImage;
+        // var colors = cardButton.colors;
+        // colors.normalColor = new Color(0.25f, 0.25f, 0.3f, 1f);
+        // colors.highlightedColor = new Color(0.35f, 0.35f, 0.45f, 1f);
+        // colors.pressedColor = new Color(0.2f, 0.2f, 0.25f, 1f);
+        // colors.disabledColor = new Color(0.15f, 0.15f, 0.15f, 0.5f);
+        // cardButton.colors = colors;
+        //
+        // cardView.button = cardButton;
+        //
+        // // Card Label
+        // var labelGO = new GameObject("Label");
+        // labelGO.transform.SetParent(cardGO.transform, false);
+        // var labelRect = labelGO.AddComponent<RectTransform>();
+        // labelRect.anchorMin = new Vector2(0, 0.3f);
+        // labelRect.anchorMax = new Vector2(1, 1);
+        // labelRect.offsetMin = new Vector2(5, 0);
+        // labelRect.offsetMax = new Vector2(-5, -5);
+        //
+        // var labelText = labelGO.AddComponent<Text>();
+        // labelText.text = "Card Name";
+        // labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        // labelText.fontSize = 14;
+        // labelText.alignment = TextAnchor.MiddleCenter;
+        // labelText.color = Color.white;
+        // cardView.label = labelText;
+        //
+        // // Cost Label
+        // var costGO = new GameObject("CostLabel");
+        // costGO.transform.SetParent(cardGO.transform, false);
+        // var costRect = costGO.AddComponent<RectTransform>();
+        // costRect.anchorMin = Vector2.zero;
+        // costRect.anchorMax = new Vector2(1, 0.3f);
+        // costRect.offsetMin = new Vector2(5, 5);
+        // costRect.offsetMax = new Vector2(-5, 0);
+        //
+        // var costText = costGO.AddComponent<Text>();
+        // costText.text = "3";
+        // costText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        // costText.fontSize = 18;
+        // costText.fontStyle = FontStyle.Bold;
+        // costText.alignment = TextAnchor.MiddleCenter;
+        // costText.color = new Color(1f, 0.85f, 0.3f, 1f);
+        // cardView.costLabel = costText;
+        //
+        // // Template deaktivieren und als Prefab-Ersatz nutzen
+        // cardGO.SetActive(false);
+        // generatedHUD.cardViewPrefab = cardView;
 
-        var cardView = cardGO.AddComponent<CardView>();
-
-        var cardRect = cardGO.AddComponent<RectTransform>();
-        cardRect.sizeDelta = new Vector2(120, 80);
-
-        // Card Background
-        var bgImage = cardGO.AddComponent<Image>();
-        bgImage.color = new Color(0.25f, 0.25f, 0.3f, 1f);
-
-        // Card Button
-        var cardButton = cardGO.AddComponent<Button>();
-        cardButton.targetGraphic = bgImage;
-        var colors = cardButton.colors;
-        colors.normalColor = new Color(0.25f, 0.25f, 0.3f, 1f);
-        colors.highlightedColor = new Color(0.35f, 0.35f, 0.45f, 1f);
-        colors.pressedColor = new Color(0.2f, 0.2f, 0.25f, 1f);
-        colors.disabledColor = new Color(0.15f, 0.15f, 0.15f, 0.5f);
-        cardButton.colors = colors;
-
-        cardView.button = cardButton;
-
-        // Card Label
-        var labelGO = new GameObject("Label");
-        labelGO.transform.SetParent(cardGO.transform, false);
-        var labelRect = labelGO.AddComponent<RectTransform>();
-        labelRect.anchorMin = new Vector2(0, 0.3f);
-        labelRect.anchorMax = new Vector2(1, 1);
-        labelRect.offsetMin = new Vector2(5, 0);
-        labelRect.offsetMax = new Vector2(-5, -5);
-
-        var labelText = labelGO.AddComponent<Text>();
-        labelText.text = "Card Name";
-        labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        labelText.fontSize = 14;
-        labelText.alignment = TextAnchor.MiddleCenter;
-        labelText.color = Color.white;
-        cardView.label = labelText;
-
-        // Cost Label
-        var costGO = new GameObject("CostLabel");
-        costGO.transform.SetParent(cardGO.transform, false);
-        var costRect = costGO.AddComponent<RectTransform>();
-        costRect.anchorMin = Vector2.zero;
-        costRect.anchorMax = new Vector2(1, 0.3f);
-        costRect.offsetMin = new Vector2(5, 5);
-        costRect.offsetMax = new Vector2(-5, 0);
-
-        var costText = costGO.AddComponent<Text>();
-        costText.text = "3";
-        costText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        costText.fontSize = 18;
-        costText.fontStyle = FontStyle.Bold;
-        costText.alignment = TextAnchor.MiddleCenter;
-        costText.color = new Color(1f, 0.85f, 0.3f, 1f);
-        cardView.costLabel = costText;
-
-        // Template deaktivieren und als Prefab-Ersatz nutzen
-        cardGO.SetActive(false);
-        generatedHUD.cardViewPrefab = cardView;
-
-        Debug.Log("AutoLevelGenerator: CardView template created.");
+        Log.Info("AutoLevelGenerator: CardView template creation skipped (deprecated).");
     }
 
     // =========================================================
@@ -1585,7 +1587,7 @@ public class AutoLevelGenerator : MonoBehaviour
         mainCam.nearClipPlane = 0.3f;
         mainCam.farClipPlane = 500f;
 
-        Debug.Log($"AutoLevelGenerator: Camera positioned for {width}x{height} level.");
+        Log.Info($"AutoLevelGenerator: Camera positioned for {width}x{height} level.");
     }
 
 
@@ -1619,7 +1621,7 @@ public class AutoLevelGenerator : MonoBehaviour
         dirLight.intensity = 1.2f;
         dirLight.shadows = LightShadows.Soft;
 
-        Debug.Log("AutoLevelGenerator: Lighting configured.");
+        Log.Info("AutoLevelGenerator: Lighting configured.");
     }
 
     // =========================================================
@@ -1630,14 +1632,14 @@ public class AutoLevelGenerator : MonoBehaviour
 
     private void CreateLiveBattleGUI()
     {
-        Debug.Log("AutoLevelGenerator: Creating Live Battle GUI...");
+        Log.Info("AutoLevelGenerator: Creating Live Battle GUI...");
 
         CleanupOldGUI();
         CreateCanvas();
         CreateLiveBattleHUD();
         CreateResultScreen();
 
-        Debug.Log("AutoLevelGenerator: Live Battle GUI creation complete.");
+        Log.Info("AutoLevelGenerator: Live Battle GUI creation complete.");
     }
 
     private void CreateLiveBattleHUD()
@@ -1743,7 +1745,7 @@ public class AutoLevelGenerator : MonoBehaviour
         generatedLiveBattleHUD.abilityButton = abilityBtn.GetComponent<Button>();
 
         hudGO.SetActive(true);
-        Debug.Log("AutoLevelGenerator: LiveBattleHUD created.");
+        Log.Info("AutoLevelGenerator: LiveBattleHUD created.");
     }
 
     private GameObject CreateHPBar(string name, Transform parent,
@@ -1807,8 +1809,8 @@ public class AutoLevelGenerator : MonoBehaviour
 
     private void SetupLiveBattleLevelController()
     {
-        // Cleanup any old LevelController
-        var oldLCs = FindObjectsByType<LevelController>(FindObjectsSortMode.None);
+        // Cleanup any old LiveBattleLevelController
+        var oldLCs = FindObjectsByType<LiveBattleLevelController>(FindObjectsSortMode.None);
         foreach (var lc in oldLCs)
         {
             if (lc != null && lc.gameObject != gameObject)
@@ -1834,14 +1836,14 @@ public class AutoLevelGenerator : MonoBehaviour
         if (generatedLiveBattleHUD != null)
         {
             liveBattleLC.hud = generatedLiveBattleHUD;
-            Debug.Log("AutoLevelGenerator: LiveBattleLevelController.hud assigned.");
+            Log.Info("AutoLevelGenerator: LiveBattleLevelController.hud assigned.");
         }
 
         // Set ResultScreen reference
         if (generatedResultScreen != null)
         {
             liveBattleLC.resultScreen = generatedResultScreen;
-            Debug.Log("AutoLevelGenerator: LiveBattleLevelController.resultScreen assigned.");
+            Log.Info("AutoLevelGenerator: LiveBattleLevelController.resultScreen assigned.");
         }
 
         // Create Player Base
@@ -1858,7 +1860,7 @@ public class AutoLevelGenerator : MonoBehaviour
             prefabRegistry = registryGO.AddComponent<TowerConquest.Data.PrefabRegistry>();
         }
 
-        Debug.Log("AutoLevelGenerator: LiveBattleLevelController fully configured.");
+        Log.Info("AutoLevelGenerator: LiveBattleLevelController fully configured.");
     }
 
     private void CreateBase(string name, bool isPlayerBase, Vector3 position)
@@ -1888,6 +1890,6 @@ public class AutoLevelGenerator : MonoBehaviour
         modelGO.transform.SetParent(baseGO.transform, false);
         baseController.modelTransform = modelGO.transform;
 
-        Debug.Log($"AutoLevelGenerator: Created {name} at {position}.");
+        Log.Info($"AutoLevelGenerator: Created {name} at {position}.");
     }
 }

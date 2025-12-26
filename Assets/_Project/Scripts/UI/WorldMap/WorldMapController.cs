@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using TowerConquest.Core;
 using TowerConquest.Data;
@@ -291,7 +292,7 @@ namespace TowerConquest.UI.WorldMap
         {
             if (status == LevelStatus.Locked)
             {
-                Debug.Log($"[WorldMapController] Level {levelId} is locked");
+                Log.Info($"[WorldMapController] Level {levelId} is locked");
                 return;
             }
 
@@ -343,7 +344,7 @@ namespace TowerConquest.UI.WorldMap
         {
             if (string.IsNullOrEmpty(selectedLevelId))
             {
-                Debug.LogWarning("[WorldMapController] No level selected");
+                Log.Warning("[WorldMapController] No level selected");
                 return;
             }
 
@@ -363,7 +364,7 @@ namespace TowerConquest.UI.WorldMap
             else
             {
                 // Load current scene as fallback for testing
-                Debug.Log($"[WorldMapController] Starting level: {selectedLevelId}");
+                Log.Info($"[WorldMapController] Starting level: {selectedLevelId}");
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
         }
@@ -378,14 +379,14 @@ namespace TowerConquest.UI.WorldMap
             }
             else
             {
-                Debug.Log("[WorldMapController] Would return to main menu");
+                Log.Info("[WorldMapController] Would return to main menu");
             }
         }
 
         private void OnFameShopClicked()
         {
             OnFameShopRequested?.Invoke();
-            Debug.Log("[WorldMapController] Opening Fame Shop");
+            Log.Info("[WorldMapController] Opening Fame Shop");
             // Fame Shop would be opened here
         }
 

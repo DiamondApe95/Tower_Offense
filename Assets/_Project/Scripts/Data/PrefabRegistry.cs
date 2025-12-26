@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -76,7 +77,7 @@ namespace TowerConquest.Data
             }
 
             cacheBuilt = true;
-            Debug.Log($"[PrefabRegistry] Cache built with {cachedPrefabs.Count} prefabs.");
+            Log.Info($"[PrefabRegistry] Cache built with {cachedPrefabs.Count} prefabs.");
         }
 
         public GameObject GetPrefab(string id)
@@ -119,7 +120,7 @@ namespace TowerConquest.Data
 
             if (!createFallbackPrimitives)
             {
-                Debug.LogWarning($"[PrefabRegistry] Prefab not found for id: {id}");
+                Log.Warning($"[PrefabRegistry] Prefab not found for id: {id}");
                 return null;
             }
 
@@ -177,7 +178,7 @@ namespace TowerConquest.Data
                 renderer.material = mat;
             }
 
-            Debug.Log($"[PrefabRegistry] Created fallback for: {id}");
+            Log.Info($"[PrefabRegistry] Created fallback for: {id}");
             return fallback;
         }
 
@@ -199,7 +200,7 @@ namespace TowerConquest.Data
 
             // Update cache
             cachedPrefabs[id] = prefab;
-            Debug.Log($"[PrefabRegistry] Registered prefab: {id}");
+            Log.Info($"[PrefabRegistry] Registered prefab: {id}");
         }
 
         public void RegisterCategory(string categoryName, List<IdPrefabPair> prefabs)
@@ -220,7 +221,7 @@ namespace TowerConquest.Data
                 }
             }
 
-            Debug.Log($"[PrefabRegistry] Registered category '{categoryName}' with {prefabs.Count} prefabs.");
+            Log.Info($"[PrefabRegistry] Registered category '{categoryName}' with {prefabs.Count} prefabs.");
         }
 
         public void ClearCache()
@@ -249,7 +250,7 @@ namespace TowerConquest.Data
                     RegisterPrefab(identifier.prefabId, identifier.gameObject);
                 }
             }
-            Debug.Log($"[PrefabRegistry] Registered {identifiers.Length} prefabs from scene.");
+            Log.Info($"[PrefabRegistry] Registered {identifiers.Length} prefabs from scene.");
         }
 
 #if UNITY_EDITOR
@@ -289,7 +290,7 @@ namespace TowerConquest.Data
 
             cacheBuilt = false;
             BuildCache();
-            Debug.Log($"[PrefabRegistry] Auto-registered {count} prefabs from {prefabFolder}.");
+            Log.Info($"[PrefabRegistry] Auto-registered {count} prefabs from {prefabFolder}.");
         }
 #endif
     }

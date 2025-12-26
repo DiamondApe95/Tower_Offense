@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using UnityEngine;
 using TowerConquest.Gameplay.Entities;
 using TowerConquest.Combat;
@@ -351,7 +352,7 @@ namespace TowerConquest.AI
 
             if (showDebugInfo)
             {
-                UnityEngine.Debug.Log($"TowerBrain: {name} attacks {CurrentTarget.name} for {damage} damage.");
+                Log.Info($"TowerBrain: {name} attacks {CurrentTarget.name} for {damage} damage.");
             }
         }
 
@@ -397,7 +398,7 @@ namespace TowerConquest.AI
 
             if (showDebugInfo)
             {
-                UnityEngine.Debug.Log($"TowerBrain: {name} AoE attack at {center} with radius {aoeRadius}.");
+                Log.Info($"TowerBrain: {name} AoE attack at {center} with radius {aoeRadius}.");
             }
         }
 

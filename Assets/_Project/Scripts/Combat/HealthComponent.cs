@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using UnityEngine;
 
 namespace TowerConquest.Combat
@@ -49,7 +50,7 @@ namespace TowerConquest.Combat
             if (currentHp <= 0f)
             {
                 currentHp = 0f;
-                UnityEngine.Debug.Log($"{name} died.");
+                Log.Info($"{name} died.");
                 OnDied?.Invoke(this);
                 OnDeath?.Invoke();
                 Destroy(gameObject);

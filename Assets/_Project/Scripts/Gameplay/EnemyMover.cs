@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 
 public class EnemyMover : MonoBehaviour
 {
@@ -23,7 +24,7 @@ public class EnemyMover : MonoBehaviour
 
         if (waypoints == null || waypoints.Length == 0)
         {
-            Debug.LogWarning("EnemyMover: No waypoints provided.");
+            Log.Warning("EnemyMover: No waypoints provided.");
             return;
         }
 
@@ -53,7 +54,7 @@ public class EnemyMover : MonoBehaviour
 
         if (cachedPositions == null || cachedPositions.Length == 0)
         {
-            Debug.LogWarning("EnemyMover: No path positions provided.");
+            Log.Warning("EnemyMover: No path positions provided.");
             return;
         }
 

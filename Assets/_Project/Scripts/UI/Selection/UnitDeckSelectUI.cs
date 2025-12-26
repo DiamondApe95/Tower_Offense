@@ -376,7 +376,7 @@ namespace TowerConquest.UI
             labelRect.offsetMin = new Vector2(10, 10);
             labelRect.offsetMax = new Vector2(-10, -10);
             var labelText = labelGO.AddComponent<Text>();
-            labelText.text = hero.name ?? hero.id;
+            labelText.text = hero.display_name ?? hero.id;
             labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             labelText.fontSize = 14;
             labelText.fontStyle = FontStyle.Bold;
@@ -621,7 +621,7 @@ namespace TowerConquest.UI
 
             if (nameText != null)
             {
-                nameText.text = hero.name ?? hero.id;
+                nameText.text = hero.display_name ?? hero.id;
             }
 
             if (button == null) button = GetComponent<Button>();

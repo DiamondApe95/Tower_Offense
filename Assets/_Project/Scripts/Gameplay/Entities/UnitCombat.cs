@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using TowerConquest.Combat;
 using TowerConquest.Core;
 using UnityEngine;
@@ -229,7 +230,7 @@ namespace TowerConquest.Gameplay.Entities
                 }
 
                 targetHealth.TakeDamage(finalDamage, "physical", gameObject);
-                Debug.Log($"[UnitCombat] {gameObject.name} dealt {finalDamage} damage to {currentTarget.name}");
+                Log.Info($"[UnitCombat] {gameObject.name} dealt {finalDamage} damage to {currentTarget.name}");
             }
 
             // Handle construction site damage

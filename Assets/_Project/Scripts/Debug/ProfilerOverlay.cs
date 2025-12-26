@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 
 namespace TowerConquest.Debug
 {
@@ -9,7 +10,7 @@ namespace TowerConquest.Debug
 
         public void Show()
         {
-            UnityEngine.Debug.Log("Stub method called.");
+            Log.Info("Stub method called.");
         }
 
     }

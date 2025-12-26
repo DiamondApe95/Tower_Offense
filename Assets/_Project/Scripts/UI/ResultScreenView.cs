@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using TowerConquest.Core;
 using TowerConquest.Data;
@@ -154,7 +155,7 @@ namespace TowerConquest.UI
                 nextLevelButton.interactable = hasNextLevel;
             }
 
-            Debug.Log($"ResultScreenView: Victory={victory}, Fame={fameEarned}, Stars={starsEarned}");
+            Log.Info($"ResultScreenView: Victory={victory}, Fame={fameEarned}, Stars={starsEarned}");
         }
 
         private void UpdateFameDisplay(int fameEarned)
@@ -259,7 +260,7 @@ namespace TowerConquest.UI
                 if (!string.IsNullOrEmpty(nextLevelId))
                 {
                     progress.UnlockLevel(nextLevelId);
-                    Debug.Log($"[ResultScreenView] Unlocked next level: {nextLevelId}");
+                    Log.Info($"[ResultScreenView] Unlocked next level: {nextLevelId}");
                 }
             }
 
@@ -310,7 +311,7 @@ namespace TowerConquest.UI
             }
             else
             {
-                Debug.Log("[ResultScreenView] Would return to world map");
+                Log.Info("[ResultScreenView] Would return to world map");
             }
         }
 

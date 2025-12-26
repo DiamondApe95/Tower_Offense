@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using UnityEngine;
 
 namespace TowerConquest.Gameplay
@@ -59,13 +60,13 @@ namespace TowerConquest.Gameplay
         {
             if (amount < 0)
             {
-                Debug.LogWarning($"[GoldManager] Cannot spend negative gold: {amount}");
+                Log.Warning($"[GoldManager] Cannot spend negative gold: {amount}");
                 return false;
             }
 
             if (!CanAfford(amount))
             {
-                Debug.Log($"[GoldManager] {team} cannot afford {amount} gold (have: {currentGold})");
+                Log.Info($"[GoldManager] {team} cannot afford {amount} gold (have: {currentGold})");
                 return false;
             }
 
@@ -73,7 +74,7 @@ namespace TowerConquest.Gameplay
             OnGoldSpent?.Invoke(amount, currentGold);
             OnGoldChanged?.Invoke(currentGold);
 
-            Debug.Log($"[GoldManager] {team} spent {amount} gold (remaining: {currentGold})");
+            Log.Info($"[GoldManager] {team} spent {amount} gold (remaining: {currentGold})");
             return true;
         }
 
@@ -84,7 +85,7 @@ namespace TowerConquest.Gameplay
         {
             if (amount < 0)
             {
-                Debug.LogWarning($"[GoldManager] Cannot add negative gold: {amount}");
+                Log.Warning($"[GoldManager] Cannot add negative gold: {amount}");
                 return;
             }
 
@@ -92,7 +93,7 @@ namespace TowerConquest.Gameplay
             OnGoldEarned?.Invoke(amount, currentGold);
             OnGoldChanged?.Invoke(currentGold);
 
-            Debug.Log($"[GoldManager] {team} earned {amount} gold (total: {currentGold})");
+            Log.Info($"[GoldManager] {team} earned {amount} gold (total: {currentGold})");
         }
 
         /// <summary>

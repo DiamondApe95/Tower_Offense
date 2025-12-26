@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -188,21 +189,21 @@ public class BuildManager : MonoBehaviour
     {
         if (!CanBuildAt(tile))
         {
-            Debug.Log("BuildManager: Cannot build at this location.");
+            Log.Info("BuildManager: Cannot build at this location.");
             return;
         }
 
         GameObject prefab = GetSelectedTowerPrefab();
         if (prefab == null)
         {
-            Debug.LogError("BuildManager: No tower prefab selected.");
+            Log.Error("BuildManager: No tower prefab selected.");
             return;
         }
 
         int cost = GetTowerCost(prefab);
         if (CurrentGold < cost)
         {
-            Debug.Log($"BuildManager: Not enough gold. Need {cost}, have {CurrentGold}.");
+            Log.Info($"BuildManager: Not enough gold. Need {cost}, have {CurrentGold}.");
             return;
         }
 
@@ -215,7 +216,7 @@ public class BuildManager : MonoBehaviour
         // Gold abziehen
         SpendGold(cost);
 
-        Debug.Log($"BuildManager: Tower built on {tile.name}. Gold remaining: {CurrentGold}");
+        Log.Info($"BuildManager: Tower built on {tile.name}. Gold remaining: {CurrentGold}");
         OnTowerBuilt?.Invoke(towerObj);
     }
 
@@ -242,7 +243,7 @@ public class BuildManager : MonoBehaviour
         int refund = GetTowerSellValue(towerObj);
         AddGold(refund);
 
-        Debug.Log($"BuildManager: Tower sold for {refund} gold.");
+        Log.Info($"BuildManager: Tower sold for {refund} gold.");
         OnTowerSold?.Invoke(towerObj);
 
         Destroy(towerObj);
@@ -283,7 +284,7 @@ public class BuildManager : MonoBehaviour
         SelectedTower = tower;
         isBuildModeActive = false;
         OnTowerSelected?.Invoke(tower?.gameObject);
-        Debug.Log($"BuildManager: Selected tower {tower?.name}");
+        Log.Info($"BuildManager: Selected tower {tower?.name}");
     }
 
     public void DeselectTower()
@@ -299,7 +300,7 @@ public class BuildManager : MonoBehaviour
         {
             selectedTowerIndex = index;
             isBuildModeActive = true;
-            Debug.Log($"BuildManager: Selected tower type {index}: {availableTowerPrefabs[index]?.name}");
+            Log.Info($"BuildManager: Selected tower type {index}: {availableTowerPrefabs[index]?.name}");
         }
     }
 

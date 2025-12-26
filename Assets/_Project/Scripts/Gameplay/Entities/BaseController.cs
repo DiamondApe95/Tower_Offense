@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using UnityEngine;
 
 namespace TowerConquest.Gameplay.Entities
@@ -107,7 +108,7 @@ namespace TowerConquest.Gameplay.Entities
 
             IsDestroyed = true;
 
-            Debug.Log($"[BaseController] Base {baseId} destroyed!");
+            Log.Info($"[BaseController] Base {baseId} destroyed!");
 
             if (destroyVFX != null)
             {

@@ -1,4 +1,5 @@
 using TowerConquest.Core;
+using TowerConquest.Debug;
 using TowerConquest.Data;
 using TowerConquest.Gameplay;
 using TowerConquest.Gameplay.Entities;
@@ -69,13 +70,13 @@ namespace TowerConquest.Debug
         {
             if (!Application.isPlaying)
             {
-                UnityEngine.Debug.LogWarning("DebugOverlay: JSON reload only available in Play Mode.");
+                Log.Warning("DebugOverlay: JSON reload only available in Play Mode.");
                 return;
             }
 
             JsonDatabase database = ServiceLocator.Get<JsonDatabase>();
             database.LoadAll();
-            UnityEngine.Debug.Log("DebugOverlay: JSON data reloaded.");
+            Log.Info("DebugOverlay: JSON data reloaded.");
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using UnityEngine;
 using TowerConquest.Data;
 
@@ -75,7 +76,7 @@ namespace TowerConquest.Progression
             int cost = GetUnitUpgradeCost(unitId);
             if (cost == 0)
             {
-                Debug.LogWarning($"[UpgradeSystem] Unit {unitId} is already max level");
+                Log.Warning($"[UpgradeSystem] Unit {unitId} is already max level");
                 return false;
             }
 
@@ -87,7 +88,7 @@ namespace TowerConquest.Progression
             int currentLevel = GetUnitLevel(unitId);
             unitLevels[unitId] = currentLevel + 1;
 
-            Debug.Log($"[UpgradeSystem] Upgraded {unitId} to level {unitLevels[unitId]}");
+            Log.Info($"[UpgradeSystem] Upgraded {unitId} to level {unitLevels[unitId]}");
             SaveUpgrades();
             return true;
         }
@@ -100,7 +101,7 @@ namespace TowerConquest.Progression
             int cost = GetHeroUpgradeCost(heroId);
             if (cost == 0)
             {
-                Debug.LogWarning($"[UpgradeSystem] Hero {heroId} is already max level");
+                Log.Warning($"[UpgradeSystem] Hero {heroId} is already max level");
                 return false;
             }
 
@@ -112,7 +113,7 @@ namespace TowerConquest.Progression
             int currentLevel = GetHeroLevel(heroId);
             heroLevels[heroId] = currentLevel + 1;
 
-            Debug.Log($"[UpgradeSystem] Upgraded hero {heroId} to level {heroLevels[heroId]}");
+            Log.Info($"[UpgradeSystem] Upgraded hero {heroId} to level {heroLevels[heroId]}");
             SaveUpgrades();
             return true;
         }
@@ -167,7 +168,7 @@ namespace TowerConquest.Progression
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogWarning($"[UpgradeSystem] Failed to parse unit levels: {e.Message}");
+                    Log.Warning($"[UpgradeSystem] Failed to parse unit levels: {e.Message}");
                 }
             }
 
@@ -191,7 +192,7 @@ namespace TowerConquest.Progression
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogWarning($"[UpgradeSystem] Failed to parse hero levels: {e.Message}");
+                    Log.Warning($"[UpgradeSystem] Failed to parse hero levels: {e.Message}");
                 }
             }
 
@@ -215,11 +216,11 @@ namespace TowerConquest.Progression
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogWarning($"[UpgradeSystem] Failed to parse tower levels: {e.Message}");
+                    Log.Warning($"[UpgradeSystem] Failed to parse tower levels: {e.Message}");
                 }
             }
 
-            Debug.Log($"[UpgradeSystem] Loaded upgrades: {unitLevels.Count} units, {heroLevels.Count} heroes, {towerLevels.Count} towers");
+            Log.Info($"[UpgradeSystem] Loaded upgrades: {unitLevels.Count} units, {heroLevels.Count} heroes, {towerLevels.Count} towers");
         }
 
         private void SaveUpgrades()
@@ -249,7 +250,7 @@ namespace TowerConquest.Progression
             PlayerPrefs.SetString("TowerLevels", JsonUtility.ToJson(towerWrapper));
 
             PlayerPrefs.Save();
-            Debug.Log("[UpgradeSystem] Saved upgrades");
+            Log.Info("[UpgradeSystem] Saved upgrades");
         }
 
         /// <summary>
@@ -273,7 +274,7 @@ namespace TowerConquest.Progression
             int currentLevel = GetTowerLevel(towerId);
             towerLevels[towerId] = currentLevel + 1;
 
-            Debug.Log($"[UpgradeSystem] Upgraded tower {towerId} to level {towerLevels[towerId]}");
+            Log.Info($"[UpgradeSystem] Upgraded tower {towerId} to level {towerLevels[towerId]}");
             SaveUpgrades();
             return true;
         }
@@ -287,7 +288,7 @@ namespace TowerConquest.Progression
             heroLevels.Clear();
             towerLevels.Clear();
             SaveUpgrades();
-            Debug.Log("[UpgradeSystem] Reset all upgrades");
+            Log.Info("[UpgradeSystem] Reset all upgrades");
         }
     }
 

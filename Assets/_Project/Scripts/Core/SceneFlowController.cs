@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -88,13 +89,13 @@ namespace TowerConquest.Core
         {
             if (isLoading)
             {
-                UnityEngine.Debug.LogWarning($"SceneFlowController: Already loading a scene. Ignoring request for '{sceneName}'.");
+                Log.Warning($"SceneFlowController: Already loading a scene. Ignoring request for '{sceneName}'.");
                 return;
             }
 
             if (!Application.CanStreamedLevelBeLoaded(sceneName))
             {
-                UnityEngine.Debug.LogError($"SceneFlowController: Scene '{sceneName}' not found in build settings.");
+                Log.Error($"SceneFlowController: Scene '{sceneName}' not found in build settings.");
                 return;
             }
 

@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.IO;
 using UnityEngine;
 
@@ -12,22 +13,22 @@ namespace TowerConquest.Data
             {
                 if (string.IsNullOrWhiteSpace(absolutePath))
                 {
-                    UnityEngine.Debug.LogWarning("JsonLoader.LoadText called with empty path.");
+                    Log.Warning("JsonLoader.LoadText called with empty path.");
                     return string.Empty;
                 }
 
                 if (!File.Exists(absolutePath))
                 {
-                    UnityEngine.Debug.LogWarning($"JsonLoader could not find file at {absolutePath}.");
+                    Log.Warning($"JsonLoader could not find file at {absolutePath}.");
                     return string.Empty;
                 }
 
-                UnityEngine.Debug.Log($"Loading text from {absolutePath}.");
+                Log.Info($"Loading text from {absolutePath}.");
                 return File.ReadAllText(absolutePath);
             }
             catch (Exception exception)
             {
-                UnityEngine.Debug.LogWarning($"JsonLoader failed to load {absolutePath}. Exception: {exception.Message}");
+                Log.Warning($"JsonLoader failed to load {absolutePath}. Exception: {exception.Message}");
                 return string.Empty;
             }
         }

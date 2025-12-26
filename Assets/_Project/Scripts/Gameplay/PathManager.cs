@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using TowerConquest.Data;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace TowerConquest.Gameplay
             spawnPoints.Clear();
             if (level == null)
             {
-                UnityEngine.Debug.LogWarning("PathManager.InitializeFromLevel called with null level.");
+                Log.Warning("PathManager.InitializeFromLevel called with null level.");
                 return;
             }
 
@@ -26,7 +27,7 @@ namespace TowerConquest.Gameplay
 
             if (level.paths == null || level.paths.Length == 0)
             {
-                UnityEngine.Debug.LogWarning("PathManager.InitializeFromLevel called with no paths.");
+                Log.Warning("PathManager.InitializeFromLevel called with no paths.");
                 return;
             }
 
@@ -66,14 +67,14 @@ namespace TowerConquest.Gameplay
         {
             if (spawnPoints.Count == 0)
             {
-                UnityEngine.Debug.LogWarning("PathManager.GetSpawnPosition called with no spawn points.");
+                Log.Warning("PathManager.GetSpawnPosition called with no spawn points.");
                 return Vector3.zero;
             }
 
             LevelDefinition.PositionDto spawn = spawnPoints[0]?.position;
             if (spawn == null)
             {
-                UnityEngine.Debug.LogWarning("PathManager.GetSpawnPosition called with missing spawn position.");
+                Log.Warning("PathManager.GetSpawnPosition called with missing spawn position.");
                 return Vector3.zero;
             }
 

@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using TowerConquest.Core;
 using TowerConquest.Data;
@@ -99,13 +100,13 @@ namespace TowerConquest.Gameplay
             var trapDef = database?.FindTrap(trapId);
             if (trapDef == null)
             {
-                Debug.LogError($"[TrapPlacementManager] Trap definition not found: {trapId}");
+                Log.Error($"[TrapPlacementManager] Trap definition not found: {trapId}");
                 return null;
             }
 
             if (!CanPlaceTrap(position))
             {
-                Debug.LogWarning($"[TrapPlacementManager] Cannot place trap at {position}");
+                Log.Warning($"[TrapPlacementManager] Cannot place trap at {position}");
                 return null;
             }
 
@@ -140,7 +141,7 @@ namespace TowerConquest.Gameplay
 
             activeConstructionSites.Add(site);
 
-            Debug.Log($"[TrapPlacementManager] Placed trap construction site for {trapId} at {position}");
+            Log.Info($"[TrapPlacementManager] Placed trap construction site for {trapId} at {position}");
 
             // Request builder from construction manager
             if (constructionManager != null)
@@ -173,7 +174,7 @@ namespace TowerConquest.Gameplay
 
         private void OnTrapSiteComplete(TrapConstructionSite site)
         {
-            Debug.Log($"[TrapPlacementManager] Trap construction complete: {site.TrapID}");
+            Log.Info($"[TrapPlacementManager] Trap construction complete: {site.TrapID}");
 
             // Spawn the actual trap
             SpawnTrap(site);
@@ -188,7 +189,7 @@ namespace TowerConquest.Gameplay
 
         private void OnTrapSiteDestroyed(TrapConstructionSite site)
         {
-            Debug.Log($"[TrapPlacementManager] Trap construction destroyed: {site.TrapID}");
+            Log.Info($"[TrapPlacementManager] Trap construction destroyed: {site.TrapID}");
 
             activeConstructionSites.Remove(site);
             site.OnConstructionComplete -= OnTrapSiteComplete;
@@ -202,7 +203,7 @@ namespace TowerConquest.Gameplay
             var trapDef = database?.FindTrap(site.TrapID);
             if (trapDef == null)
             {
-                Debug.LogError($"[TrapPlacementManager] Trap definition not found: {site.TrapID}");
+                Log.Error($"[TrapPlacementManager] Trap definition not found: {site.TrapID}");
                 return;
             }
 

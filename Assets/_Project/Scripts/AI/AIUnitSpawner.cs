@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 using TowerConquest.Gameplay;
 using TowerConquest.Data;
 
@@ -41,7 +42,7 @@ namespace TowerConquest.AI
             var unitDef = database.GetUnit(unitId);
             if (unitDef == null)
             {
-                Debug.LogWarning($"[AIUnitSpawner] Unit not found: {unitId}");
+                Log.Warning($"[AIUnitSpawner] Unit not found: {unitId}");
                 return false;
             }
 
@@ -55,18 +56,18 @@ namespace TowerConquest.AI
             int slotIndex = FindUnitSlotIndex(unitId);
             if (slotIndex < 0)
             {
-                Debug.LogWarning($"[AIUnitSpawner] Unit {unitId} not in AI deck");
+                Log.Warning($"[AIUnitSpawner] Unit {unitId} not in AI deck");
                 return false;
             }
 
             // Use spawner to spawn unit (handles gold, cooldown, and instantiation)
             if (liveBattleSpawner != null && liveBattleSpawner.TrySpawnUnit(slotIndex))
             {
-                Debug.Log($"[AIUnitSpawner] Spawned {unitId} from slot {slotIndex}");
+                Log.Info($"[AIUnitSpawner] Spawned {unitId} from slot {slotIndex}");
                 return true;
             }
 
-            Debug.LogWarning($"[AIUnitSpawner] Failed to spawn {unitId}");
+            Log.Warning($"[AIUnitSpawner] Failed to spawn {unitId}");
             return false;
         }
 

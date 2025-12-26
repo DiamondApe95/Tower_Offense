@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using UnityEngine;
 
 namespace TowerConquest.Core
@@ -222,7 +223,7 @@ namespace TowerConquest.Core
             infiniteEnergy = false;
             instantKill = false;
 
-            UnityEngine.Debug.Log("GameConfig: Defaults applied.");
+            Log.Info("GameConfig: Defaults applied.");
         }
 
         /// <summary>
@@ -261,7 +262,7 @@ namespace TowerConquest.Core
                     break;
             }
 
-            UnityEngine.Debug.Log($"GameConfig: Applied {difficulty} difficulty.");
+            Log.Info($"GameConfig: Applied {difficulty} difficulty.");
         }
 
         /// <summary>
@@ -331,19 +332,19 @@ namespace TowerConquest.Core
 
             if (defaultHandSize <= 0)
             {
-                UnityEngine.Debug.LogError("GameConfig: defaultHandSize must be positive.");
+                Log.Error("GameConfig: defaultHandSize must be positive.");
                 valid = false;
             }
 
             if (defaultMaxWaves <= 0)
             {
-                UnityEngine.Debug.LogError("GameConfig: defaultMaxWaves must be positive.");
+                Log.Error("GameConfig: defaultMaxWaves must be positive.");
                 valid = false;
             }
 
             if (availableSpeedModes == null || availableSpeedModes.Length == 0)
             {
-                UnityEngine.Debug.LogError("GameConfig: availableSpeedModes must have at least one value.");
+                Log.Error("GameConfig: availableSpeedModes must have at least one value.");
                 valid = false;
             }
 

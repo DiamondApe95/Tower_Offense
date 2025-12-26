@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using System.Linq;
 using UnityEngine;
 
@@ -26,25 +27,25 @@ namespace TowerConquest.Gameplay
             CivilizationID = civId;
             SelectedUnits.Clear();
             SelectedHero = null;
-            Debug.Log($"[UnitDeck] Set civilization: {civId}");
+            Log.Info($"[UnitDeck] Set civilization: {civId}");
         }
 
         public bool AddUnit(string unitId)
         {
             if (SelectedUnits.Count >= MAX_UNITS)
             {
-                Debug.LogWarning($"[UnitDeck] Cannot add more than {MAX_UNITS} units");
+                Log.Warning($"[UnitDeck] Cannot add more than {MAX_UNITS} units");
                 return false;
             }
 
             if (SelectedUnits.Contains(unitId))
             {
-                Debug.LogWarning($"[UnitDeck] Unit already in deck: {unitId}");
+                Log.Warning($"[UnitDeck] Unit already in deck: {unitId}");
                 return false;
             }
 
             SelectedUnits.Add(unitId);
-            Debug.Log($"[UnitDeck] Added unit: {unitId} ({SelectedUnits.Count}/{MAX_UNITS})");
+            Log.Info($"[UnitDeck] Added unit: {unitId} ({SelectedUnits.Count}/{MAX_UNITS})");
             return true;
         }
 
@@ -52,24 +53,24 @@ namespace TowerConquest.Gameplay
         {
             if (SelectedUnits.Remove(unitId))
             {
-                Debug.Log($"[UnitDeck] Removed unit: {unitId} ({SelectedUnits.Count}/{MAX_UNITS})");
+                Log.Info($"[UnitDeck] Removed unit: {unitId} ({SelectedUnits.Count}/{MAX_UNITS})");
                 return true;
             }
 
-            Debug.LogWarning($"[UnitDeck] Unit not in deck: {unitId}");
+            Log.Warning($"[UnitDeck] Unit not in deck: {unitId}");
             return false;
         }
 
         public void SetHero(string heroId)
         {
             SelectedHero = heroId;
-            Debug.Log($"[UnitDeck] Set hero: {heroId}");
+            Log.Info($"[UnitDeck] Set hero: {heroId}");
         }
 
         public void ClearHero()
         {
             SelectedHero = null;
-            Debug.Log("[UnitDeck] Cleared hero");
+            Log.Info("[UnitDeck] Cleared hero");
         }
 
         public bool IsValid()
@@ -79,11 +80,11 @@ namespace TowerConquest.Gameplay
             bool hasHero = !string.IsNullOrEmpty(SelectedHero);
 
             if (!hasCivilization)
-                Debug.LogWarning("[UnitDeck] Invalid: No civilization set");
+                Log.Warning("[UnitDeck] Invalid: No civilization set");
             if (!hasUnits)
-                Debug.LogWarning($"[UnitDeck] Invalid: Need {MAX_UNITS} units (have {SelectedUnits.Count})");
+                Log.Warning($"[UnitDeck] Invalid: Need {MAX_UNITS} units (have {SelectedUnits.Count})");
             if (!hasHero)
-                Debug.LogWarning("[UnitDeck] Invalid: No hero set");
+                Log.Warning("[UnitDeck] Invalid: No hero set");
 
             return hasCivilization && hasUnits && hasHero;
         }
@@ -103,7 +104,7 @@ namespace TowerConquest.Gameplay
             CivilizationID = null;
             SelectedUnits.Clear();
             SelectedHero = null;
-            Debug.Log("[UnitDeck] Cleared deck");
+            Log.Info("[UnitDeck] Cleared deck");
         }
 
         public UnitDeck Clone()

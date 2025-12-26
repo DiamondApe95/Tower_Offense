@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using UnityEngine;
 
 namespace TowerConquest.Progression
@@ -41,7 +42,7 @@ namespace TowerConquest.Progression
         {
             if (amount < 0)
             {
-                Debug.LogWarning($"[FameManager] Cannot add negative fame: {amount}");
+                Log.Warning($"[FameManager] Cannot add negative fame: {amount}");
                 return;
             }
 
@@ -50,7 +51,7 @@ namespace TowerConquest.Progression
             OnFameEarned?.Invoke(amount, totalFame);
             OnFameChanged?.Invoke(totalFame);
 
-            Debug.Log($"[FameManager] Earned {amount} fame (total: {totalFame}, lifetime: {totalFameEarned})");
+            Log.Info($"[FameManager] Earned {amount} fame (total: {totalFame}, lifetime: {totalFameEarned})");
 
             SaveFame();
         }
@@ -62,13 +63,13 @@ namespace TowerConquest.Progression
         {
             if (amount < 0)
             {
-                Debug.LogWarning($"[FameManager] Cannot spend negative fame: {amount}");
+                Log.Warning($"[FameManager] Cannot spend negative fame: {amount}");
                 return false;
             }
 
             if (totalFame < amount)
             {
-                Debug.LogWarning($"[FameManager] Not enough fame (have: {totalFame}, need: {amount})");
+                Log.Warning($"[FameManager] Not enough fame (have: {totalFame}, need: {amount})");
                 return false;
             }
 
@@ -76,7 +77,7 @@ namespace TowerConquest.Progression
             OnFameSpent?.Invoke(amount, totalFame);
             OnFameChanged?.Invoke(totalFame);
 
-            Debug.Log($"[FameManager] Spent {amount} fame (remaining: {totalFame})");
+            Log.Info($"[FameManager] Spent {amount} fame (remaining: {totalFame})");
 
             SaveFame();
             return true;
@@ -100,14 +101,14 @@ namespace TowerConquest.Progression
 
             AddFame(totalReward);
 
-            Debug.Log($"[FameManager] Level {levelId} complete. Victory: {victory}, Reward: {totalReward}");
+            Log.Info($"[FameManager] Level {levelId} complete. Victory: {victory}, Reward: {totalReward}");
         }
 
         private void LoadFame()
         {
             totalFame = PlayerPrefs.GetInt("PlayerFame", 0);
             totalFameEarned = PlayerPrefs.GetInt("PlayerTotalFameEarned", totalFame);
-            Debug.Log($"[FameManager] Loaded fame: {totalFame}, lifetime: {totalFameEarned}");
+            Log.Info($"[FameManager] Loaded fame: {totalFame}, lifetime: {totalFameEarned}");
         }
 
         private void SaveFame()

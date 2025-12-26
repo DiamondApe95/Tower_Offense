@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 
 namespace TowerConquest.Combat
 {
@@ -8,7 +9,7 @@ namespace TowerConquest.Combat
         {
             if (target == null)
             {
-                UnityEngine.Debug.LogWarning("ApplySlow called with null target.");
+                Log.Warning("ApplySlow called with null target.");
                 return;
             }
 
@@ -27,7 +28,7 @@ namespace TowerConquest.Combat
         {
             if (target == null)
             {
-                UnityEngine.Debug.LogWarning("ApplyBurn called with null target.");
+                Log.Warning("ApplyBurn called with null target.");
                 return;
             }
 
@@ -39,7 +40,7 @@ namespace TowerConquest.Combat
         {
             if (target == null)
             {
-                UnityEngine.Debug.LogWarning("ApplyArmorShred called with null target.");
+                Log.Warning("ApplyArmorShred called with null target.");
                 return;
             }
 

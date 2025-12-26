@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 
 namespace TowerConquest.Combat
 {
@@ -9,7 +10,7 @@ namespace TowerConquest.Combat
 
         public int Mitigate(int damage)
         {
-            UnityEngine.Debug.Log("Mitigating damage.");
+            Log.Info("Mitigating damage.");
             return damage;
         }
 

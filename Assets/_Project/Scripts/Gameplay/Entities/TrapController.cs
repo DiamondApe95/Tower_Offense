@@ -1,4 +1,5 @@
 using TowerConquest.Combat;
+using TowerConquest.Debug;
 using TowerConquest.Core;
 using TowerConquest.Data;
 using UnityEngine;
@@ -54,13 +55,13 @@ namespace TowerConquest.Gameplay.Entities
 
             if (trapDefinition?.effects == null || trapDefinition.effects.Length == 0)
             {
-                UnityEngine.Debug.LogWarning($"Trap '{trapId}' has no effects.");
+                Log.Warning($"Trap '{trapId}' has no effects.");
                 return;
             }
 
             effectResolver.ApplyEffects(gameObject, unit.gameObject, trapDefinition.effects);
             cooldownTimer = Mathf.Max(0f, cooldownSeconds);
-            UnityEngine.Debug.Log($"Trap '{trapId}' triggered on {unit.UnitId}.");
+            Log.Info($"Trap '{trapId}' triggered on {unit.UnitId}.");
         }
     }
 }

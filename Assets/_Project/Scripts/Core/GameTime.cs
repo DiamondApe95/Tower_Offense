@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 
 namespace TowerConquest.Core
 {
@@ -9,13 +10,13 @@ namespace TowerConquest.Core
 
         public void Tick(float deltaTime)
         {
-            UnityEngine.Debug.Log("Stub method called.");
+            Log.Info("Stub method called.");
         }
 
         public void SetTimeScale(float scale)
         {
             Time.timeScale = scale;
-            UnityEngine.Debug.Log($"GameTime set Time.timeScale to {scale}.");
+            Log.Info($"GameTime set Time.timeScale to {scale}.");
         }
 
     }

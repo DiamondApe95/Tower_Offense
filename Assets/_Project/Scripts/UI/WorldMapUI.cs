@@ -1,4 +1,5 @@
 using TowerConquest.Core;
+using TowerConquest.Debug;
 using TowerConquest.Saving;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,15 +15,15 @@ namespace TowerConquest.UI
         {
             SaveManager saveManager = ServiceLocator.Get<SaveManager>();
             PlayerProgress progress = saveManager.GetOrCreateProgress();
-            UnityEngine.Debug.Log($"Unlocked levels: {string.Join(", ", progress.unlockedLevelIds)}");
-            UnityEngine.Debug.Log($"Completed levels: {string.Join(", ", progress.completedLevelIds)}");
+            Log.Info($"Unlocked levels: {string.Join(", ", progress.unlockedLevelIds)}");
+            Log.Info($"Completed levels: {string.Join(", ", progress.completedLevelIds)}");
         }
 
         public void DebugSelectLevel(string levelId)
         {
             if (string.IsNullOrWhiteSpace(levelId))
             {
-                UnityEngine.Debug.LogWarning("DebugSelectLevel called with empty level id.");
+                Log.Warning("DebugSelectLevel called with empty level id.");
                 return;
             }
 
@@ -35,7 +36,7 @@ namespace TowerConquest.UI
             }
 
             saveManager.SaveProgress(progress);
-            UnityEngine.Debug.Log($"Debug selected level: {levelId}");
+            Log.Info($"Debug selected level: {levelId}");
 
             LoadLevelGameplay();
         }
@@ -48,13 +49,13 @@ namespace TowerConquest.UI
             }
             else
             {
-                UnityEngine.Debug.LogError("LevelGameplay scene not found in build settings!");
+                Log.Error("LevelGameplay scene not found in build settings!");
             }
         }
 
         public void Open()
         {
-            UnityEngine.Debug.Log("Stub method called.");
+            Log.Info("Stub method called.");
         }
 
     }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 using TowerConquest.Data;
 
 namespace TowerConquest.Gameplay
@@ -23,7 +24,7 @@ namespace TowerConquest.Gameplay
             var unitDef = database.GetUnit(unitId);
             if (unitDef == null)
             {
-                Debug.LogWarning($"[CostSystem] Unit not found: {unitId}");
+                Log.Warning($"[CostSystem] Unit not found: {unitId}");
                 return 0;
             }
 
@@ -38,7 +39,7 @@ namespace TowerConquest.Gameplay
             var towerDef = database.GetTower(towerId);
             if (towerDef == null)
             {
-                Debug.LogWarning($"[CostSystem] Tower not found: {towerId}");
+                Log.Warning($"[CostSystem] Tower not found: {towerId}");
                 return 0;
             }
 
@@ -71,7 +72,7 @@ namespace TowerConquest.Gameplay
             int cost = GetUnitCost(unitId);
             if (goldManager.SpendGold(cost))
             {
-                Debug.Log($"[CostSystem] Purchased unit '{unitId}' for {cost} gold");
+                Log.Info($"[CostSystem] Purchased unit '{unitId}' for {cost} gold");
                 return true;
             }
             return false;
@@ -85,7 +86,7 @@ namespace TowerConquest.Gameplay
             int cost = GetTowerCost(towerId);
             if (goldManager.SpendGold(cost))
             {
-                Debug.Log($"[CostSystem] Purchased tower '{towerId}' for {cost} gold");
+                Log.Info($"[CostSystem] Purchased tower '{towerId}' for {cost} gold");
                 return true;
             }
             return false;

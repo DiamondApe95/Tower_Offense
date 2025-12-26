@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using UnityEngine;
 using TowerConquest.Core;
 using TowerConquest.Gameplay.Entities;
@@ -56,7 +57,7 @@ namespace TowerConquest.Gameplay.Economy
             ResetCombo();
             SubscribeToKillEvents();
 
-            Debug.Log($"[ComboKillSystem] Initialized for team {team}");
+            Log.Info($"[ComboKillSystem] Initialized for team {team}");
         }
 
         private void SubscribeToKillEvents()
@@ -119,7 +120,7 @@ namespace TowerConquest.Gameplay.Economy
 
             if (IsComboActive)
             {
-                Debug.Log($"[ComboKillSystem] Combo x{currentCombo}! Multiplier: {currentMultiplier:F2}x");
+                Log.Info($"[ComboKillSystem] Combo x{currentCombo}! Multiplier: {currentMultiplier:F2}x");
             }
         }
 
@@ -139,7 +140,7 @@ namespace TowerConquest.Gameplay.Economy
             if (bonusGold > 0)
             {
                 OnComboKillReward?.Invoke(baseGold, bonusGold);
-                Debug.Log($"[ComboKillSystem] Combo bonus! Base: {baseGold}, Bonus: +{bonusGold} (x{currentMultiplier:F2})");
+                Log.Info($"[ComboKillSystem] Combo bonus! Base: {baseGold}, Bonus: +{bonusGold} (x{currentMultiplier:F2})");
             }
 
             return totalGold;
@@ -149,7 +150,7 @@ namespace TowerConquest.Gameplay.Economy
         {
             if (currentCombo >= minKillsForCombo)
             {
-                Debug.Log($"[ComboKillSystem] Combo ended at x{currentCombo}");
+                Log.Info($"[ComboKillSystem] Combo ended at x{currentCombo}");
                 OnComboEnded?.Invoke(currentCombo);
             }
 

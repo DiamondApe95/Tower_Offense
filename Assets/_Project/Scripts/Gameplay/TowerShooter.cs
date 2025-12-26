@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 
 public class TowerShooter : MonoBehaviour
 {
@@ -78,7 +79,7 @@ public class TowerShooter : MonoBehaviour
     {
         if (projectilePrefab == null)
         {
-            Debug.LogError("TowerShooter: projectilePrefab missing!");
+            Log.Error("TowerShooter: projectilePrefab missing!");
             return;
         }
 

@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using TowerConquest.Combat;
 using UnityEngine;
 
@@ -63,7 +64,7 @@ namespace TowerConquest.Gameplay
                 healthComponent.Initialize(maxHP, 0f);
             }
 
-            Debug.Log($"[TrapConstructionSite] Initialized: {trapId}, Team: {team}, Builders needed: {requiredBuilders}");
+            Log.Info($"[TrapConstructionSite] Initialized: {trapId}, Team: {team}, Builders needed: {requiredBuilders}");
         }
 
         /// <summary>
@@ -73,12 +74,12 @@ namespace TowerConquest.Gameplay
         {
             if (isComplete)
             {
-                Debug.LogWarning("[TrapConstructionSite] Builder arrived but construction already complete");
+                Log.Warning("[TrapConstructionSite] Builder arrived but construction already complete");
                 return;
             }
 
             currentBuilders++;
-            Debug.Log($"[TrapConstructionSite] Builder arrived ({currentBuilders}/{requiredBuilders})");
+            Log.Info($"[TrapConstructionSite] Builder arrived ({currentBuilders}/{requiredBuilders})");
 
             OnBuilderArrived?.Invoke(currentBuilders, requiredBuilders);
 
@@ -93,7 +94,7 @@ namespace TowerConquest.Gameplay
             if (isComplete) return;
 
             isComplete = true;
-            Debug.Log($"[TrapConstructionSite] Construction complete for {trapId}");
+            Log.Info($"[TrapConstructionSite] Construction complete for {trapId}");
 
             OnConstructionComplete?.Invoke(this);
         }
@@ -107,7 +108,7 @@ namespace TowerConquest.Gameplay
 
             if (healthComponent != null)
             {
-                healthComponent.TakeDamage(damage, DamageSystem.DamageType.Physical, null);
+                healthComponent.TakeDamage(damage, "Physical", null);
             }
             else
             {
@@ -123,7 +124,7 @@ namespace TowerConquest.Gameplay
         {
             if (isComplete) return;
 
-            Debug.Log($"[TrapConstructionSite] Destroyed: {trapId}");
+            Log.Info($"[TrapConstructionSite] Destroyed: {trapId}");
             OnConstructionDestroyed?.Invoke(this);
 
             Destroy(gameObject);

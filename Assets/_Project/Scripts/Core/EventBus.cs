@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,7 +36,7 @@ namespace TowerConquest.Core
                 }
                 catch (Exception ex)
                 {
-                    UnityEngine.Debug.LogError($"EventBus: Error in handler for {eventType.Name}: {ex.Message}");
+                    Log.Error($"EventBus: Error in handler for {eventType.Name}: {ex.Message}");
                 }
             }
         }
@@ -58,7 +59,7 @@ namespace TowerConquest.Core
                 }
                 catch (Exception ex)
                 {
-                    UnityEngine.Debug.LogError($"EventBus: Error in handler for '{eventName}': {ex.Message}");
+                    Log.Error($"EventBus: Error in handler for '{eventName}': {ex.Message}");
                 }
             }
         }

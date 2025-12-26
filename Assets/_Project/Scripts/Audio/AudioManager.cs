@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using UnityEngine;
 using TowerConquest.Core;
@@ -266,7 +267,7 @@ namespace TowerConquest.Audio
             }
             else
             {
-                UnityEngine.Debug.LogWarning($"AudioManager: SFX '{sfxId}' not found.");
+                Log.Warning($"AudioManager: SFX '{sfxId}' not found.");
             }
         }
 

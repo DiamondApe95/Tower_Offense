@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 
 namespace TowerConquest.Debug
 {
@@ -6,17 +7,17 @@ namespace TowerConquest.Debug
     {
         public static void Info(object message)
         {
-            UnityEngine.Debug.Log(message);
+            Log.Info(message);
         }
 
         public static void Warning(object message)
         {
-            UnityEngine.Debug.LogWarning(message);
+            Log.Warning(message);
         }
 
         public static void Error(object message)
         {
-            UnityEngine.Debug.LogError(message);
+            Log.Error(message);
         }
     }
 }
