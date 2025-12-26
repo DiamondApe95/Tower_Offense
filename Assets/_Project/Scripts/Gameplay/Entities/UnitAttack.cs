@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 using TowerConquest.Combat;
 
 namespace TowerConquest.Gameplay.Entities
@@ -10,7 +11,7 @@ namespace TowerConquest.Gameplay.Entities
 
         public void Attack(TargetingSystem target)
         {
-            UnityEngine.Debug.Log("Stub method called.");
+            Log.Info("Stub method called.");
         }
 
     }

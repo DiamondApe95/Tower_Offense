@@ -1,4 +1,5 @@
 using TowerConquest.Combat;
+using TowerConquest.Debug;
 using TowerConquest.Core;
 using TowerConquest.Data;
 using UnityEngine;
@@ -91,7 +92,7 @@ namespace TowerConquest.Gameplay.Entities
                     unitCombat.RegisterAttacker(gameObject);
                 }
 
-                UnityEngine.Debug.Log($"Tower hit unit {currentTarget.UnitId}");
+                Log.Info($"Tower hit unit {currentTarget.UnitId}");
             }
         }
 

@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -70,7 +71,7 @@ namespace TowerConquest.UI
             }
 
             UpdateDisplay();
-            Debug.Log("[BattleCountdownTimer] Countdown started");
+            Log.Info("[BattleCountdownTimer] Countdown started");
         }
 
         /// <summary>
@@ -150,7 +151,7 @@ namespace TowerConquest.UI
                 countdownText.transform.localScale = Vector3.one * pulseScale;
             }
 
-            Debug.Log("[BattleCountdownTimer] Countdown complete!");
+            Log.Info("[BattleCountdownTimer] Countdown complete!");
 
             // Hide panel after short delay
             Invoke(nameof(HideCountdownPanel), startTextDuration);
@@ -245,7 +246,7 @@ namespace TowerConquest.UI
 
             countdownPanel.SetActive(false);
 
-            Debug.Log("[BattleCountdownTimer] Created default UI");
+            Log.Info("[BattleCountdownTimer] Created default UI");
         }
     }
 }

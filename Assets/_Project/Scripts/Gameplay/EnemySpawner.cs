@@ -1,4 +1,5 @@
 using System.Collections;
+using TowerConquest.Debug;
 using UnityEngine;
 using TowerConquest.Gameplay;
 
@@ -32,7 +33,7 @@ public class EnemySpawner : MonoBehaviour
 
         if (pathWaypointsRoot == null)
         {
-            Debug.LogError("EnemySpawner: pathWaypointsRoot missing!");
+            Log.Error("EnemySpawner: pathWaypointsRoot missing!");
             return;
         }
 
@@ -68,7 +69,7 @@ public class EnemySpawner : MonoBehaviour
 
         if (enemyPrefab == null || spawnPoint == null || cachedWaypoints == null || cachedWaypoints.Length == 0)
         {
-            Debug.LogError("EnemySpawner: Missing references or waypoints.");
+            Log.Error("EnemySpawner: Missing references or waypoints.");
             return;
         }
 

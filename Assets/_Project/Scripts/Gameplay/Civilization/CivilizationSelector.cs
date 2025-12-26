@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 using TowerConquest.Data;
 
 namespace TowerConquest.Gameplay
@@ -38,7 +39,7 @@ namespace TowerConquest.Gameplay
             playerDeck = new UnitDeck();
             playerDeck.SetCivilization(civId);
 
-            Debug.Log($"[CivilizationSelector] Started selection for civilization: {civId}");
+            Log.Info($"[CivilizationSelector] Started selection for civilization: {civId}");
         }
 
         /// <summary>
@@ -114,11 +115,11 @@ namespace TowerConquest.Gameplay
         {
             if (!IsSelectionComplete())
             {
-                Debug.LogWarning("[CivilizationSelector] Cannot confirm incomplete selection");
+                Log.Warning("[CivilizationSelector] Cannot confirm incomplete selection");
                 return;
             }
 
-            Debug.Log($"[CivilizationSelector] Selection confirmed: {playerDeck}");
+            Log.Info($"[CivilizationSelector] Selection confirmed: {playerDeck}");
             // Proceed to level loading
         }
 
@@ -126,7 +127,7 @@ namespace TowerConquest.Gameplay
         [ContextMenu("Print Deck")]
         private void DebugPrintDeck()
         {
-            Debug.Log(playerDeck.ToString());
+            Log.Info(playerDeck.ToString());
         }
         #endif
     }

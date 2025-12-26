@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using TowerConquest.AI;
 using TowerConquest.Core;
@@ -92,7 +93,7 @@ namespace TowerConquest.Gameplay
             {
                 GameObject bootstrapperGO = new GameObject("GameBootstrapper");
                 bootstrapper = bootstrapperGO.AddComponent<GameBootstrapper>();
-                Debug.Log("LiveBattleLevelController: Created GameBootstrapper automatically.");
+                Log.Info("LiveBattleLevelController: Created GameBootstrapper automatically.");
             }
         }
 
@@ -150,10 +151,10 @@ namespace TowerConquest.Gameplay
             if (AI != null)
             {
                 AI.enabled = true;
-                Debug.Log("LiveBattleLevelController: AI enabled");
+                Log.Info("LiveBattleLevelController: AI enabled");
             }
 
-            Debug.Log("LiveBattleLevelController: Battle started!");
+            Log.Info("LiveBattleLevelController: Battle started!");
             OnBattleStarted?.Invoke();
 
             if (hud != null)
@@ -178,7 +179,7 @@ namespace TowerConquest.Gameplay
             levelDefinition = database.FindLevel(levelId);
             if (levelDefinition == null)
             {
-                Debug.LogError($"LiveBattleLevelController: Level '{levelId}' not found!");
+                Log.Error($"LiveBattleLevelController: Level '{levelId}' not found!");
                 // Create default level for testing
                 CreateDefaultLevel();
             }
@@ -214,7 +215,7 @@ namespace TowerConquest.Gameplay
                 hud.Initialize(this);
             }
 
-            Debug.Log($"LiveBattleLevelController: Initialized level '{levelId}' with {startingGold} starting gold.");
+            Log.Info($"LiveBattleLevelController: Initialized level '{levelId}' with {startingGold} starting gold.");
         }
 
         private void CreateDefaultLevel()
@@ -377,7 +378,7 @@ namespace TowerConquest.Gameplay
                 GameObject playerAbilityGO = new GameObject("PlayerAbilityManager");
                 PlayerAbility = playerAbilityGO.AddComponent<AbilityManager>();
                 PlayerAbility.Initialize(playerCiv.specialAbility, GoldManager.Team.Player, database);
-                Debug.Log($"LiveBattleLevelController: Set up player ability '{playerCiv.specialAbility}'");
+                Log.Info($"LiveBattleLevelController: Set up player ability '{playerCiv.specialAbility}'");
             }
 
             // Get AI civilization ability
@@ -387,7 +388,7 @@ namespace TowerConquest.Gameplay
                 GameObject aiAbilityGO = new GameObject("AIAbilityManager");
                 AIAbility = aiAbilityGO.AddComponent<AbilityManager>();
                 AIAbility.Initialize(aiCiv.specialAbility, GoldManager.Team.AI, database);
-                Debug.Log($"LiveBattleLevelController: Set up AI ability '{aiCiv.specialAbility}'");
+                Log.Info($"LiveBattleLevelController: Set up AI ability '{aiCiv.specialAbility}'");
             }
         }
 
@@ -400,21 +401,21 @@ namespace TowerConquest.Gameplay
             {
                 GameObject conMgrGO = new GameObject("ConstructionManager");
                 ConstructionMgr = conMgrGO.AddComponent<ConstructionManager>();
-                Debug.Log("LiveBattleLevelController: Created ConstructionManager");
+                Log.Info("LiveBattleLevelController: Created ConstructionManager");
             }
 
             PrefabRegistry prefabRegistry = null;
             ServiceLocator.TryGet(out prefabRegistry);
             ConstructionMgr.Initialize(database, prefabRegistry);
 
-            Debug.Log("LiveBattleLevelController: ConstructionManager initialized");
+            Log.Info("LiveBattleLevelController: ConstructionManager initialized");
         }
 
         private void SetupAI()
         {
             if (levelDefinition == null)
             {
-                Debug.LogWarning("LiveBattleLevelController: Cannot setup AI without level definition");
+                Log.Warning("LiveBattleLevelController: Cannot setup AI without level definition");
                 return;
             }
 
@@ -425,7 +426,7 @@ namespace TowerConquest.Gameplay
             {
                 GameObject aiGO = new GameObject("AICommander");
                 AI = aiGO.AddComponent<AICommander>();
-                Debug.Log("LiveBattleLevelController: Created AICommander");
+                Log.Info("LiveBattleLevelController: Created AICommander");
             }
 
             // Parse difficulty
@@ -468,7 +469,7 @@ namespace TowerConquest.Gameplay
             Transform aiBaseTransform = EnemyBase != null ? EnemyBase.transform : null;
             if (aiBaseTransform == null)
             {
-                Debug.LogWarning("LiveBattleLevelController: AI base not found, AI may not function correctly");
+                Log.Warning("LiveBattleLevelController: AI base not found, AI may not function correctly");
             }
 
             AI.Initialize(difficulty, strategy, AIDeck, AIGold, database, ConstructionMgr, aiBaseTransform);
@@ -477,17 +478,17 @@ namespace TowerConquest.Gameplay
             if (AISpawner != null)
             {
                 AI.GetUnitSpawner().SetLiveBattleSpawner(AISpawner);
-                Debug.Log("LiveBattleLevelController: Connected AI to spawner");
+                Log.Info("LiveBattleLevelController: Connected AI to spawner");
             }
             else
             {
-                Debug.LogWarning("LiveBattleLevelController: AI spawner not found, AI cannot spawn units");
+                Log.Warning("LiveBattleLevelController: AI spawner not found, AI cannot spawn units");
             }
 
             // Enable AI when battle starts
             AI.enabled = false; // Disabled until battle starts
 
-            Debug.Log($"LiveBattleLevelController: AI initialized with {difficulty} difficulty and {strategy} strategy");
+            Log.Info($"LiveBattleLevelController: AI initialized with {difficulty} difficulty and {strategy} strategy");
         }
 
         private void Update()
@@ -548,7 +549,7 @@ namespace TowerConquest.Gameplay
                 IsCountingDown = true;
                 SetupCountdownTimer();
                 countdownTimer.StartCountdown(countdownDuration);
-                Debug.Log("LiveBattleLevelController: Starting countdown...");
+                Log.Info("LiveBattleLevelController: Starting countdown...");
             }
             else
             {
@@ -564,7 +565,7 @@ namespace TowerConquest.Gameplay
             IsBattleEnded = true;
             PlayerVictory = playerWins;
 
-            Debug.Log($"LiveBattleLevelController: Battle ended! Player {(playerWins ? "wins" : "loses")}");
+            Log.Info($"LiveBattleLevelController: Battle ended! Player {(playerWins ? "wins" : "loses")}");
 
             // Calculate fame reward
             int fameEarned = 0;
@@ -634,13 +635,13 @@ namespace TowerConquest.Gameplay
 
             if (PlayerAbility == null)
             {
-                Debug.LogWarning("LiveBattleLevelController: No ability manager available");
+                Log.Warning("LiveBattleLevelController: No ability manager available");
                 return false;
             }
 
             if (!PlayerAbility.CanUse)
             {
-                Debug.Log($"LiveBattleLevelController: Ability on cooldown ({PlayerAbility.CooldownRemaining:F1}s remaining)");
+                Log.Info($"LiveBattleLevelController: Ability on cooldown ({PlayerAbility.CooldownRemaining:F1}s remaining)");
                 return false;
             }
 

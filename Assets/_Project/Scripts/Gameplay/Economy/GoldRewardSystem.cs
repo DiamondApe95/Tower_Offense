@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 using TowerConquest.Data;
 
 namespace TowerConquest.Gameplay
@@ -23,7 +24,7 @@ namespace TowerConquest.Gameplay
             var unitDef = database.GetUnit(unitId);
             if (unitDef == null)
             {
-                Debug.LogWarning($"[GoldRewardSystem] Unit not found: {unitId}");
+                Log.Warning($"[GoldRewardSystem] Unit not found: {unitId}");
                 return 0;
             }
 
@@ -38,7 +39,7 @@ namespace TowerConquest.Gameplay
             var towerDef = database.GetTower(towerId);
             if (towerDef == null)
             {
-                Debug.LogWarning($"[GoldRewardSystem] Tower not found: {towerId}");
+                Log.Warning($"[GoldRewardSystem] Tower not found: {towerId}");
                 return 0;
             }
 
@@ -54,7 +55,7 @@ namespace TowerConquest.Gameplay
             var heroDef = database.GetHero(heroId);
             if (heroDef == null)
             {
-                Debug.LogWarning($"[GoldRewardSystem] Hero not found: {heroId}");
+                Log.Warning($"[GoldRewardSystem] Hero not found: {heroId}");
                 return 0;
             }
 

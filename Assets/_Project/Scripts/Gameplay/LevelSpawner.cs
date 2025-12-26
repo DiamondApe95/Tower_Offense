@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using TowerConquest.Core;
 using TowerConquest.Data;
 using TowerConquest.Gameplay.Entities;
@@ -21,7 +22,7 @@ namespace TowerConquest.Gameplay
         {
             if (levelDefinition == null)
             {
-                UnityEngine.Debug.LogWarning("LevelSpawner.Spawn called with null level definition.");
+                Log.Warning("LevelSpawner.Spawn called with null level definition.");
                 return;
             }
 
@@ -43,7 +44,7 @@ namespace TowerConquest.Gameplay
             basePosition = Vector3.zero;
             if (levelDefinition.@base == null || levelDefinition.@base.position == null)
             {
-                UnityEngine.Debug.LogWarning("LevelSpawner.SpawnBase missing base definition.");
+                Log.Warning("LevelSpawner.SpawnBase missing base definition.");
                 return;
             }
 

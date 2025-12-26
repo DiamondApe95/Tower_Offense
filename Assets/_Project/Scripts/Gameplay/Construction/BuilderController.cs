@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 using UnityEngine.AI;
 using TowerConquest.Combat;
 
@@ -62,13 +63,13 @@ namespace TowerConquest.Gameplay
         {
             if (trapSite == null)
             {
-                Debug.LogWarning("[BuilderController] Cannot assign to null trap site");
+                Log.Warning("[BuilderController] Cannot assign to null trap site");
                 return;
             }
 
             if (isAssigned)
             {
-                Debug.LogWarning("[BuilderController] Builder already assigned");
+                Log.Warning("[BuilderController] Builder already assigned");
                 return;
             }
 
@@ -82,7 +83,7 @@ namespace TowerConquest.Gameplay
 
             MoveToTarget();
 
-            Debug.Log($"[BuilderController] Assigned to trap site: {trapSite.TrapID}");
+            Log.Info($"[BuilderController] Assigned to trap site: {trapSite.TrapID}");
         }
 
         private void MoveToTarget()
@@ -102,7 +103,7 @@ namespace TowerConquest.Gameplay
             if (destination != Vector3.zero)
             {
                 agent.SetDestination(destination);
-                Debug.Log("[BuilderController] Moving to construction site");
+                Log.Info("[BuilderController] Moving to construction site");
             }
         }
 
@@ -113,13 +114,13 @@ namespace TowerConquest.Gameplay
         {
             if (site == null)
             {
-                Debug.LogWarning("[BuilderController] Cannot assign to null site");
+                Log.Warning("[BuilderController] Cannot assign to null site");
                 return;
             }
 
             if (isAssigned)
             {
-                Debug.LogWarning("[BuilderController] Builder already assigned");
+                Log.Warning("[BuilderController] Builder already assigned");
                 return;
             }
 
@@ -133,7 +134,7 @@ namespace TowerConquest.Gameplay
 
             MoveToTarget();
 
-            Debug.Log($"[BuilderController] Assigned to site: {site.TowerID}");
+            Log.Info($"[BuilderController] Assigned to site: {site.TowerID}");
         }
 
         private void Update()
@@ -153,7 +154,7 @@ namespace TowerConquest.Gameplay
             if (hasArrived) return;
 
             hasArrived = true;
-            Debug.Log("[BuilderController] Reached construction site");
+            Log.Info("[BuilderController] Reached construction site");
 
             // Notify the appropriate construction site
             if (targetSite != null)
@@ -170,28 +171,28 @@ namespace TowerConquest.Gameplay
 
         private void OnConstructionComplete(ConstructionSite site)
         {
-            Debug.Log("[BuilderController] Construction complete, builder leaving");
+            Log.Info("[BuilderController] Construction complete, builder leaving");
             UnassignFromSite();
             Destroy(gameObject, 0.5f);
         }
 
         private void OnTrapConstructionComplete(TrapConstructionSite site)
         {
-            Debug.Log("[BuilderController] Trap construction complete, builder leaving");
+            Log.Info("[BuilderController] Trap construction complete, builder leaving");
             UnassignFromSite();
             Destroy(gameObject, 0.5f);
         }
 
         private void OnSiteDestroyed(ConstructionSite site)
         {
-            Debug.Log("[BuilderController] Construction site destroyed");
+            Log.Info("[BuilderController] Construction site destroyed");
             UnassignFromSite();
             Destroy(gameObject, 0.5f);
         }
 
         private void OnTrapSiteDestroyed(TrapConstructionSite site)
         {
-            Debug.Log("[BuilderController] Trap construction site destroyed");
+            Log.Info("[BuilderController] Trap construction site destroyed");
             UnassignFromSite();
             Destroy(gameObject, 0.5f);
         }
@@ -219,7 +220,7 @@ namespace TowerConquest.Gameplay
 
         private void OnBuilderDied()
         {
-            Debug.Log("[BuilderController] Builder killed");
+            Log.Info("[BuilderController] Builder killed");
             UnassignFromSite();
         }
 

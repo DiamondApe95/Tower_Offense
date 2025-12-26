@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 using TowerConquest.Gameplay;
 using TowerConquest.Data;
 
@@ -34,7 +35,7 @@ namespace TowerConquest.AI
             var towerDef = database.GetTower(towerId);
             if (towerDef == null)
             {
-                Debug.LogWarning($"[AIBuildPlanner] Tower not found: {towerId}");
+                Log.Warning($"[AIBuildPlanner] Tower not found: {towerId}");
                 return false;
             }
 
@@ -48,7 +49,7 @@ namespace TowerConquest.AI
             Vector3 buildPosition = FindBuildLocation();
             if (buildPosition == Vector3.zero)
             {
-                Debug.Log("[AIBuildPlanner] No valid build location found");
+                Log.Info("[AIBuildPlanner] No valid build location found");
                 return false;
             }
 
@@ -70,7 +71,7 @@ namespace TowerConquest.AI
             // Spawn builders
             SpawnBuilders(site, buildPosition);
 
-            Debug.Log($"[AIBuildPlanner] Started building {towerId} at {buildPosition}");
+            Log.Info($"[AIBuildPlanner] Started building {towerId} at {buildPosition}");
             return true;
         }
 
@@ -82,7 +83,7 @@ namespace TowerConquest.AI
             Transform aiBase = commander.GetBase();
             if (aiBase == null)
             {
-                Debug.LogWarning("[AIBuildPlanner] AI base not set");
+                Log.Warning("[AIBuildPlanner] AI base not set");
                 return Vector3.zero;
             }
 

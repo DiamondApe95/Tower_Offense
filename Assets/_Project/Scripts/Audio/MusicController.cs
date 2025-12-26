@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 
 namespace TowerConquest.Audio
 {
@@ -9,7 +10,7 @@ namespace TowerConquest.Audio
 
         public void Crossfade(string musicId)
         {
-            UnityEngine.Debug.Log("Stub method called.");
+            Log.Info("Stub method called.");
         }
 
     }

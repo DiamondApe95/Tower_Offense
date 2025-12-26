@@ -1,24 +1,25 @@
 using UnityEngine;
+using TowerConquest.Debug;
 
 public class HUDButtons : MonoBehaviour
 {
     public void OnStartWaveClicked()
     {
-        Debug.Log("HUD: Start Wave clicked");
+        Log.Info("HUD: Start Wave clicked");
     }
 
     public void OnPauseClicked()
     {
-        Debug.Log("HUD: Pause clicked");
+        Log.Info("HUD: Pause clicked");
     }
 
     public void OnSpeedx1Clicked()
     {
-        Debug.Log("HUD: Speed x1 clicked");
+        Log.Info("HUD: Speed x1 clicked");
     }
 
     public void OnSpeedx2Clicked()
     {
-        Debug.Log("HUD: Speed x2 clicked");
+        Log.Info("HUD: Speed x2 clicked");
     }
 }

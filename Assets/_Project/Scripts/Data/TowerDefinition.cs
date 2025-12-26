@@ -5,6 +5,7 @@ namespace TowerConquest.Data
     {
         public string id;
         public string display_name;
+        public string description;
         public string category;
         public string[] tags;
 

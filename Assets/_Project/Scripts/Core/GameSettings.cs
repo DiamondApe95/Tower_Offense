@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.IO;
 using UnityEngine;
 
@@ -55,11 +56,11 @@ namespace TowerConquest.Core
             {
                 string json = JsonUtility.ToJson(this, true);
                 File.WriteAllText(GetSavePath(), json);
-                UnityEngine.Debug.Log($"GameSettings: Saved settings to {GetSavePath()}");
+                Log.Info($"GameSettings: Saved settings to {GetSavePath()}");
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError($"GameSettings: Failed to save settings: {ex.Message}");
+                Log.Error($"GameSettings: Failed to save settings: {ex.Message}");
             }
         }
 
@@ -69,7 +70,7 @@ namespace TowerConquest.Core
 
             if (!File.Exists(path))
             {
-                UnityEngine.Debug.Log("GameSettings: No settings file found, using defaults.");
+                Log.Info("GameSettings: No settings file found, using defaults.");
                 return new GameSettings();
             }
 
@@ -77,12 +78,12 @@ namespace TowerConquest.Core
             {
                 string json = File.ReadAllText(path);
                 GameSettings settings = JsonUtility.FromJson<GameSettings>(json);
-                UnityEngine.Debug.Log("GameSettings: Loaded settings from file.");
+                Log.Info("GameSettings: Loaded settings from file.");
                 return settings ?? new GameSettings();
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError($"GameSettings: Failed to load settings: {ex.Message}");
+                Log.Error($"GameSettings: Failed to load settings: {ex.Message}");
                 return new GameSettings();
             }
         }
@@ -115,7 +116,7 @@ namespace TowerConquest.Core
             // Gameplay
             Time.timeScale = gameSpeed;
 
-            UnityEngine.Debug.Log("GameSettings: Applied settings to game.");
+            Log.Info("GameSettings: Applied settings to game.");
         }
 
         public void Reset()
@@ -143,7 +144,7 @@ namespace TowerConquest.Core
             zoomSpeed = 2f;
             invertZoom = false;
 
-            UnityEngine.Debug.Log("GameSettings: Reset to defaults.");
+            Log.Info("GameSettings: Reset to defaults.");
         }
     }
 }

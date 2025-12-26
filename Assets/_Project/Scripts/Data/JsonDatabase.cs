@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using System.IO;
 using UnityEngine;
 
@@ -120,7 +121,7 @@ namespace TowerConquest.Data
                 }
             }
 
-            UnityEngine.Debug.Log($"JsonDatabase loaded: Units={Units.Count}, Spells={Spells.Count}, Towers={Towers.Count}, " +
+            Log.Info($"JsonDatabase loaded: Units={Units.Count}, Spells={Spells.Count}, Towers={Towers.Count}, " +
                 $"Traps={Traps.Count}, Levels={Levels.Count}, Heroes={Heroes.Count}, " +
                 $"Civilizations={Civilizations.Count}, Abilities={Abilities.Count}.");
         }
@@ -129,7 +130,7 @@ namespace TowerConquest.Data
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                UnityEngine.Debug.LogWarning("FindUnit called with empty id.");
+                Log.Warning("FindUnit called with empty id.");
                 return null;
             }
 
@@ -141,7 +142,7 @@ namespace TowerConquest.Data
                 }
             }
 
-            UnityEngine.Debug.LogWarning($"Unit with id '{id}' was not found.");
+            Log.Warning($"Unit with id '{id}' was not found.");
             return null;
         }
 
@@ -157,7 +158,7 @@ namespace TowerConquest.Data
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                UnityEngine.Debug.LogWarning("FindSpell called with empty id.");
+                Log.Warning("FindSpell called with empty id.");
                 return null;
             }
 
@@ -169,7 +170,7 @@ namespace TowerConquest.Data
                 }
             }
 
-            UnityEngine.Debug.LogWarning($"Spell with id '{id}' was not found.");
+            Log.Warning($"Spell with id '{id}' was not found.");
             return null;
         }
 
@@ -177,7 +178,7 @@ namespace TowerConquest.Data
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                UnityEngine.Debug.LogWarning("FindTower called with empty id.");
+                Log.Warning("FindTower called with empty id.");
                 return null;
             }
 
@@ -189,7 +190,7 @@ namespace TowerConquest.Data
                 }
             }
 
-            UnityEngine.Debug.LogWarning($"Tower with id '{id}' was not found.");
+            Log.Warning($"Tower with id '{id}' was not found.");
             return null;
         }
 
@@ -205,7 +206,7 @@ namespace TowerConquest.Data
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                UnityEngine.Debug.LogWarning("FindTrap called with empty id.");
+                Log.Warning("FindTrap called with empty id.");
                 return null;
             }
 
@@ -217,7 +218,7 @@ namespace TowerConquest.Data
                 }
             }
 
-            UnityEngine.Debug.LogWarning($"Trap with id '{id}' was not found.");
+            Log.Warning($"Trap with id '{id}' was not found.");
             return null;
         }
 
@@ -225,7 +226,7 @@ namespace TowerConquest.Data
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                UnityEngine.Debug.LogWarning("FindLevel called with empty id.");
+                Log.Warning("FindLevel called with empty id.");
                 return null;
             }
 
@@ -237,7 +238,7 @@ namespace TowerConquest.Data
                 }
             }
 
-            UnityEngine.Debug.LogWarning($"Level with id '{id}' was not found.");
+            Log.Warning($"Level with id '{id}' was not found.");
             return null;
         }
 
@@ -245,7 +246,7 @@ namespace TowerConquest.Data
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                UnityEngine.Debug.LogWarning("FindHero called with empty id.");
+                Log.Warning("FindHero called with empty id.");
                 return null;
             }
 
@@ -257,7 +258,7 @@ namespace TowerConquest.Data
                 }
             }
 
-            UnityEngine.Debug.LogWarning($"Hero with id '{id}' was not found.");
+            Log.Warning($"Hero with id '{id}' was not found.");
             return null;
         }
 
@@ -269,11 +270,16 @@ namespace TowerConquest.Data
             return FindHero(id);
         }
 
+        public CivilizationDefinition GetCivilization(string id)
+        {
+            return FindCivilization(id);
+        }
+
         public CivilizationDefinition FindCivilization(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                UnityEngine.Debug.LogWarning("FindCivilization called with empty id.");
+                Log.Warning("FindCivilization called with empty id.");
                 return null;
             }
 
@@ -285,7 +291,7 @@ namespace TowerConquest.Data
                 }
             }
 
-            UnityEngine.Debug.LogWarning($"Civilization with id '{id}' was not found.");
+            Log.Warning($"Civilization with id '{id}' was not found.");
             return null;
         }
 
@@ -293,7 +299,7 @@ namespace TowerConquest.Data
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                UnityEngine.Debug.LogWarning("FindAbility called with empty id.");
+                Log.Warning("FindAbility called with empty id.");
                 return null;
             }
 
@@ -305,7 +311,7 @@ namespace TowerConquest.Data
                 }
             }
 
-            UnityEngine.Debug.LogWarning($"Ability with id '{id}' was not found.");
+            Log.Warning($"Ability with id '{id}' was not found.");
             return null;
         }
 
@@ -515,7 +521,7 @@ namespace TowerConquest.Data
                 fameReward = new LevelDefinition.FameRewardDto { victory = 250, defeat = 50 }
             });
 
-            UnityEngine.Debug.Log($"[JsonDatabase] Created {levels.Count} default levels");
+            Log.Info($"[JsonDatabase] Created {levels.Count} default levels");
             return levels;
         }
     }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using UnityEngine;
 using TowerConquest.Gameplay.Entities;
 using TowerConquest.Combat;
@@ -335,7 +336,7 @@ namespace TowerConquest.AI
 
                 if (showDebugInfo)
                 {
-                    UnityEngine.Debug.Log($"UnitBrain: {name} attacks {CurrentTarget.name} for {damage} damage.");
+                    Log.Info($"UnitBrain: {name} attacks {CurrentTarget.name} for {damage} damage.");
                 }
             }
         }

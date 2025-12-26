@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using UnityEngine;
 using TowerConquest.Combat;
 using TowerConquest.Data;
@@ -61,7 +62,7 @@ namespace TowerConquest.Gameplay
                 healthComponent.Initialize(maxHP, 0f);
             }
 
-            Debug.Log($"[ConstructionSite] Initialized: {towerId}, Team: {team}, Builders needed: {requiredBuilders}");
+            Log.Info($"[ConstructionSite] Initialized: {towerId}, Team: {team}, Builders needed: {requiredBuilders}");
         }
 
         /// <summary>
@@ -71,12 +72,12 @@ namespace TowerConquest.Gameplay
         {
             if (isComplete)
             {
-                Debug.LogWarning("[ConstructionSite] Builder arrived but construction already complete");
+                Log.Warning("[ConstructionSite] Builder arrived but construction already complete");
                 return;
             }
 
             currentBuilders++;
-            Debug.Log($"[ConstructionSite] Builder arrived ({currentBuilders}/{requiredBuilders})");
+            Log.Info($"[ConstructionSite] Builder arrived ({currentBuilders}/{requiredBuilders})");
 
             OnBuilderCountChanged?.Invoke(currentBuilders, requiredBuilders);
 
@@ -94,7 +95,7 @@ namespace TowerConquest.Gameplay
             if (isComplete) return;
 
             isComplete = true;
-            Debug.Log($"[ConstructionSite] Construction complete for {towerId}");
+            Log.Info($"[ConstructionSite] Construction complete for {towerId}");
 
             OnConstructionComplete?.Invoke(this);
 
@@ -127,7 +128,7 @@ namespace TowerConquest.Gameplay
         {
             if (isComplete) return;
 
-            Debug.Log($"[ConstructionSite] Destroyed: {towerId}");
+            Log.Info($"[ConstructionSite] Destroyed: {towerId}");
             OnConstructionDestroyed?.Invoke(this);
 
             // Notify construction manager

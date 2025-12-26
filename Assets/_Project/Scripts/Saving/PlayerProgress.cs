@@ -15,6 +15,10 @@ namespace TowerConquest.Saving
         public string lastSelectedLevelId;
         public string selectedGameMode = "offense";
 
+        // Civilization & Fame Progress
+        public List<string> unlockedCivilizationIds = new();
+        public int fame;
+
         // Tutorial
         public bool tutorialCompleted;
         public bool offenseTutorialCompleted;

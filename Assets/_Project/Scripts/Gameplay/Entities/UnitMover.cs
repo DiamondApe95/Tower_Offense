@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -87,7 +88,7 @@ namespace TowerConquest.Gameplay.Entities
             HasReachedGoal = true;
             isMoving = false;
 
-            UnityEngine.Debug.Log("UnitMover: Reached end/base.");
+            Log.Info("UnitMover: Reached end/base.");
 
             if (baseController != null)
             {

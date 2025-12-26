@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -138,7 +139,7 @@ namespace TowerConquest.UI
         {
             if (tutorialSteps.Count == 0)
             {
-                UnityEngine.Debug.LogWarning("TutorialSystem: No tutorial steps defined.");
+                Log.Warning("TutorialSystem: No tutorial steps defined.");
                 return;
             }
 
@@ -246,7 +247,7 @@ namespace TowerConquest.UI
             GameObject target = GameObject.Find(targetName);
             if (target == null)
             {
-                UnityEngine.Debug.LogWarning($"TutorialSystem: Target '{targetName}' not found.");
+                Log.Warning($"TutorialSystem: Target '{targetName}' not found.");
                 return;
             }
 
@@ -347,7 +348,7 @@ namespace TowerConquest.UI
             }
 
             OnTutorialCompleted?.Invoke();
-            UnityEngine.Debug.Log("TutorialSystem: Tutorial completed.");
+            Log.Info("TutorialSystem: Tutorial completed.");
         }
 
         private void HideTutorial()

@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -123,7 +124,7 @@ namespace TowerConquest.Gameplay
             var towerDef = database?.GetTower(towerId);
             if (towerDef == null)
             {
-                Debug.LogError($"[ConstructionManager] Tower definition not found: {towerId}");
+                Log.Error($"[ConstructionManager] Tower definition not found: {towerId}");
                 return null;
             }
 
@@ -159,7 +160,7 @@ namespace TowerConquest.Gameplay
 
             activeSites.Add(site);
 
-            Debug.Log($"[ConstructionManager] Placed construction site for {towerId} at {position}");
+            Log.Info($"[ConstructionManager] Placed construction site for {towerId} at {position}");
 
             // Automatically spawn builders for this site
             StartCoroutine(SpawnBuildersForSite(site, requiredBuilders, team));
@@ -207,7 +208,7 @@ namespace TowerConquest.Gameplay
                 var builder = SpawnBuilderForSite(spawnPos, team, site);
                 if (builder != null)
                 {
-                    Debug.Log($"[ConstructionManager] Spawned builder {i + 1}/{count} for {site.TowerID}");
+                    Log.Info($"[ConstructionManager] Spawned builder {i + 1}/{count} for {site.TowerID}");
                 }
 
                 // Wait before spawning next builder (except for last one)
@@ -289,7 +290,7 @@ namespace TowerConquest.Gameplay
             Vector3 spawnPos = GetBuilderSpawnPoint(trapSite.OwnerTeam);
             var builder = SpawnBuilderForTrap(spawnPos, trapSite.OwnerTeam, trapSite);
 
-            Debug.Log($"[ConstructionManager] Spawned builder for trap {trapSite.TrapID}");
+            Log.Info($"[ConstructionManager] Spawned builder for trap {trapSite.TrapID}");
         }
 
         private BuilderController SpawnBuilderForTrap(Vector3 position, GoldManager.Team team, TrapConstructionSite trapSite)
@@ -342,7 +343,7 @@ namespace TowerConquest.Gameplay
         {
             if (builderPrefab == null)
             {
-                Debug.LogError("[ConstructionManager] Builder prefab not assigned");
+                Log.Error("[ConstructionManager] Builder prefab not assigned");
                 return null;
             }
 
@@ -358,7 +359,7 @@ namespace TowerConquest.Gameplay
             builder.Initialize(team);
             availableBuilders.Add(builder);
 
-            Debug.Log($"[ConstructionManager] Spawned builder for team {team}");
+            Log.Info($"[ConstructionManager] Spawned builder for team {team}");
 
             // Try to assign to a site immediately
             AssignBuilders(team);
@@ -390,7 +391,7 @@ namespace TowerConquest.Gameplay
                     assignedBuilders.Add(builder);
                     availableBuilders.Remove(builder);
 
-                    Debug.Log($"[ConstructionManager] Assigned builder to {site.TowerID}");
+                    Log.Info($"[ConstructionManager] Assigned builder to {site.TowerID}");
                 }
 
                 if (unassignedBuilders.Count == 0)
@@ -400,7 +401,7 @@ namespace TowerConquest.Gameplay
 
         private void OnConstructionComplete(ConstructionSite site)
         {
-            Debug.Log($"[ConstructionManager] Construction complete: {site.TowerID}");
+            Log.Info($"[ConstructionManager] Construction complete: {site.TowerID}");
 
             // Spawn the actual tower
             SpawnCompletedTower(site);
@@ -418,7 +419,7 @@ namespace TowerConquest.Gameplay
 
         private void OnConstructionDestroyed(ConstructionSite site)
         {
-            Debug.Log($"[ConstructionManager] Construction destroyed: {site.TowerID}");
+            Log.Info($"[ConstructionManager] Construction destroyed: {site.TowerID}");
 
             // Remove from active sites
             activeSites.Remove(site);
@@ -438,7 +439,7 @@ namespace TowerConquest.Gameplay
                     if (gm.OwnerTeam == site.OwnerTeam)
                     {
                         gm.AddGold(refundAmount);
-                        Debug.Log($"[ConstructionManager] Refunded {refundAmount} gold for destroyed construction site");
+                        Log.Info($"[ConstructionManager] Refunded {refundAmount} gold for destroyed construction site");
                         break;
                     }
                 }
@@ -450,7 +451,7 @@ namespace TowerConquest.Gameplay
             var towerDef = database.GetTower(site.TowerID);
             if (towerDef == null)
             {
-                Debug.LogError($"[ConstructionManager] Tower definition not found: {site.TowerID}");
+                Log.Error($"[ConstructionManager] Tower definition not found: {site.TowerID}");
                 return;
             }
 
@@ -485,17 +486,18 @@ namespace TowerConquest.Gameplay
             towerController.buildCost = towerDef.goldCost;
             towerController.ownerTeam = site.OwnerTeam;
 
-            if (towerDef.baseStats != null)
+            if (towerDef.baseAttack != null)
             {
-                towerController.range = towerDef.baseStats.range > 0 ? towerDef.baseStats.range : 6f;
-                towerController.damage = towerDef.baseStats.damage > 0 ? towerDef.baseStats.damage : 20f;
-                towerController.attacksPerSecond = towerDef.baseStats.attackSpeed > 0 ? towerDef.baseStats.attackSpeed : 1f;
+                towerController.range = towerDef.baseAttack.range > 0 ? towerDef.baseAttack.range : 6f;
+                towerController.damage = towerDef.baseAttack.base_damage > 0 ? towerDef.baseAttack.base_damage : 20f;
+                towerController.attacksPerSecond = towerDef.baseAttack.attacks_per_second > 0 ? towerDef.baseAttack.attacks_per_second : 1f;
             }
 
-            if (towerDef.effects != null)
-            {
-                towerController.effects = towerDef.effects;
-            }
+            // Note: effects are in tiers, not directly on TowerDefinition
+            // if (towerDef.tiers != null && towerDef.tiers.Length > 0)
+            // {
+            //     towerController.effects = towerDef.tiers[0].effects;
+            // }
 
             // Recalculate DPS
             towerController.UpdateDpsCache();
@@ -518,7 +520,7 @@ namespace TowerConquest.Gameplay
             // Set team tag
             towerObj.tag = site.OwnerTeam == GoldManager.Team.Player ? "PlayerTower" : "EnemyTower";
 
-            Debug.Log($"[ConstructionManager] Spawned tower: {site.TowerID} at {site.transform.position}");
+            Log.Info($"[ConstructionManager] Spawned tower: {site.TowerID} at {site.transform.position}");
 
             OnTowerConstructionComplete?.Invoke(site);
         }

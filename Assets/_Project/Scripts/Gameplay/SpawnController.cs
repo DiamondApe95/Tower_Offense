@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using TowerConquest.Core;
 using TowerConquest.Data;
@@ -54,7 +55,7 @@ namespace TowerConquest.Gameplay
                 }
             }
 
-            UnityEngine.Debug.Log($"SpawnController: Prewarmed pool for {unitId} with {count} units.");
+            Log.Info($"SpawnController: Prewarmed pool for {unitId} with {count} units.");
         }
 
         public UnitController SpawnUnit(string unitId)
@@ -75,7 +76,7 @@ namespace TowerConquest.Gameplay
             var spawned = new List<UnitController>();
             if (string.IsNullOrWhiteSpace(unitId))
             {
-                UnityEngine.Debug.LogWarning("SpawnUnitGroup called with empty unit id.");
+                Log.Warning("SpawnUnitGroup called with empty unit id.");
                 return spawned;
             }
 
@@ -115,7 +116,7 @@ namespace TowerConquest.Gameplay
 
             if (unitObject == null)
             {
-                UnityEngine.Debug.LogError($"SpawnController: Failed to create unit {unitId}");
+                Log.Error($"SpawnController: Failed to create unit {unitId}");
                 return null;
             }
 

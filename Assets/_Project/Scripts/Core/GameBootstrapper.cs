@@ -1,4 +1,5 @@
 using TowerConquest.Data;
+using TowerConquest.Debug;
 using TowerConquest.Progression;
 using TowerConquest.Saving;
 using UnityEngine;
@@ -41,7 +42,7 @@ namespace TowerConquest.Core
             DataValidator.ValidateAll(db);
             ServiceLocator.Register(db);
 
-            UnityEngine.Debug.Log($"Loaded Units: {db.Units.Count}, Spells: {db.Spells.Count}, Towers: {db.Towers.Count}, Traps: {db.Traps.Count}, Levels: {db.Levels.Count}, Heroes: {db.Heroes.Count}.");
+            Log.Info($"Loaded Units: {db.Units.Count}, Spells: {db.Spells.Count}, Towers: {db.Towers.Count}, Traps: {db.Traps.Count}, Levels: {db.Levels.Count}, Heroes: {db.Heroes.Count}.");
 
             RegisterPrefabRegistry();
 
@@ -54,11 +55,11 @@ namespace TowerConquest.Core
             if (registry != null)
             {
                 ServiceLocator.Register(registry);
-                UnityEngine.Debug.Log("PrefabRegistry registered successfully.");
+                Log.Info("PrefabRegistry registered successfully.");
             }
             else
             {
-                UnityEngine.Debug.LogWarning("PrefabRegistry not found in scene. Prefabs will use fallback primitives.");
+                Log.Warning("PrefabRegistry not found in scene. Prefabs will use fallback primitives.");
             }
         }
 

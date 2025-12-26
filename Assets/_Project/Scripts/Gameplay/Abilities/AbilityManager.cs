@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -62,12 +63,12 @@ namespace TowerConquest.Gameplay
             if (abilityDef != null)
             {
                 cooldownDuration = abilityDef.cooldown > 0 ? abilityDef.cooldown : 90f;
-                Debug.Log($"[AbilityManager] Loaded ability '{abilityDef.name}' with cooldown {cooldownDuration}s");
+                Log.Info($"[AbilityManager] Loaded ability '{abilityDef.name}' with cooldown {cooldownDuration}s");
             }
             else
             {
                 cooldownDuration = 90f; // Default 90 seconds
-                Debug.LogWarning($"[AbilityManager] Ability definition not found for '{abilityId}', using defaults");
+                Log.Warning($"[AbilityManager] Ability definition not found for '{abilityId}', using defaults");
             }
 
             // Find spawn controller for this team
@@ -82,7 +83,7 @@ namespace TowerConquest.Gameplay
                 }
             }
 
-            Debug.Log($"[AbilityManager] Initialized ability {abilityId} for team {team}, cooldown: {cooldownDuration}s");
+            Log.Info($"[AbilityManager] Initialized ability {abilityId} for team {team}, cooldown: {cooldownDuration}s");
         }
 
         private void Update()
@@ -92,7 +93,7 @@ namespace TowerConquest.Gameplay
             {
                 isOnCooldown = false;
                 OnCooldownComplete?.Invoke();
-                Debug.Log($"[AbilityManager] Ability {abilityId} ready to use");
+                Log.Info($"[AbilityManager] Ability {abilityId} ready to use");
             }
 
             // Clean up expired buffs
@@ -106,11 +107,11 @@ namespace TowerConquest.Gameplay
         {
             if (!CanUse)
             {
-                Debug.LogWarning($"[AbilityManager] Cannot use ability (on cooldown: {CooldownRemaining:F1}s remaining)");
+                Log.Warning($"[AbilityManager] Cannot use ability (on cooldown: {CooldownRemaining:F1}s remaining)");
                 return false;
             }
 
-            Debug.Log($"[AbilityManager] Using ability {abilityDef?.name ?? abilityId}");
+            Log.Info($"[AbilityManager] Using ability {abilityDef?.name ?? abilityId}");
 
             ApplyEffects();
 
@@ -126,7 +127,7 @@ namespace TowerConquest.Gameplay
         {
             if (abilityDef == null || abilityDef.effects == null || abilityDef.effects.Length == 0)
             {
-                Debug.LogWarning($"[AbilityManager] No effects defined for ability {abilityId}");
+                Log.Warning($"[AbilityManager] No effects defined for ability {abilityId}");
                 return;
             }
 
@@ -140,7 +141,7 @@ namespace TowerConquest.Gameplay
         {
             if (effect == null) return;
 
-            Debug.Log($"[AbilityManager] Applying effect: {effect.type} to {effect.target}");
+            Log.Info($"[AbilityManager] Applying effect: {effect.type} to {effect.target}");
 
             switch (effect.type.ToLower())
             {
@@ -166,7 +167,7 @@ namespace TowerConquest.Gameplay
                     ApplySlowDebuff(effect);
                     break;
                 default:
-                    Debug.LogWarning($"[AbilityManager] Unknown effect type: {effect.type}");
+                    Log.Warning($"[AbilityManager] Unknown effect type: {effect.type}");
                     break;
             }
         }
@@ -193,7 +194,7 @@ namespace TowerConquest.Gameplay
 
                     // Apply armor buff (additive)
                     health.SetArmor(Mathf.Clamp01(health.Armor + bonusArmor));
-                    Debug.Log($"[AbilityManager] Applied +{bonusArmor * 100}% armor to {unit.UnitId} for {duration}s");
+                    Log.Info($"[AbilityManager] Applied +{bonusArmor * 100}% armor to {unit.UnitId} for {duration}s");
                 }
             }
         }
@@ -223,7 +224,7 @@ namespace TowerConquest.Gameplay
                 }
                 damageBuff.ApplyBuff(damageMultiplier, duration);
 
-                Debug.Log($"[AbilityManager] Applied +{effect.value * 100}% damage to {unit.UnitId} for {duration}s");
+                Log.Info($"[AbilityManager] Applied +{effect.value * 100}% damage to {unit.UnitId} for {duration}s");
             }
         }
 
@@ -247,7 +248,7 @@ namespace TowerConquest.Gameplay
                     });
 
                     mover.SetSpeedMultiplier(mover.moveSpeedMultiplier * speedMultiplier);
-                    Debug.Log($"[AbilityManager] Applied +{effect.value * 100}% speed to {unit.UnitId} for {duration}s");
+                    Log.Info($"[AbilityManager] Applied +{effect.value * 100}% speed to {unit.UnitId} for {duration}s");
                 }
             }
         }
@@ -263,7 +264,7 @@ namespace TowerConquest.Gameplay
                 if (health != null)
                 {
                     health.TakeDamage(damage, "magic", gameObject);
-                    Debug.Log($"[AbilityManager] Dealt {damage} AoE damage to {unit.UnitId}");
+                    Log.Info($"[AbilityManager] Dealt {damage} AoE damage to {unit.UnitId}");
                 }
             }
         }
@@ -279,7 +280,7 @@ namespace TowerConquest.Gameplay
                 if (health != null)
                 {
                     health.Heal(healAmount);
-                    Debug.Log($"[AbilityManager] Healed {unit.UnitId} for {healAmount}");
+                    Log.Info($"[AbilityManager] Healed {unit.UnitId} for {healAmount}");
                 }
             }
         }
@@ -291,7 +292,7 @@ namespace TowerConquest.Gameplay
 
             if (string.IsNullOrEmpty(unitId))
             {
-                Debug.LogWarning("[AbilityManager] SpawnUnits effect has no unit ID");
+                Log.Warning("[AbilityManager] SpawnUnits effect has no unit ID");
                 return;
             }
 
@@ -312,7 +313,7 @@ namespace TowerConquest.Gameplay
                     if (unit != null)
                     {
                         unit.transform.position = spawnPos + offset;
-                        Debug.Log($"[AbilityManager] Spawned {unitId} via ability");
+                        Log.Info($"[AbilityManager] Spawned {unitId} via ability");
                     }
                 }
                 else
@@ -322,7 +323,7 @@ namespace TowerConquest.Gameplay
                 }
             }
 
-            Debug.Log($"[AbilityManager] Spawned {count} {unitId} units");
+            Log.Info($"[AbilityManager] Spawned {count} {unitId} units");
         }
 
         private void CreateFallbackUnit(string unitId, Vector3 position)
@@ -377,7 +378,7 @@ namespace TowerConquest.Gameplay
                     });
 
                     mover.SetSpeedMultiplier(mover.moveSpeedMultiplier * (1f - slowAmount));
-                    Debug.Log($"[AbilityManager] Applied {slowAmount * 100}% slow to {unit.UnitId} for {duration}s");
+                    Log.Info($"[AbilityManager] Applied {slowAmount * 100}% slow to {unit.UnitId} for {duration}s");
                 }
             }
         }
@@ -473,7 +474,7 @@ namespace TowerConquest.Gameplay
                     break;
             }
 
-            Debug.Log($"[AbilityManager] Removed {buff.effectType} buff from {buff.unit?.UnitId}");
+            Log.Info($"[AbilityManager] Removed {buff.effectType} buff from {buff.unit?.UnitId}");
         }
 
         /// <summary>

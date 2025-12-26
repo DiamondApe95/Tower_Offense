@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections;
 using TowerConquest.Combat;
 using TowerConquest.Core;
@@ -52,7 +53,7 @@ namespace TowerConquest.Gameplay.Entities
                 StopCoroutine(auraRoutine);
             }
 
-            UnityEngine.Debug.Log($"HeroController: Hero {HeroId} died!");
+            Log.Info($"HeroController: Hero {HeroId} died!");
             OnHeroDied?.Invoke(this);
         }
 
@@ -110,26 +111,26 @@ namespace TowerConquest.Gameplay.Entities
             HeroDefinition.AbilityDto active = GetActiveAbility();
             if (active == null)
             {
-                UnityEngine.Debug.LogWarning("HeroController: No active ability configured.");
+                Log.Warning("HeroController: No active ability configured.");
                 return;
             }
 
             if (activeCooldownRemaining > 0f)
             {
-                UnityEngine.Debug.Log($"HeroController: Active ability on cooldown ({activeCooldownRemaining:0.0}s).");
+                Log.Info($"HeroController: Active ability on cooldown ({activeCooldownRemaining:0.0}s).");
                 return;
             }
 
             ApplyAbilityEffects(active);
             activeCooldownRemaining = Mathf.Max(1f, active.cooldown_seconds);
-            UnityEngine.Debug.Log($"HeroController: Activated ability '{active.id}' for hero {HeroId}.");
+            Log.Info($"HeroController: Activated ability '{active.id}' for hero {HeroId}.");
         }
 
         private void ApplyAbilityEffects(HeroDefinition.AbilityDto ability)
         {
             if (ability == null || ability.effects == null || ability.effects.Length == 0)
             {
-                UnityEngine.Debug.LogWarning("HeroController: Ability has no effects.");
+                Log.Warning("HeroController: Ability has no effects.");
                 return;
             }
 
@@ -146,7 +147,7 @@ namespace TowerConquest.Gameplay.Entities
                 if (distance <= radius)
                 {
                     effectResolver.ApplyEffects(gameObject, unit.gameObject, ability.effects);
-                    UnityEngine.Debug.Log($"HeroController: Applied {ability.id} to {unit.UnitId}.");
+                    Log.Info($"HeroController: Applied {ability.id} to {unit.UnitId}.");
                 }
             }
         }

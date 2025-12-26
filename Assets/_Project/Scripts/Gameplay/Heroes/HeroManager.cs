@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using UnityEngine;
 using TowerConquest.Core;
 using TowerConquest.Data;
@@ -52,7 +53,7 @@ namespace TowerConquest.Gameplay
                 cooldownDuration = 120f; // Default 2 minutes
             }
 
-            Debug.Log($"[HeroManager] Initialized hero {heroId} for team {team}, cooldown: {cooldownDuration}s");
+            Log.Info($"[HeroManager] Initialized hero {heroId} for team {team}, cooldown: {cooldownDuration}s");
         }
 
         private void Update()
@@ -61,7 +62,7 @@ namespace TowerConquest.Gameplay
             if (isOnCooldown && Time.time >= lastSpawnTime + cooldownDuration)
             {
                 isOnCooldown = false;
-                Debug.Log($"[HeroManager] Hero {heroId} ready to spawn");
+                Log.Info($"[HeroManager] Hero {heroId} ready to spawn");
             }
         }
 
@@ -72,14 +73,14 @@ namespace TowerConquest.Gameplay
         {
             if (!CanSpawn)
             {
-                Debug.LogWarning($"[HeroManager] Cannot spawn hero (on cooldown or already alive)");
+                Log.Warning($"[HeroManager] Cannot spawn hero (on cooldown or already alive)");
                 return null;
             }
 
             var heroDef = database.GetHero(heroId);
             if (heroDef == null)
             {
-                Debug.LogError($"[HeroManager] Hero definition not found: {heroId}");
+                Log.Error($"[HeroManager] Hero definition not found: {heroId}");
                 return null;
             }
 
@@ -106,7 +107,7 @@ namespace TowerConquest.Gameplay
             }
 
             // Initialize hero with stats from definition
-            float hp = heroDef.baseStats?.hp ?? 500f;
+            float hp = heroDef.stats?.hp ?? 500f;
             heroController.Initialize(heroId, hp);
 
             // Subscribe to death event
@@ -126,7 +127,7 @@ namespace TowerConquest.Gameplay
 
             OnHeroSpawned?.Invoke(currentHero);
 
-            Debug.Log($"[HeroManager] Spawned hero {heroId} at {currentHero.transform.position}");
+            Log.Info($"[HeroManager] Spawned hero {heroId} at {currentHero.transform.position}");
             return currentHero;
         }
 
@@ -158,7 +159,7 @@ namespace TowerConquest.Gameplay
 
             // Add NavMeshAgent for movement
             var agent = heroObj.AddComponent<UnityEngine.AI.NavMeshAgent>();
-            agent.speed = heroDef.baseStats?.speed ?? 4f;
+            agent.speed = heroDef.stats?.speed ?? 4f;
             agent.stoppingDistance = 1.5f;
 
             return heroObj;
@@ -183,7 +184,7 @@ namespace TowerConquest.Gameplay
         {
             if (currentHero == null) return;
 
-            Debug.Log($"[HeroManager] Hero {heroId} killed");
+            Log.Info($"[HeroManager] Hero {heroId} killed");
 
             currentHero = null;
             OnHeroDied?.Invoke();

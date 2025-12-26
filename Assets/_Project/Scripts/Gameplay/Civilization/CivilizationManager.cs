@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TowerConquest.Debug;
 using System.Linq;
 using UnityEngine;
 using TowerConquest.Core;
@@ -34,11 +35,11 @@ namespace TowerConquest.Gameplay
                         civilizations[civ.id] = civ;
                     }
                 }
-                Debug.Log($"[CivilizationManager] Loaded {civilizations.Count} civilizations from database");
+                Log.Info($"[CivilizationManager] Loaded {civilizations.Count} civilizations from database");
             }
             else
             {
-                Debug.LogWarning("[CivilizationManager] No civilizations in database, creating defaults");
+                Log.Warning("[CivilizationManager] No civilizations in database, creating defaults");
                 CreateDefaultCivilizations();
             }
         }
@@ -90,19 +91,19 @@ namespace TowerConquest.Gameplay
             };
             civilizations[undead.id] = undead;
 
-            Debug.Log($"[CivilizationManager] Created {civilizations.Count} default civilizations");
+            Log.Info($"[CivilizationManager] Created {civilizations.Count} default civilizations");
         }
 
         public void RegisterCivilization(CivilizationDefinition civDef)
         {
             if (civilizations.ContainsKey(civDef.id))
             {
-                Debug.LogWarning($"[CivilizationManager] Civilization already registered: {civDef.id}");
+                Log.Warning($"[CivilizationManager] Civilization already registered: {civDef.id}");
                 return;
             }
 
             civilizations[civDef.id] = civDef;
-            Debug.Log($"[CivilizationManager] Registered civilization: {civDef.name}");
+            Log.Info($"[CivilizationManager] Registered civilization: {civDef.name}");
         }
 
         public CivilizationDefinition GetCivilization(string id)
@@ -112,7 +113,7 @@ namespace TowerConquest.Gameplay
                 return civ;
             }
 
-            Debug.LogWarning($"[CivilizationManager] Civilization not found: {id}");
+            Log.Warning($"[CivilizationManager] Civilization not found: {id}");
             return null;
         }
 
@@ -148,7 +149,7 @@ namespace TowerConquest.Gameplay
             else
             {
                 // Fallback: return all free civilizations
-                Debug.LogWarning("[CivilizationManager] SaveManager not found, returning only free civilizations");
+                Log.Warning("[CivilizationManager] SaveManager not found, returning only free civilizations");
                 unlockedCivs = civilizations.Values.Where(c => c.unlockCost == 0).ToList();
             }
 
@@ -219,7 +220,7 @@ namespace TowerConquest.Gameplay
             progress.unlockedCivilizationIds.Add(civId);
             saveManager.SaveProgress(progress);
 
-            Debug.Log($"[CivilizationManager] Unlocked civilization {civ.name} for {civ.unlockCost} Fame");
+            Log.Info($"[CivilizationManager] Unlocked civilization {civ.name} for {civ.unlockCost} Fame");
             return true;
         }
 

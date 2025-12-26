@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 
 namespace TowerConquest.Combat
 {
@@ -44,7 +45,7 @@ namespace TowerConquest.Combat
             if (health != null)
             {
                 health.ApplyArmorModifier(-shredAmount);
-                UnityEngine.Debug.Log($"{name} armor shred applied ({shredAmount:0.##}).");
+                Log.Info($"{name} armor shred applied ({shredAmount:0.##}).");
             }
         }
 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerConquest.Debug;
 using TowerConquest.Gameplay;
 using TowerConquest.Data;
 
@@ -86,7 +87,7 @@ namespace TowerConquest.AI
 
             nextDecisionTime = Time.time + decisionInterval;
 
-            Debug.Log($"[AICommander] Initialized with {difficulty} difficulty and {strategyType} strategy");
+            Log.Info($"[AICommander] Initialized with {difficulty} difficulty and {strategyType} strategy");
         }
 
         private AIStrategy CreateStrategy(StrategyType type)

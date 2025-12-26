@@ -1,4 +1,5 @@
 using System;
+using TowerConquest.Debug;
 using System.Collections.Generic;
 using TowerConquest.Core;
 using TowerConquest.Data;
@@ -92,7 +93,7 @@ namespace TowerConquest.Gameplay
             isPlacingMode = false;
 
             OnCategoryChanged?.Invoke(category);
-            Debug.Log($"[BuildCategoryManager] Switched to category: {category}");
+            Log.Info($"[BuildCategoryManager] Switched to category: {category}");
         }
 
         /// <summary>
@@ -113,7 +114,7 @@ namespace TowerConquest.Gameplay
             }
 
             OnBuildableSelected?.Invoke(buildableId);
-            Debug.Log($"[BuildCategoryManager] Selected: {buildableId}");
+            Log.Info($"[BuildCategoryManager] Selected: {buildableId}");
         }
 
         /// <summary>
@@ -158,20 +159,20 @@ namespace TowerConquest.Gameplay
         {
             if (!levelController.CanPerformGameplayActions())
             {
-                Debug.Log("[BuildCategoryManager] Cannot place during countdown");
+                Log.Info("[BuildCategoryManager] Cannot place during countdown");
                 return false;
             }
 
             if (string.IsNullOrEmpty(selectedBuildableId))
             {
-                Debug.LogWarning("[BuildCategoryManager] No buildable selected");
+                Log.Warning("[BuildCategoryManager] No buildable selected");
                 return false;
             }
 
             int cost = GetSelectedCost();
             if (!playerGold.CanAfford(cost))
             {
-                Debug.Log("[BuildCategoryManager] Not enough gold");
+                Log.Info("[BuildCategoryManager] Not enough gold");
                 return false;
             }
 
@@ -215,7 +216,7 @@ namespace TowerConquest.Gameplay
             int slotIndex = deck.SelectedUnits.IndexOf(selectedBuildableId);
             if (slotIndex < 0)
             {
-                Debug.LogWarning($"[BuildCategoryManager] Unit not in deck: {selectedBuildableId}");
+                Log.Warning($"[BuildCategoryManager] Unit not in deck: {selectedBuildableId}");
                 return false;
             }
 
@@ -227,14 +228,14 @@ namespace TowerConquest.Gameplay
             // Check if position is on a build tile
             if (!IsOnBuildTile(position))
             {
-                Debug.Log("[BuildCategoryManager] Position is not on a build tile");
+                Log.Info("[BuildCategoryManager] Position is not on a build tile");
                 return false;
             }
 
             // Check if there's already a tower or construction site
             if (HasExistingConstruction(position))
             {
-                Debug.Log("[BuildCategoryManager] Position already has a construction");
+                Log.Info("[BuildCategoryManager] Position already has a construction");
                 return false;
             }
 
@@ -256,7 +257,7 @@ namespace TowerConquest.Gameplay
             // Check if position is on a path tile
             if (!IsOnPathTile(position))
             {
-                Debug.Log("[BuildCategoryManager] Position is not on a path tile");
+                Log.Info("[BuildCategoryManager] Position is not on a path tile");
                 return false;
             }
 
@@ -371,7 +372,7 @@ namespace TowerConquest.Gameplay
         {
             isPlacingMode = false;
             selectedBuildableId = null;
-            Debug.Log("[BuildCategoryManager] Placement cancelled");
+            Log.Info("[BuildCategoryManager] Placement cancelled");
         }
 
         /// <summary>
