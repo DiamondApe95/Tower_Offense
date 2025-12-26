@@ -68,10 +68,6 @@ public class AutoLevelGenerator : MonoBehaviour
         {
             SetupLiveBattleLevelController();
         }
-        else
-        {
-            SetupLevelController();
-        }
 
         // 5. Configure Lighting
         SetupLighting();
@@ -115,16 +111,6 @@ public class AutoLevelGenerator : MonoBehaviour
         // Entferne alte Spawner, Controller, etc. wenn nicht auf diesem Objekt
         if (cleanupManagers)
         {
-            var oldLevelControllers = FindObjectsByType<LevelController>(FindObjectsSortMode.None);
-            foreach (var lc in oldLevelControllers)
-            {
-                if (lc != null && lc.gameObject != gameObject)
-                {
-                    DestroyImmediate(lc.gameObject);
-                    cleanedCount++;
-                }
-            }
-
             var oldBuildManagers = FindObjectsByType<BuildManager>(FindObjectsSortMode.None);
             foreach (var bm in oldBuildManagers)
             {
@@ -432,8 +418,6 @@ public class AutoLevelGenerator : MonoBehaviour
             return;
         }
 
-        LevelController lc = FindFirstObjectByType<LevelController>();
-
         for (int i = 0; i < spawnPoints.Count; i++)
         {
             Transform sp = spawnPoints[i];
@@ -449,9 +433,6 @@ public class AutoLevelGenerator : MonoBehaviour
             spawner.enemyPrefab = enemyPrefab;
             spawner.enemiesPerWave = enemiesPerWave;
             spawner.spawnInterval = spawnInterval;
-
-            // optional if your EnemySpawner has this
-            spawner.levelController = lc;
         }
 
         Debug.Log($"AutoLevelGenerator: Added/Configured EnemySpawner on {spawnPoints.Count} SpawnPoints (using {defaultWaypoints.name}).");
@@ -1607,44 +1588,6 @@ public class AutoLevelGenerator : MonoBehaviour
         Debug.Log($"AutoLevelGenerator: Camera positioned for {width}x{height} level.");
     }
 
-    // =========================================================
-    // LEVEL CONTROLLER SETUP
-    // =========================================================
-
-    private void SetupLevelController()
-    {
-        // Suche oder erstelle LevelController
-        LevelController lc = FindFirstObjectByType<LevelController>();
-        if (lc == null)
-        {
-            var lcGO = new GameObject("LevelController");
-            lc = lcGO.AddComponent<LevelController>();
-        }
-
-        // Setze HUD-Referenz
-        if (generatedHUD != null)
-        {
-            lc.hud = generatedHUD;
-            Debug.Log("AutoLevelGenerator: LevelController.hud assigned.");
-        }
-
-        // Setze ResultScreen-Referenz
-        if (generatedResultScreen != null)
-        {
-            lc.resultScreen = generatedResultScreen;
-            Debug.Log("AutoLevelGenerator: LevelController.resultScreen assigned.");
-        }
-
-        // LevelSpawner hinzufügen falls nicht vorhanden
-        var spawner = lc.GetComponent<LevelSpawner>();
-        if (spawner == null)
-        {
-            spawner = lc.gameObject.AddComponent<LevelSpawner>();
-        }
-        lc.levelSpawner = spawner;
-
-        Debug.Log("AutoLevelGenerator: LevelController fully configured.");
-    }
 
     // =========================================================
     // LIGHTING SETUP

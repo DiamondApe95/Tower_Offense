@@ -17,7 +17,7 @@ namespace TowerConquest.Gameplay
         private readonly List<Vector3> spawnPositions = new List<Vector3>();
         private Vector3 basePosition;
 
-        public void Spawn(LevelDefinition levelDefinition, GameMode mode, LevelController levelController)
+        public void Spawn(LevelDefinition levelDefinition, GameMode mode)
         {
             if (levelDefinition == null)
             {
@@ -34,14 +34,8 @@ namespace TowerConquest.Gameplay
             SpawnPaths(levelDefinition);
             SpawnSpawnPoints(levelDefinition);
 
-            if (mode == GameMode.Defense)
-            {
-                SpawnTowerSlots(levelDefinition, levelController);
-            }
-            else
-            {
-                SpawnEnemyDefenses(levelDefinition);
-            }
+            // Always spawn enemy defenses (no more Defense mode with tower slots)
+            SpawnEnemyDefenses(levelDefinition);
         }
 
         private void SpawnBase(LevelDefinition levelDefinition)
@@ -167,35 +161,6 @@ namespace TowerConquest.Gameplay
             ConfigureTower(towerController, placement.tower_id, placement.tier);
         }
 
-        private void SpawnTowerSlots(LevelDefinition levelDefinition, LevelController levelController)
-        {
-            if (levelDefinition.enemy_defenses?.towers == null)
-            {
-                UnityEngine.Debug.LogWarning("LevelSpawner.SpawnTowerSlots: no tower slots defined.");
-                return;
-            }
-
-            foreach (LevelDefinition.TowerPlacementDto placement in levelDefinition.enemy_defenses.towers)
-            {
-                if (placement == null)
-                {
-                    continue;
-                }
-
-                GameObject slotObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                slotObject.name = $"TowerSlot_{placement.instance_id}";
-                slotObject.transform.position = new Vector3(placement.position.x, placement.position.y, placement.position.z);
-                slotObject.transform.localScale = new Vector3(1.2f, 0.2f, 1.2f);
-
-                TowerSlotController slotController = slotObject.GetComponent<TowerSlotController>();
-                if (slotController == null)
-                {
-                    slotController = slotObject.AddComponent<TowerSlotController>();
-                }
-
-                slotController.Initialize(levelController, placement.tower_id, placement.tier);
-            }
-        }
 
         private void SpawnTrap(LevelDefinition.TrapPlacementDto placement)
         {
