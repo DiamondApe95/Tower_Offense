@@ -41,7 +41,15 @@
         "victory": 100,
         "defeat": 20
       },
-      "unlockRequirement": null
+      "unlockRequirement": null,
+      "player_rules": {
+        "starting_deck": {
+          "unit_cards": ["unit_legionary", "unit_archer", "unit_cavalry"],
+          "spell_cards": []
+        },
+        "hero_pool": ["hero_centurion"],
+        "max_waves": 5
+      }
     },
     {
       "id": "lvl_02_gallic_frontier",
@@ -59,7 +67,15 @@
         "victory": 120,
         "defeat": 25
       },
-      "unlockRequirement": "lvl_01_etruria_outpost"
+      "unlockRequirement": "lvl_01_etruria_outpost",
+      "player_rules": {
+        "starting_deck": {
+          "unit_cards": ["unit_legionary", "unit_archer", "unit_cavalry"],
+          "spell_cards": []
+        },
+        "hero_pool": ["hero_centurion"],
+        "max_waves": 6
+      }
     },
     {
       "id": "lvl_03_carthage_siege",
@@ -77,7 +93,15 @@
         "victory": 150,
         "defeat": 30
       },
-      "unlockRequirement": "lvl_02_gallic_frontier"
+      "unlockRequirement": "lvl_02_gallic_frontier",
+      "player_rules": {
+        "starting_deck": {
+          "unit_cards": ["unit_legionary", "unit_archer", "unit_cavalry"],
+          "spell_cards": []
+        },
+        "hero_pool": ["hero_centurion"],
+        "max_waves": 7
+      }
     },
     {
       "id": "lvl_04_greek_colony",
@@ -95,7 +119,15 @@
         "victory": 180,
         "defeat": 35
       },
-      "unlockRequirement": "lvl_03_carthage_siege"
+      "unlockRequirement": "lvl_03_carthage_siege",
+      "player_rules": {
+        "starting_deck": {
+          "unit_cards": ["unit_legionary", "unit_archer", "unit_cavalry"],
+          "spell_cards": []
+        },
+        "hero_pool": ["hero_centurion"],
+        "max_waves": 8
+      }
     },
     {
       "id": "lvl_05_germanic_forest",
@@ -123,7 +155,15 @@
           }
         ]
       },
-      "unlockRequirement": "lvl_04_greek_colony"
+      "unlockRequirement": "lvl_04_greek_colony",
+      "player_rules": {
+        "starting_deck": {
+          "unit_cards": ["unit_legionary", "unit_archer", "unit_cavalry"],
+          "spell_cards": []
+        },
+        "hero_pool": ["hero_centurion"],
+        "max_waves": 10
+      }
     }
   ]
 }
