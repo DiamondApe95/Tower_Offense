@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TowerConquest.Core;
 using TowerConquest.Data;
+using TowerConquest.Saving;
 
 namespace TowerConquest.Gameplay
 {
@@ -121,9 +123,104 @@ namespace TowerConquest.Gameplay
 
         public List<CivilizationDefinition> GetUnlockedCivilizations()
         {
-            // TODO: Check against PlayerProgress to see which are unlocked
-            // For now, return all with unlockCost == 0
-            return civilizations.Values.Where(c => c.unlockCost == 0).ToList();
+            var unlockedCivs = new List<CivilizationDefinition>();
+
+            // Get player progress
+            SaveManager saveManager = null;
+            if (ServiceLocator.TryGet(out saveManager))
+            {
+                PlayerProgress progress = saveManager.GetOrCreateProgress();
+
+                foreach (var civ in civilizations.Values)
+                {
+                    // Free civilizations (unlockCost == 0) are always available
+                    if (civ.unlockCost == 0)
+                    {
+                        unlockedCivs.Add(civ);
+                    }
+                    // Check if civilization is unlocked in progress
+                    else if (progress.unlockedCivilizationIds.Contains(civ.id))
+                    {
+                        unlockedCivs.Add(civ);
+                    }
+                }
+            }
+            else
+            {
+                // Fallback: return all free civilizations
+                Debug.LogWarning("[CivilizationManager] SaveManager not found, returning only free civilizations");
+                unlockedCivs = civilizations.Values.Where(c => c.unlockCost == 0).ToList();
+            }
+
+            return unlockedCivs;
+        }
+
+        /// <summary>
+        /// Check if a civilization is unlocked for the player
+        /// </summary>
+        public bool IsCivilizationUnlocked(string civId)
+        {
+            var civ = GetCivilization(civId);
+            if (civ == null) return false;
+
+            // Free civilizations are always unlocked
+            if (civ.unlockCost == 0) return true;
+
+            // Check player progress
+            SaveManager saveManager = null;
+            if (ServiceLocator.TryGet(out saveManager))
+            {
+                PlayerProgress progress = saveManager.GetOrCreateProgress();
+                return progress.unlockedCivilizationIds.Contains(civId);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Unlock a civilization with Fame
+        /// </summary>
+        public bool TryUnlockCivilization(string civId, out string errorMessage)
+        {
+            errorMessage = "";
+            var civ = GetCivilization(civId);
+            if (civ == null)
+            {
+                errorMessage = "Civilization not found";
+                return false;
+            }
+
+            // Already unlocked?
+            if (IsCivilizationUnlocked(civId))
+            {
+                errorMessage = "Already unlocked";
+                return false;
+            }
+
+            // Get required systems
+            SaveManager saveManager = null;
+            if (!ServiceLocator.TryGet(out saveManager))
+            {
+                errorMessage = "SaveManager not available";
+                return false;
+            }
+
+            PlayerProgress progress = saveManager.GetOrCreateProgress();
+
+            // Check if player has enough fame
+            if (progress.fame < civ.unlockCost)
+            {
+                errorMessage = $"Not enough Fame. Need {civ.unlockCost}, have {progress.fame}";
+                return false;
+            }
+
+            // Spend fame and unlock
+            progress.fame -= civ.unlockCost;
+            progress.unlockedCivilizationIds.Add(civId);
+            saveManager.SaveProgress(progress);
+
+            Debug.Log($"[CivilizationManager] Unlocked civilization {civ.name} for {civ.unlockCost} Fame");
+            return true;
         }
 
         public List<UnitDefinition> GetAvailableUnits(string civId)
