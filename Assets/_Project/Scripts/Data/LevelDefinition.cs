@@ -5,16 +5,49 @@ namespace TowerConquest.Data
     {
         public string id;
         public string display_name;
+        public string description;
         public string region_id;
         public int recommended_power;
         public float estimated_duration_seconds;
-        public ConditionDto win_condition;
-        public ConditionDto lose_condition;
-        public BaseDto @base;
+
+        // NEW: Civilization & AI Settings
+        public string playerCivilization; // Civilization for player
+        public string enemyCivilization; // Civilization for AI
+        public string aiDifficulty; // easy, normal, hard
+        public string aiStrategy; // aggressive, defensive, balanced
+
+        // NEW: Gold Economy
+        public int startGold; // Starting gold for both player and AI
+
+        // NEW: Fame Rewards
+        public FameRewardDto fameReward;
+
+        // NEW: Unlock Requirements
+        public string unlockRequirement; // Level ID that must be completed first (null = unlocked from start)
+
+        public ConditionDto win_condition; // DEPRECATED
+        public ConditionDto lose_condition; // DEPRECATED
+        public BaseDto @base; // Player base settings
+        public BaseDto enemyBase; // AI base settings
         public SpawnPointDto[] spawn_points;
         public PathDto[] paths;
-        public EnemyDefensesDto enemy_defenses;
-        public PlayerRulesDto player_rules;
+        public EnemyDefensesDto enemy_defenses; // DEPRECATED - AI will build dynamically
+        public PlayerRulesDto player_rules; // DEPRECATED - uses UnitDeck instead
+
+        [System.Serializable]
+        public class FameRewardDto
+        {
+            public int victory; // Fame for winning
+            public int defeat; // Fame for losing
+            public BonusConditionDto[] bonus; // Bonus fame conditions
+        }
+
+        [System.Serializable]
+        public class BonusConditionDto
+        {
+            public string condition; // e.g., "win_under_5_min", "no_tower_lost"
+            public int fame;
+        }
 
         [System.Serializable]
         public class ConditionDto

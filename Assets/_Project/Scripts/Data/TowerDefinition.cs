@@ -7,7 +7,22 @@ namespace TowerConquest.Data
         public string display_name;
         public string category;
         public string[] tags;
-        public TierDto[] tiers;
+
+        // NEW: Gold, Civilization & Construction
+        public string civilization; // Which civilization this tower belongs to
+        public int goldCost; // Cost to build tower
+        public int goldReward; // Gold rewarded for destroying this tower
+        public float constructionTime; // Time for builders to construct
+        public int requiredBuilders; // Number of builders needed
+
+        public TierDto[] tiers; // DEPRECATED - will use upgradeLevels instead
+
+        // NEW: Base Stats & Upgrade System
+        public StatsDto baseStats;
+        public AttackDto baseAttack;
+        public UpgradeLevel[] upgradeLevels;
+        public string prefabPath;
+        public string constructionSitePrefabPath;
 
         [System.Serializable]
         public class TierDto
@@ -23,6 +38,7 @@ namespace TowerConquest.Data
         {
             public float hp;
             public float armor;
+            public float constructionHP; // HP of construction site before tower is built
         }
 
         [System.Serializable]

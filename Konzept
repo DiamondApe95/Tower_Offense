@@ -1,4 +1,36 @@
-Unten ist eine **Unity-3D (URP) Projektstruktur** + **konkrete Script-Namen** (inkl. Verantwortlichkeiten), so dass Codex/KI daraus sauber Systeme bauen kann. Fokus: **datengetrieben**, **Tower Offense zuerst**, aber so angelegt, dass **Defense-Modus** später “nur” ein anderer Controller ist.
+## NEUES SPIELKONZEPT (Dezember 2025)
+
+Das Spiel wurde komplett überarbeitet zu einem **Live Battle RTS/Tower Defense Hybrid**:
+
+### Kernkonzept
+- **Spielmodus**: Echtzeit-Schlacht (Spieler vs KI)
+- **Gold-Wirtschaft**: Einheiten und Türme kosten Gold, Kills/Destructions geben Gold zurück
+- **Zivilisationen**: Verschiedene Zivilisationen mit einzigartigen Einheiten, Türmen und Helden
+- **Baumeister-System**: Türme werden durch Baumeister errichtet (nicht sofort gebaut)
+- **Helden**: Kostenlose, cooldown-basierte Helden
+- **Fame-Progression**: Einheiten und Helden mit Fame upgraden
+- **Spezialfähigkeiten**: Zivilisations-spezifische Fähigkeiten mit Cooldowns
+
+### Dokumentation
+- **Vollständiges Game Design**: `GAME_DESIGN_DOCUMENT.md`
+- **Technische Architektur**: `ARCHITECTURE.md`
+- **Beispiel-Daten**: `Assets/_Project/Data/JSON/Examples/`
+
+### Neue Systeme
+- **Gold Economy**: `Scripts/Gameplay/Economy/` (GoldManager, GoldRewardSystem, CostSystem)
+- **Civilization**: `Scripts/Gameplay/Civilization/` (CivilizationManager, UnitDeck, CivilizationSelector)
+- **Construction**: `Scripts/Gameplay/Construction/` (ConstructionSite, BuilderController, ConstructionManager)
+- **AI Opponent**: `Scripts/AI/` (AICommander, AIStrategy, AIBuildPlanner, AIUnitSpawner)
+- **Heroes**: `Scripts/Gameplay/Heroes/` (HeroManager)
+- **Abilities**: `Scripts/Gameplay/Abilities/` (AbilityManager)
+- **Progression**: `Scripts/Progression/` (FameManager, UpgradeSystem)
+
+---
+
+## LEGACY DOKUMENTATION (Alt - Tower Offense mit Karten-System)
+
+Unten ist die ursprüngliche **Unity-3D (URP) Projektstruktur** für das alte Tower Offense Konzept.
+Viele Systeme wurden für das neue Konzept erweitert oder ersetzt (z.B. DeckManager → UnitDeck, WaveController → Live Battle).
 
 ---
 

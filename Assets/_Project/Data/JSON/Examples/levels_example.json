@@ -1,0 +1,142 @@
+{
+  "levels": [
+    {
+      "id": "level_01",
+      "display_name": "Erste Schlacht",
+      "description": "Zerstöre die feindliche Ork-Basis mit deinen Rittern",
+      "region_id": "region_plains",
+      "recommended_power": 100,
+      "estimated_duration_seconds": 300,
+      "playerCivilization": "kingdom",
+      "enemyCivilization": "horde",
+      "aiDifficulty": "easy",
+      "aiStrategy": "balanced",
+      "startGold": 500,
+      "fameReward": {
+        "victory": 100,
+        "defeat": 20,
+        "bonus": [
+          {
+            "condition": "win_under_5_min",
+            "fame": 50
+          },
+          {
+            "condition": "no_tower_lost",
+            "fame": 30
+          }
+        ]
+      },
+      "unlockRequirement": null,
+      "base": {
+        "id": "player_base",
+        "hp": 1000,
+        "armor": 10,
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      "enemyBase": {
+        "id": "enemy_base",
+        "hp": 1000,
+        "armor": 10,
+        "position": {
+          "x": 50,
+          "y": 0,
+          "z": 0
+        }
+      },
+      "spawn_points": [
+        {
+          "id": "player_spawn",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        }
+      ],
+      "paths": [
+        {
+          "id": "main_path",
+          "from_spawn_id": "player_spawn",
+          "to_base_id": "enemy_base",
+          "waypoints": [
+            { "x": 10, "y": 0, "z": 0 },
+            { "x": 25, "y": 0, "z": 0 },
+            { "x": 40, "y": 0, "z": 0 },
+            { "x": 50, "y": 0, "z": 0 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "level_02",
+      "display_name": "Orks-Gegenangriff",
+      "description": "Die Orks greifen aggressiv an. Halte stand!",
+      "region_id": "region_plains",
+      "recommended_power": 150,
+      "estimated_duration_seconds": 360,
+      "playerCivilization": "kingdom",
+      "enemyCivilization": "horde",
+      "aiDifficulty": "normal",
+      "aiStrategy": "aggressive",
+      "startGold": 600,
+      "fameReward": {
+        "victory": 150,
+        "defeat": 30,
+        "bonus": [
+          {
+            "condition": "win_under_6_min",
+            "fame": 60
+          }
+        ]
+      },
+      "unlockRequirement": "level_01",
+      "base": {
+        "id": "player_base",
+        "hp": 1000,
+        "armor": 10,
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      "enemyBase": {
+        "id": "enemy_base",
+        "hp": 1200,
+        "armor": 15,
+        "position": {
+          "x": 60,
+          "y": 0,
+          "z": 0
+        }
+      },
+      "spawn_points": [
+        {
+          "id": "player_spawn",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        }
+      ],
+      "paths": [
+        {
+          "id": "main_path",
+          "from_spawn_id": "player_spawn",
+          "to_base_id": "enemy_base",
+          "waypoints": [
+            { "x": 15, "y": 0, "z": 5 },
+            { "x": 30, "y": 0, "z": -5 },
+            { "x": 45, "y": 0, "z": 5 },
+            { "x": 60, "y": 0, "z": 0 }
+          ]
+        }
+      ]
+    }
+  ]
+}

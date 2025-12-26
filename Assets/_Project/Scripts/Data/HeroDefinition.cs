@@ -8,9 +8,19 @@ namespace TowerConquest.Data
         public string role;
         public string rarity;
         public string[] tags;
+
+        // NEW: Civilization & Progression
+        public string civilization; // Which civilization this hero belongs to
+        public int unlockCost; // Fame cost to unlock hero
+        public float spawnCooldown; // Cooldown between hero spawns (in seconds)
+
         public StatsDto stats;
         public AttackDto attack;
         public AbilityDto[] abilities;
+
+        // NEW: Upgrade System
+        public UpgradeLevel[] upgradeLevels;
+        public string prefabPath;
 
         [System.Serializable]
         public class StatsDto

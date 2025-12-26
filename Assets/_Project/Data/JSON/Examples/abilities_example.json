@@ -1,0 +1,67 @@
+{
+  "abilities": [
+    {
+      "id": "divine_protection",
+      "name": "Göttlicher Schutz",
+      "civilization": "kingdom",
+      "description": "Alle verbündeten Einheiten erhalten +50% Rüstung für 10 Sekunden",
+      "cooldown": 90.0,
+      "effects": [
+        {
+          "type": "buff_armor",
+          "target": "all_friendly_units",
+          "value": 0.5,
+          "duration": 10.0,
+          "radius": 0,
+          "spawnUnitId": "",
+          "spawnCount": 0
+        }
+      ],
+      "vfxPrefab": "Prefabs/VFX/DivineProtection",
+      "sfx": "divine_protection_cast",
+      "upgradeCosts": [0, 500, 1500, 3000]
+    },
+    {
+      "id": "bloodlust",
+      "name": "Blutdurst",
+      "civilization": "horde",
+      "description": "Alle verbündeten Einheiten erhalten +30% Schaden für 15 Sekunden",
+      "cooldown": 90.0,
+      "effects": [
+        {
+          "type": "buff_damage",
+          "target": "all_friendly_units",
+          "value": 0.3,
+          "duration": 15.0,
+          "radius": 0,
+          "spawnUnitId": "",
+          "spawnCount": 0
+        }
+      ],
+      "vfxPrefab": "Prefabs/VFX/Bloodlust",
+      "sfx": "bloodlust_cast",
+      "upgradeCosts": [0, 500, 1500, 3000]
+    },
+    {
+      "id": "raise_dead",
+      "name": "Totenbeschwörung",
+      "civilization": "undead",
+      "description": "Beschwört 5 Skelett-Krieger an deiner Basis",
+      "cooldown": 120.0,
+      "effects": [
+        {
+          "type": "spawn_units",
+          "target": "friendly_base",
+          "value": 0,
+          "duration": 0,
+          "radius": 5.0,
+          "spawnUnitId": "skeleton",
+          "spawnCount": 5
+        }
+      ],
+      "vfxPrefab": "Prefabs/VFX/RaiseDead",
+      "sfx": "raise_dead_cast",
+      "upgradeCosts": [0, 1000, 2500, 5000]
+    }
+  ]
+}
