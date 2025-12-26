@@ -219,6 +219,13 @@ namespace TowerConquest.Gameplay
 
             Vector3 position = spawnPoint != null ? spawnPoint.position : transform.position;
 
+            // Validate and clamp position to map boundaries
+            if (MapBoundary.Instance != null && !MapBoundary.Instance.IsWithinBounds(position))
+            {
+                position = MapBoundary.Instance.ClampToBounds(position);
+                Log.Warning($"[LiveBattleSpawnController] Spawn position was outside map bounds, clamped to: {position}");
+            }
+
             // Get from pool or create new
             GameObject unitObject = GetFromPool(unitId);
             if (unitObject == null)
