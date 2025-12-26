@@ -288,7 +288,7 @@ public class AutoLevelGenerator : MonoBehaviour
         // 2) Auto-load materials from Assets/_Project/MAP
         AutoLoadMaterialsEditorOnly();
 
-        // 3) Auto-load prefabs from Assets/Prefab
+        // 3) Auto-load prefabs from Assets/_Project/Prefab
         AutoLoadPrefabsEditorOnly();
 
         // 4) Auto-setup prefabs (Tower/Enemy)
@@ -400,6 +400,9 @@ public class AutoLevelGenerator : MonoBehaviour
         if (autoCreateBuildManager)
             CreateOrUpdateBuildManager();
 
+        // Setup ConstructionManager
+        SetupConstructionManager();
+
         // Setup map boundaries
         SetupMapBoundaries();
 
@@ -423,7 +426,7 @@ public class AutoLevelGenerator : MonoBehaviour
     {
         if (enemyPrefab == null)
         {
-            Log.Error("AutoLevelGenerator: enemyPrefab is null. Put Enemy.prefab in Assets/Prefab or assign manually.");
+            Log.Error($"AutoLevelGenerator: enemyPrefab is null. Put Enemy.prefab in {prefabFolder} or assign manually.");
             return;
         }
 
@@ -506,6 +509,41 @@ public class AutoLevelGenerator : MonoBehaviour
             bm.buildTileMask = 1 << buildLayer;
         else
             Log.Warning($"AutoLevelGenerator: Layer '{buildLayerName}' not found. BuildManager.buildTileMask not set.");
+    }
+
+    // =========================================================
+    // AUTO: ConstructionManager Setup
+    // =========================================================
+    private void SetupConstructionManager()
+    {
+        #if UNITY_EDITOR
+        // Find or create ConstructionManager
+        TowerConquest.Gameplay.ConstructionManager cm = FindFirstObjectByType<TowerConquest.Gameplay.ConstructionManager>();
+        if (cm == null)
+        {
+            GameObject go = new GameObject("ConstructionManager");
+            cm = go.AddComponent<TowerConquest.Gameplay.ConstructionManager>();
+            Log.Info("AutoLevelGenerator: Created ConstructionManager.");
+        }
+
+        // Load and assign Builder prefab
+        GameObject builderPrefab = LoadPrefabByName("Unit_Builder");
+        if (builderPrefab != null)
+        {
+            // Use reflection to set the private builderPrefab field
+            var field = typeof(TowerConquest.Gameplay.ConstructionManager).GetField("builderPrefab",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (field != null)
+            {
+                field.SetValue(cm, builderPrefab);
+                Log.Info("AutoLevelGenerator: Assigned Unit_Builder prefab to ConstructionManager.");
+            }
+        }
+        else
+        {
+            Log.Warning("AutoLevelGenerator: Could not find Unit_Builder.prefab. ConstructionManager will use default builder.");
+        }
+        #endif
     }
 
     private void SetupMapBoundaries()
