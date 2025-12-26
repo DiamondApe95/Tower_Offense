@@ -6,6 +6,8 @@ TagManager:
   tags:
   - PlayerBase
   - EnemyBase
+  - EnemyTower
+  - PlayerUnit
   layers:
   - Default
   - TransparentFX
