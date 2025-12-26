@@ -133,8 +133,8 @@ public class EnemySpawner : MonoBehaviour
         // Find enemy base (player base is the target for enemies)
         var playerBase = FindFirstObjectByType<TowerConquest.Gameplay.Entities.BaseController>();
 
-        // Initialize combat with enemy team settings
-        combat.Initialize(GoldManager.Team.Enemy, 25f, 2f, 1f, playerBase);
+        // Initialize combat with AI team settings (enemies are AI controlled)
+        combat.Initialize(GoldManager.Team.AI, 25f, 2f, 1f, playerBase);
 
         Log.Info($"[EnemySpawner] Setup combat for spawned enemy");
     }
