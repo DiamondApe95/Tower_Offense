@@ -32,26 +32,34 @@ namespace TowerConquest.Debug
                 return;
             }
 
-            LevelController level = Object.FindFirstObjectByType<LevelController>();
-            if (level == null || level.Run == null)
+            // Check for Live Battle Level Controller
+            LiveBattleLevelController level = Object.FindFirstObjectByType<LiveBattleLevelController>();
+            if (level == null)
             {
                 GUI.Box(new Rect(10, 10, 220, 80), "Debug Overlay");
-                GUI.Label(new Rect(20, 35, 200, 20), "No LevelController found.");
+                GUI.Label(new Rect(20, 35, 200, 20), "No LiveBattleLevelController found.");
+                if (GUI.Button(new Rect(20, 55, 200, 20), "Reload JSON (F5)"))
+                {
+                    ReloadJson();
+                }
                 return;
             }
 
-            int wave = level.Run.waveIndex;
-            float baseHp = level.BaseHp;
-            int units = level.ActiveUnits;
-            float dps = level.EstimatedDps;
+            // Display Live Battle info
+            float playerBaseHp = level.GetPlayerBaseHPPercent() * 100f;
+            float enemyBaseHp = level.GetEnemyBaseHPPercent() * 100f;
+            int playerGold = level.PlayerGold?.CurrentGold ?? 0;
+            string battleTime = level.GetFormattedBattleTime();
+            string status = level.IsBattleActive ? "ACTIVE" : (level.IsBattleEnded ? "ENDED" : "WAITING");
 
-            GUI.Box(new Rect(10, 10, 240, 140), "Debug Overlay");
-            GUI.Label(new Rect(20, 35, 220, 20), $"Wave: {wave}/{level.Run.maxWaves}");
-            GUI.Label(new Rect(20, 55, 220, 20), $"Base HP: {baseHp:0.#}");
-            GUI.Label(new Rect(20, 75, 220, 20), $"Active Units: {units}");
-            GUI.Label(new Rect(20, 95, 220, 20), $"Estimated DPS: {dps:0.#}");
+            GUI.Box(new Rect(10, 10, 280, 180), "Debug Overlay - Live Battle");
+            GUI.Label(new Rect(20, 35, 260, 20), $"Status: {status}");
+            GUI.Label(new Rect(20, 55, 260, 20), $"Battle Time: {battleTime}");
+            GUI.Label(new Rect(20, 75, 260, 20), $"Player Base: {playerBaseHp:0.#}%");
+            GUI.Label(new Rect(20, 95, 260, 20), $"Enemy Base: {enemyBaseHp:0.#}%");
+            GUI.Label(new Rect(20, 115, 260, 20), $"Player Gold: {playerGold}");
 
-            if (GUI.Button(new Rect(20, 115, 200, 20), "Reload JSON (F5)"))
+            if (GUI.Button(new Rect(20, 140, 200, 20), "Reload JSON (F5)"))
             {
                 ReloadJson();
             }
