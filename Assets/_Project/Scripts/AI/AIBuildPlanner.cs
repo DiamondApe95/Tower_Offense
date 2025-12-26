@@ -87,14 +87,41 @@ namespace TowerConquest.AI
                 return Vector3.zero;
             }
 
-            // Random offset from base
-            Vector3 offset = new Vector3(
-                Random.Range(-20f, 20f),
-                0f,
-                Random.Range(-20f, 20f)
-            );
+            // Try multiple times to find a valid position within map boundaries
+            int maxAttempts = 10;
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                // Random offset from base (reduced range for better chances)
+                Vector3 offset = new Vector3(
+                    Random.Range(-15f, 15f),
+                    0f,
+                    Random.Range(-15f, 15f)
+                );
 
-            return aiBase.position + offset;
+                Vector3 candidatePosition = aiBase.position + offset;
+
+                // Validate position is within map boundaries
+                if (MapBoundary.Instance != null)
+                {
+                    if (MapBoundary.Instance.IsWithinSafeBounds(candidatePosition))
+                    {
+                        return candidatePosition;
+                    }
+                }
+                else
+                {
+                    // No boundary system found, return candidate (backward compatibility)
+                    return candidatePosition;
+                }
+            }
+
+            // If all attempts failed, return a clamped position near the base
+            if (MapBoundary.Instance != null)
+            {
+                return MapBoundary.Instance.ClampToSafeBounds(aiBase.position);
+            }
+
+            return aiBase.position;
         }
 
         private void SpawnBuilders(ConstructionSite site, Vector3 buildPosition)
@@ -107,6 +134,12 @@ namespace TowerConquest.AI
                 // Spawn builder near AI base
                 Vector3 spawnPos = commander.GetBase().position + Random.insideUnitSphere * 5f;
                 spawnPos.y = 0f;
+
+                // Clamp to map boundaries
+                if (MapBoundary.Instance != null)
+                {
+                    spawnPos = MapBoundary.Instance.ClampToSafeBounds(spawnPos);
+                }
 
                 constructionManager.SpawnBuilder(spawnPos, GoldManager.Team.AI);
             }

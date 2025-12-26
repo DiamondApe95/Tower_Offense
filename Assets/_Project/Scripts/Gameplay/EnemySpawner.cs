@@ -88,7 +88,16 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnOne()
     {
-        GameObject enemyGO = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+        Vector3 spawnPosition = spawnPoint.position;
+
+        // Validate and clamp position to map boundaries
+        if (MapBoundary.Instance != null && !MapBoundary.Instance.IsWithinBounds(spawnPosition))
+        {
+            spawnPosition = MapBoundary.Instance.ClampToBounds(spawnPosition);
+            UnityEngine.Debug.LogWarning($"[EnemySpawner] Spawn position was outside map bounds, clamped to: {spawnPosition}");
+        }
+
+        GameObject enemyGO = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
 
         EnemyMover mover = enemyGO.GetComponent<EnemyMover>();
         if (mover == null)

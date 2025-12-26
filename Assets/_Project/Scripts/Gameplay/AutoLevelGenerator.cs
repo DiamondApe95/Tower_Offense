@@ -390,6 +390,9 @@ public class AutoLevelGenerator : MonoBehaviour
         if (autoCreateBuildManager)
             CreateOrUpdateBuildManager();
 
+        // Setup map boundaries
+        SetupMapBoundaries();
+
 #if UNITY_EDITOR
         if (!Application.isPlaying)
         {
@@ -462,6 +465,21 @@ public class AutoLevelGenerator : MonoBehaviour
             bm.buildTileMask = 1 << buildLayer;
         else
             Log.Warning($"AutoLevelGenerator: Layer '{buildLayerName}' not found. BuildManager.buildTileMask not set.");
+    }
+
+    private void SetupMapBoundaries()
+    {
+        MapBoundary boundary = FindFirstObjectByType<MapBoundary>();
+        if (boundary == null)
+        {
+            GameObject go = new GameObject("MapBoundary");
+            boundary = go.AddComponent<MapBoundary>();
+        }
+
+        // Set boundaries based on generated map
+        boundary.SetBoundaries(origin, width, height, tileSize);
+
+        Log.Info($"AutoLevelGenerator: Map boundaries set - Min: {boundary.minBounds}, Max: {boundary.maxBounds}");
     }
 
     // =========================================================
