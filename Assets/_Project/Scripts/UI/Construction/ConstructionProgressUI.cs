@@ -43,7 +43,7 @@ namespace TowerConquest.UI
             isInitialized = true;
 
             // Subscribe to events
-            site.OnBuilderArrived += OnBuilderProgressChanged;
+            site.OnBuilderCountChanged += OnBuilderProgressChanged;
             site.OnConstructionComplete += OnSiteComplete;
             site.OnConstructionDestroyed += OnSiteDestroyed;
 
@@ -232,7 +232,7 @@ namespace TowerConquest.UI
         {
             if (targetSite != null)
             {
-                targetSite.OnBuilderArrived -= OnBuilderProgressChanged;
+                targetSite.OnBuilderCountChanged -= OnBuilderProgressChanged;
                 targetSite.OnConstructionComplete -= OnSiteComplete;
                 targetSite.OnConstructionDestroyed -= OnSiteDestroyed;
             }
@@ -251,7 +251,7 @@ namespace TowerConquest.UI
         {
             if (targetSite != null)
             {
-                targetSite.OnBuilderArrived -= OnBuilderProgressChanged;
+                targetSite.OnBuilderCountChanged -= OnBuilderProgressChanged;
                 targetSite.OnConstructionComplete -= OnSiteComplete;
                 targetSite.OnConstructionDestroyed -= OnSiteDestroyed;
             }

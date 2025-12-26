@@ -25,10 +25,4 @@ namespace TowerConquest.Data
             public int spawnCount; // For spawn effects
         }
     }
-
-    [System.Serializable]
-    public class AbilitiesJsonRoot
-    {
-        public AbilityDefinition[] abilities;
-    }
 }

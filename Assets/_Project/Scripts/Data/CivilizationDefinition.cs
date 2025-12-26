@@ -17,10 +17,4 @@ namespace TowerConquest.Data
         public string prefabPath;
         public string iconPath;
     }
-
-    [System.Serializable]
-    public class CivilizationsJsonRoot
-    {
-        public CivilizationDefinition[] civilizations;
-    }
 }
