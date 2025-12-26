@@ -427,7 +427,22 @@ namespace TowerConquest.Gameplay
             site.OnConstructionComplete -= OnConstructionComplete;
             site.OnConstructionDestroyed -= OnConstructionDestroyed;
 
-            // TODO: Partial gold refund?
+            // Partial gold refund (50% of tower cost)
+            var towerDef = database?.GetTower(site.TowerID);
+            if (towerDef != null && towerDef.goldCost > 0)
+            {
+                int refundAmount = Mathf.RoundToInt(towerDef.goldCost * 0.5f);
+                var goldManagers = FindObjectsByType<GoldManager>(FindObjectsSortMode.None);
+                foreach (var gm in goldManagers)
+                {
+                    if (gm.OwnerTeam == site.OwnerTeam)
+                    {
+                        gm.AddGold(refundAmount);
+                        Debug.Log($"[ConstructionManager] Refunded {refundAmount} gold for destroyed construction site");
+                        break;
+                    }
+                }
+            }
         }
 
         private void SpawnCompletedTower(ConstructionSite site)
@@ -439,16 +454,127 @@ namespace TowerConquest.Gameplay
                 return;
             }
 
-            // TODO: Load tower prefab and spawn
-            // For now, just log
-            Debug.Log($"[ConstructionManager] Would spawn tower: {site.TowerID} at {site.transform.position}");
+            GameObject towerObj = null;
 
-            // GameObject towerPrefab = prefabRegistry.LoadPrefab(towerDef.prefabPath);
-            // if (towerPrefab != null)
-            // {
-            //     GameObject tower = Instantiate(towerPrefab, site.transform.position, site.transform.rotation);
-            //     // Initialize tower
-            // }
+            // Try to load from prefab registry first
+            if (prefabRegistry != null)
+            {
+                towerObj = prefabRegistry.CreateOrFallback(site.TowerID);
+            }
+
+            // Fallback: Create default tower object
+            if (towerObj == null)
+            {
+                towerObj = CreateDefaultTower(towerDef);
+            }
+
+            // Position the tower
+            towerObj.transform.position = site.transform.position;
+            towerObj.transform.rotation = site.transform.rotation;
+            towerObj.name = $"Tower_{site.TowerID}_{site.OwnerTeam}";
+
+            // Setup TowerController
+            var towerController = towerObj.GetComponent<TowerController>();
+            if (towerController == null)
+            {
+                towerController = towerObj.AddComponent<TowerController>();
+            }
+
+            // Initialize tower with definition data
+            towerController.towerId = site.TowerID;
+            towerController.buildCost = towerDef.goldCost;
+            towerController.ownerTeam = site.OwnerTeam;
+
+            if (towerDef.baseStats != null)
+            {
+                towerController.range = towerDef.baseStats.range > 0 ? towerDef.baseStats.range : 6f;
+                towerController.damage = towerDef.baseStats.damage > 0 ? towerDef.baseStats.damage : 20f;
+                towerController.attacksPerSecond = towerDef.baseStats.attackSpeed > 0 ? towerDef.baseStats.attackSpeed : 1f;
+            }
+
+            if (towerDef.effects != null)
+            {
+                towerController.effects = towerDef.effects;
+            }
+
+            // Recalculate DPS
+            towerController.UpdateDpsCache();
+
+            // Set team layer
+            int layer = site.OwnerTeam == GoldManager.Team.Player
+                ? LayerMask.NameToLayer("PlayerTower")
+                : LayerMask.NameToLayer("EnemyTower");
+            if (layer < 0)
+            {
+                layer = site.OwnerTeam == GoldManager.Team.Player
+                    ? LayerMask.NameToLayer("PlayerUnit")
+                    : LayerMask.NameToLayer("Enemy");
+            }
+            if (layer >= 0)
+            {
+                SetLayerRecursively(towerObj, layer);
+            }
+
+            // Set team tag
+            towerObj.tag = site.OwnerTeam == GoldManager.Team.Player ? "PlayerTower" : "EnemyTower";
+
+            Debug.Log($"[ConstructionManager] Spawned tower: {site.TowerID} at {site.transform.position}");
+
+            OnTowerConstructionComplete?.Invoke(site);
+        }
+
+        /// <summary>
+        /// Create a default tower object when no prefab is available
+        /// </summary>
+        private GameObject CreateDefaultTower(TowerDefinition towerDef)
+        {
+            GameObject towerObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            towerObj.transform.localScale = new Vector3(1.5f, 2f, 1.5f);
+
+            var renderer = towerObj.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                Material mat = new Material(Shader.Find("Standard"));
+                // Color based on tower type
+                mat.color = new Color(0.4f, 0.4f, 0.6f, 1f); // Stone gray-blue
+                renderer.material = mat;
+            }
+
+            // Add a simple turret head
+            GameObject turretHead = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            turretHead.name = "TurretHead";
+            turretHead.transform.SetParent(towerObj.transform);
+            turretHead.transform.localPosition = new Vector3(0f, 0.6f, 0f);
+            turretHead.transform.localScale = new Vector3(0.6f, 0.4f, 0.6f);
+
+            var headRenderer = turretHead.GetComponent<Renderer>();
+            if (headRenderer != null)
+            {
+                Material headMat = new Material(Shader.Find("Standard"));
+                headMat.color = new Color(0.3f, 0.3f, 0.4f, 1f);
+                headRenderer.material = headMat;
+            }
+
+            // Remove collider from turret head to avoid double collisions
+            var headCollider = turretHead.GetComponent<Collider>();
+            if (headCollider != null)
+            {
+                Destroy(headCollider);
+            }
+
+            return towerObj;
+        }
+
+        /// <summary>
+        /// Recursively set layer on object and all children
+        /// </summary>
+        private void SetLayerRecursively(GameObject obj, int layer)
+        {
+            obj.layer = layer;
+            foreach (Transform child in obj.transform)
+            {
+                SetLayerRecursively(child.gameObject, layer);
+            }
         }
 
         /// <summary>

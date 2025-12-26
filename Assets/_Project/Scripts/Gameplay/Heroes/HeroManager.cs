@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
+using TowerConquest.Core;
 using TowerConquest.Data;
+using TowerConquest.Gameplay.Entities;
 
 namespace TowerConquest.Gameplay
 {
@@ -20,6 +22,7 @@ namespace TowerConquest.Gameplay
         [SerializeField] private bool isOnCooldown;
 
         private JsonDatabase database;
+        private PrefabRegistry prefabRegistry;
         private Transform spawnPoint;
 
         public string HeroID => heroId;
@@ -36,10 +39,13 @@ namespace TowerConquest.Gameplay
             database = db;
             spawnPoint = spawn;
 
+            // Try to get PrefabRegistry
+            ServiceLocator.TryGet(out prefabRegistry);
+
             var heroDef = database.GetHero(heroId);
             if (heroDef != null)
             {
-                cooldownDuration = heroDef.spawnCooldown;
+                cooldownDuration = heroDef.spawnCooldown > 0 ? heroDef.spawnCooldown : 120f;
             }
             else
             {
@@ -77,14 +83,43 @@ namespace TowerConquest.Gameplay
                 return null;
             }
 
-            // TODO: Load hero prefab and spawn
-            // For now, create empty game object as placeholder
-            currentHero = new GameObject($"Hero_{heroId}_{ownerTeam}");
+            // Try to load from prefab registry first
+            if (prefabRegistry != null)
+            {
+                currentHero = prefabRegistry.CreateOrFallback(heroId);
+            }
+
+            // Fallback: Create default hero object
+            if (currentHero == null)
+            {
+                currentHero = CreateDefaultHero(heroDef);
+            }
+
+            currentHero.name = $"Hero_{heroId}_{ownerTeam}";
             currentHero.transform.position = spawnPoint != null ? spawnPoint.position : Vector3.zero;
 
-            // TODO: Initialize hero controller
-            // var heroController = currentHero.AddComponent<HeroController>();
-            // heroController.Initialize(heroDef, ownerTeam);
+            // Setup HeroController
+            var heroController = currentHero.GetComponent<HeroController>();
+            if (heroController == null)
+            {
+                heroController = currentHero.AddComponent<HeroController>();
+            }
+
+            // Initialize hero with stats from definition
+            float hp = heroDef.baseStats?.hp ?? 500f;
+            heroController.Initialize(heroId, hp);
+
+            // Subscribe to death event
+            heroController.OnHeroDied += HandleHeroDeath;
+
+            // Set team layer
+            int layer = ownerTeam == GoldManager.Team.Player
+                ? LayerMask.NameToLayer("PlayerUnit")
+                : LayerMask.NameToLayer("Enemy");
+            if (layer >= 0)
+            {
+                SetLayerRecursively(currentHero, layer);
+            }
 
             lastSpawnTime = Time.time;
             isOnCooldown = true;
@@ -93,6 +128,52 @@ namespace TowerConquest.Gameplay
 
             Debug.Log($"[HeroManager] Spawned hero {heroId} at {currentHero.transform.position}");
             return currentHero;
+        }
+
+        private void HandleHeroDeath(HeroController hero)
+        {
+            if (hero != null)
+            {
+                hero.OnHeroDied -= HandleHeroDeath;
+            }
+            OnHeroKilled();
+        }
+
+        /// <summary>
+        /// Create a default hero object when no prefab is available
+        /// </summary>
+        private GameObject CreateDefaultHero(HeroDefinition heroDef)
+        {
+            GameObject heroObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            heroObj.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+
+            var renderer = heroObj.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                Material mat = new Material(Shader.Find("Standard"));
+                // Heroes get a golden color
+                mat.color = new Color(1f, 0.85f, 0.2f, 1f);
+                renderer.material = mat;
+            }
+
+            // Add NavMeshAgent for movement
+            var agent = heroObj.AddComponent<UnityEngine.AI.NavMeshAgent>();
+            agent.speed = heroDef.baseStats?.speed ?? 4f;
+            agent.stoppingDistance = 1.5f;
+
+            return heroObj;
+        }
+
+        /// <summary>
+        /// Recursively set layer on object and all children
+        /// </summary>
+        private void SetLayerRecursively(GameObject obj, int layer)
+        {
+            obj.layer = layer;
+            foreach (Transform child in obj.transform)
+            {
+                SetLayerRecursively(child.gameObject, layer);
+            }
         }
 
         /// <summary>

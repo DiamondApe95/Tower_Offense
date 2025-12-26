@@ -385,5 +385,138 @@ namespace TowerConquest.Data
             }
             return null;
         }
+
+        /// <summary>
+        /// Get all units from the database
+        /// </summary>
+        public List<UnitDefinition> GetAllUnits()
+        {
+            return Units != null ? new List<UnitDefinition>(Units) : new List<UnitDefinition>();
+        }
+
+        /// <summary>
+        /// Get all heroes from the database
+        /// </summary>
+        public List<HeroDefinition> GetAllHeroes()
+        {
+            return Heroes != null ? new List<HeroDefinition>(Heroes) : new List<HeroDefinition>();
+        }
+
+        /// <summary>
+        /// Get all towers from the database
+        /// </summary>
+        public List<TowerDefinition> GetAllTowers()
+        {
+            return Towers != null ? new List<TowerDefinition>(Towers) : new List<TowerDefinition>();
+        }
+
+        /// <summary>
+        /// Get all civilizations from the database
+        /// </summary>
+        public List<CivilizationDefinition> GetAllCivilizations()
+        {
+            return Civilizations != null ? new List<CivilizationDefinition>(Civilizations) : new List<CivilizationDefinition>();
+        }
+
+        /// <summary>
+        /// Get all levels from the database
+        /// </summary>
+        public List<LevelDefinition> GetAllLevels()
+        {
+            if (Levels != null && Levels.Count > 0)
+            {
+                return new List<LevelDefinition>(Levels);
+            }
+
+            // Return default levels if none loaded
+            return CreateDefaultLevels();
+        }
+
+        /// <summary>
+        /// Get all traps from the database
+        /// </summary>
+        public List<TrapDefinition> GetAllTraps()
+        {
+            return Traps != null ? new List<TrapDefinition>(Traps) : new List<TrapDefinition>();
+        }
+
+        /// <summary>
+        /// Get all abilities from the database
+        /// </summary>
+        public List<AbilityDefinition> GetAllAbilities()
+        {
+            return Abilities != null ? new List<AbilityDefinition>(Abilities) : new List<AbilityDefinition>();
+        }
+
+        /// <summary>
+        /// Create default levels when none are loaded from JSON
+        /// </summary>
+        private List<LevelDefinition> CreateDefaultLevels()
+        {
+            var levels = new List<LevelDefinition>();
+
+            levels.Add(new LevelDefinition
+            {
+                id = "lvl_01_etruria_outpost",
+                display_name = "Etruria Outpost",
+                description = "The first battle begins at an ancient outpost",
+                difficulty = "Easy",
+                startGold = 500,
+                aiDifficulty = "easy",
+                aiStrategy = "defensive",
+                fameReward = new LevelDefinition.FameRewardDto { victory = 100, defeat = 20 }
+            });
+
+            levels.Add(new LevelDefinition
+            {
+                id = "lvl_02_gallic_frontier",
+                display_name = "Gallic Frontier",
+                description = "The Gauls have fortified the frontier",
+                difficulty = "Easy",
+                startGold = 500,
+                aiDifficulty = "easy",
+                aiStrategy = "balanced",
+                fameReward = new LevelDefinition.FameRewardDto { victory = 120, defeat = 25 }
+            });
+
+            levels.Add(new LevelDefinition
+            {
+                id = "lvl_03_carthage_siege",
+                display_name = "Carthage Siege",
+                description = "Lay siege to the Carthaginian stronghold",
+                difficulty = "Normal",
+                startGold = 600,
+                aiDifficulty = "normal",
+                aiStrategy = "defensive",
+                fameReward = new LevelDefinition.FameRewardDto { victory = 150, defeat = 30 }
+            });
+
+            levels.Add(new LevelDefinition
+            {
+                id = "lvl_04_greek_colony",
+                display_name = "Greek Colony",
+                description = "The Greeks defend their colony with phalanx tactics",
+                difficulty = "Normal",
+                startGold = 600,
+                aiDifficulty = "normal",
+                aiStrategy = "balanced",
+                fameReward = new LevelDefinition.FameRewardDto { victory = 180, defeat = 35 }
+            });
+
+            levels.Add(new LevelDefinition
+            {
+                id = "lvl_05_germanic_forest",
+                display_name = "Germanic Forest",
+                description = "Face the fierce Germanic tribes in their home territory",
+                difficulty = "Hard",
+                startGold = 700,
+                aiDifficulty = "hard",
+                aiStrategy = "aggressive",
+                fameReward = new LevelDefinition.FameRewardDto { victory = 250, defeat = 50 }
+            });
+
+            UnityEngine.Debug.Log($"[JsonDatabase] Created {levels.Count} default levels");
+            return levels;
+        }
     }
 }
