@@ -26,6 +26,10 @@ public class AutoLevelGenerator : MonoBehaviour
     [Tooltip("Erstellt Level + GUI + Controller + Kamera - alles in einem Klick!")]
     public bool autoSetupOnPlay = false;
 
+    [Header("Game Mode")]
+    [Tooltip("Use Live Battle mode (RTS/TD Hybrid) instead of Wave-based mode")]
+    public bool useLiveBattleMode = true;
+
     [Header("Cleanup Settings")]
     [Tooltip("Automatisch alle vorherigen generierten Objekte entfernen")]
     public bool autoCleanupPrevious = true;
@@ -50,10 +54,24 @@ public class AutoLevelGenerator : MonoBehaviour
         SetupCamera();
 
         // 3. Create GUI (Canvas, HUD, ResultScreen)
-        CreateCompleteGUI();
+        if (useLiveBattleMode)
+        {
+            CreateLiveBattleGUI();
+        }
+        else
+        {
+            CreateCompleteGUI();
+        }
 
         // 4. Setup LevelController with all references
-        SetupLevelController();
+        if (useLiveBattleMode)
+        {
+            SetupLiveBattleLevelController();
+        }
+        else
+        {
+            SetupLevelController();
+        }
 
         // 5. Configure Lighting
         SetupLighting();
@@ -1659,5 +1677,274 @@ public class AutoLevelGenerator : MonoBehaviour
         dirLight.shadows = LightShadows.Soft;
 
         Debug.Log("AutoLevelGenerator: Lighting configured.");
+    }
+
+    // =========================================================
+    // LIVE BATTLE MODE: GUI CREATION
+    // =========================================================
+
+    private TowerConquest.UI.LiveBattleHUD generatedLiveBattleHUD;
+
+    private void CreateLiveBattleGUI()
+    {
+        Debug.Log("AutoLevelGenerator: Creating Live Battle GUI...");
+
+        CleanupOldGUI();
+        CreateCanvas();
+        CreateLiveBattleHUD();
+        CreateResultScreen();
+
+        Debug.Log("AutoLevelGenerator: Live Battle GUI creation complete.");
+    }
+
+    private void CreateLiveBattleHUD()
+    {
+        if (generatedCanvas == null) return;
+
+        // HUD Container
+        var hudGO = new GameObject("LiveBattleHUD");
+        hudGO.transform.SetParent(generatedCanvas.transform, false);
+        generatedLiveBattleHUD = hudGO.AddComponent<TowerConquest.UI.LiveBattleHUD>();
+
+        var hudRect = hudGO.AddComponent<RectTransform>();
+        hudRect.anchorMin = Vector2.zero;
+        hudRect.anchorMax = Vector2.one;
+        hudRect.offsetMin = Vector2.zero;
+        hudRect.offsetMax = Vector2.zero;
+
+        // === TOP BAR ===
+        var topBar = CreateUIPanel("TopBar", hudGO.transform,
+            new Vector2(0, 1), new Vector2(1, 1),
+            new Vector2(0, -10), new Vector2(0, -70),
+            new Color(0.1f, 0.1f, 0.15f, 0.9f));
+
+        // Gold Display (links)
+        var goldText = CreateUIText("GoldText", topBar.transform, "500",
+            new Vector2(0, 0.5f), new Vector2(0, 0.5f),
+            new Vector2(20, -15), new Vector2(150, 30), 28);
+        goldText.color = new Color(1f, 0.85f, 0.3f, 1f);
+        goldText.fontStyle = FontStyle.Bold;
+        generatedLiveBattleHUD.goldText = goldText;
+
+        // Battle Time (mitte)
+        var timeText = CreateUIText("BattleTimeText", topBar.transform, "00:00",
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+            new Vector2(-50, -15), new Vector2(100, 30), 24);
+        timeText.alignment = TextAnchor.MiddleCenter;
+        generatedLiveBattleHUD.battleTimeText = timeText;
+
+        // Player Base HP (links mitte)
+        var playerHPBar = CreateHPBar("PlayerBaseHP", topBar.transform,
+            new Vector2(0.2f, 0.5f), new Vector2(0.4f, 0.5f),
+            new Vector2(10, -15), new Vector2(-10, 15),
+            new Color(0.2f, 0.6f, 0.2f, 1f));
+        generatedLiveBattleHUD.playerBaseHPSlider = playerHPBar.GetComponent<Slider>();
+
+        // Enemy Base HP (rechts mitte)
+        var enemyHPBar = CreateHPBar("EnemyBaseHP", topBar.transform,
+            new Vector2(0.6f, 0.5f), new Vector2(0.8f, 0.5f),
+            new Vector2(10, -15), new Vector2(-10, 15),
+            new Color(0.7f, 0.2f, 0.2f, 1f));
+        generatedLiveBattleHUD.enemyBaseHPSlider = enemyHPBar.GetComponent<Slider>();
+
+        // Status Text (rechts)
+        var statusText = CreateUIText("StatusText", topBar.transform, "Battle!",
+            new Vector2(1, 0.5f), new Vector2(1, 0.5f),
+            new Vector2(-150, -15), new Vector2(-20, 30), 20);
+        statusText.alignment = TextAnchor.MiddleRight;
+        generatedLiveBattleHUD.statusText = statusText;
+
+        // === UNIT SPAWN BAR (unten) ===
+        var unitBar = CreateUIPanel("UnitSpawnBar", hudGO.transform,
+            new Vector2(0, 0), new Vector2(0.8f, 0),
+            new Vector2(20, 20), new Vector2(-20, 130),
+            new Color(0.12f, 0.12f, 0.15f, 0.9f));
+
+        var hlg = unitBar.AddComponent<HorizontalLayoutGroup>();
+        hlg.spacing = 10;
+        hlg.padding = new RectOffset(15, 15, 10, 10);
+        hlg.childAlignment = TextAnchor.MiddleLeft;
+        hlg.childControlWidth = false;
+        hlg.childControlHeight = false;
+        generatedLiveBattleHUD.unitButtonContainer = unitBar.transform;
+
+        // === HERO BUTTON (unten rechts) ===
+        var heroBtn = CreateUIButton("HeroButton", hudGO.transform, "HERO",
+            new Vector2(1, 0), new Vector2(1, 0),
+            new Vector2(-180, 80), new Vector2(100, 70),
+            new Color(0.5f, 0.4f, 0.1f, 1f));
+        generatedLiveBattleHUD.heroButton = heroBtn.GetComponent<Button>();
+
+        // Hero Cooldown Overlay
+        var heroCooldownGO = new GameObject("HeroCooldownOverlay");
+        heroCooldownGO.transform.SetParent(heroBtn.transform, false);
+        var heroCooldownRect = heroCooldownGO.AddComponent<RectTransform>();
+        heroCooldownRect.anchorMin = Vector2.zero;
+        heroCooldownRect.anchorMax = Vector2.one;
+        heroCooldownRect.offsetMin = Vector2.zero;
+        heroCooldownRect.offsetMax = Vector2.zero;
+        var heroCooldownImage = heroCooldownGO.AddComponent<Image>();
+        heroCooldownImage.color = new Color(0, 0, 0, 0.7f);
+        heroCooldownImage.type = Image.Type.Filled;
+        heroCooldownImage.fillMethod = Image.FillMethod.Vertical;
+        heroCooldownImage.fillOrigin = 0;
+        heroCooldownImage.fillAmount = 0f;
+        heroCooldownGO.SetActive(false);
+        generatedLiveBattleHUD.heroCooldownOverlay = heroCooldownImage;
+
+        // === ABILITY BUTTON (unten rechts, neben Hero) ===
+        var abilityBtn = CreateUIButton("AbilityButton", hudGO.transform, "ABILITY",
+            new Vector2(1, 0), new Vector2(1, 0),
+            new Vector2(-70, 80), new Vector2(100, 70),
+            new Color(0.3f, 0.2f, 0.5f, 1f));
+        generatedLiveBattleHUD.abilityButton = abilityBtn.GetComponent<Button>();
+
+        hudGO.SetActive(true);
+        Debug.Log("AutoLevelGenerator: LiveBattleHUD created.");
+    }
+
+    private GameObject CreateHPBar(string name, Transform parent,
+        Vector2 anchorMin, Vector2 anchorMax,
+        Vector2 offsetMin, Vector2 offsetMax, Color fillColor)
+    {
+        var sliderGO = new GameObject(name);
+        sliderGO.transform.SetParent(parent, false);
+
+        var rect = sliderGO.AddComponent<RectTransform>();
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.offsetMin = offsetMin;
+        rect.offsetMax = offsetMax;
+
+        var slider = sliderGO.AddComponent<Slider>();
+        slider.minValue = 0;
+        slider.maxValue = 1;
+        slider.value = 1;
+        slider.interactable = false;
+
+        // Background
+        var bgGO = new GameObject("Background");
+        bgGO.transform.SetParent(sliderGO.transform, false);
+        var bgRect = bgGO.AddComponent<RectTransform>();
+        bgRect.anchorMin = Vector2.zero;
+        bgRect.anchorMax = Vector2.one;
+        bgRect.offsetMin = Vector2.zero;
+        bgRect.offsetMax = Vector2.zero;
+        var bgImage = bgGO.AddComponent<Image>();
+        bgImage.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+
+        // Fill Area
+        var fillAreaGO = new GameObject("Fill Area");
+        fillAreaGO.transform.SetParent(sliderGO.transform, false);
+        var fillAreaRect = fillAreaGO.AddComponent<RectTransform>();
+        fillAreaRect.anchorMin = Vector2.zero;
+        fillAreaRect.anchorMax = Vector2.one;
+        fillAreaRect.offsetMin = new Vector2(2, 2);
+        fillAreaRect.offsetMax = new Vector2(-2, -2);
+
+        // Fill
+        var fillGO = new GameObject("Fill");
+        fillGO.transform.SetParent(fillAreaGO.transform, false);
+        var fillRect = fillGO.AddComponent<RectTransform>();
+        fillRect.anchorMin = Vector2.zero;
+        fillRect.anchorMax = Vector2.one;
+        fillRect.offsetMin = Vector2.zero;
+        fillRect.offsetMax = Vector2.zero;
+        var fillImage = fillGO.AddComponent<Image>();
+        fillImage.color = fillColor;
+
+        slider.fillRect = fillRect;
+
+        return sliderGO;
+    }
+
+    // =========================================================
+    // LIVE BATTLE MODE: LEVEL CONTROLLER SETUP
+    // =========================================================
+
+    private void SetupLiveBattleLevelController()
+    {
+        // Cleanup any old LevelController
+        var oldLCs = FindObjectsByType<LevelController>(FindObjectsSortMode.None);
+        foreach (var lc in oldLCs)
+        {
+            if (lc != null && lc.gameObject != gameObject)
+            {
+                DestroyImmediate(lc.gameObject);
+            }
+        }
+
+        var oldLiveLCs = FindObjectsByType<LiveBattleLevelController>(FindObjectsSortMode.None);
+        foreach (var lc in oldLiveLCs)
+        {
+            if (lc != null && lc.gameObject != gameObject)
+            {
+                DestroyImmediate(lc.gameObject);
+            }
+        }
+
+        // Create LiveBattleLevelController
+        var lcGO = new GameObject("LiveBattleLevelController");
+        var liveBattleLC = lcGO.AddComponent<LiveBattleLevelController>();
+
+        // Set HUD reference
+        if (generatedLiveBattleHUD != null)
+        {
+            liveBattleLC.hud = generatedLiveBattleHUD;
+            Debug.Log("AutoLevelGenerator: LiveBattleLevelController.hud assigned.");
+        }
+
+        // Set ResultScreen reference
+        if (generatedResultScreen != null)
+        {
+            liveBattleLC.resultScreen = generatedResultScreen;
+            Debug.Log("AutoLevelGenerator: LiveBattleLevelController.resultScreen assigned.");
+        }
+
+        // Create Player Base
+        CreateBase("PlayerBase", true, spawnPoints.Count > 0 ? spawnPoints[0].position + Vector3.up : Vector3.zero);
+
+        // Create Enemy Base
+        CreateBase("EnemyBase", false, goalPoints.Count > 0 ? goalPoints[0].position + Vector3.up : new Vector3(10, 0, 0));
+
+        // Create PrefabRegistry if not exists
+        var prefabRegistry = FindFirstObjectByType<TowerConquest.Data.PrefabRegistry>();
+        if (prefabRegistry == null)
+        {
+            var registryGO = new GameObject("PrefabRegistry");
+            prefabRegistry = registryGO.AddComponent<TowerConquest.Data.PrefabRegistry>();
+        }
+
+        Debug.Log("AutoLevelGenerator: LiveBattleLevelController fully configured.");
+    }
+
+    private void CreateBase(string name, bool isPlayerBase, Vector3 position)
+    {
+        var baseGO = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        baseGO.name = name;
+        baseGO.transform.position = position;
+        baseGO.transform.localScale = new Vector3(2f, 2f, 2f);
+        baseGO.tag = isPlayerBase ? "PlayerBase" : "EnemyBase";
+
+        var baseController = baseGO.AddComponent<TowerConquest.Gameplay.Entities.BaseController>();
+        baseController.isPlayerBase = isPlayerBase;
+        baseController.maxHp = 2000f;
+        baseController.armor = 0.1f;
+
+        // Set color
+        var renderer = baseGO.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            var mat = new Material(Shader.Find("Standard"));
+            mat.color = isPlayerBase ? new Color(0.2f, 0.5f, 0.8f, 1f) : new Color(0.8f, 0.2f, 0.2f, 1f);
+            renderer.material = mat;
+        }
+
+        // Create a model child for shake effects
+        var modelGO = new GameObject("Model");
+        modelGO.transform.SetParent(baseGO.transform, false);
+        baseController.modelTransform = modelGO.transform;
+
+        Debug.Log($"AutoLevelGenerator: Created {name} at {position}.");
     }
 }

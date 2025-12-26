@@ -1,0 +1,77 @@
+{
+  "abilities": [
+    {
+      "id": "ability_kingdom_rally",
+      "name": "Rally the Troops",
+      "civilization": "civ_kingdom",
+      "description": "Inspire all friendly units, increasing their damage and armor for 10 seconds.",
+      "cooldown": 45,
+      "effects": [
+        {
+          "type": "buff_damage",
+          "target": "all_friendly_units",
+          "value": 25,
+          "duration": 10,
+          "radius": 0
+        },
+        {
+          "type": "buff_armor",
+          "target": "all_friendly_units",
+          "value": 15,
+          "duration": 10,
+          "radius": 0
+        }
+      ],
+      "vfxPrefab": "VFX/Rally",
+      "sfx": "Audio/SFX/rally_horn",
+      "upgradeCosts": [0, 100, 250, 500]
+    },
+    {
+      "id": "ability_horde_bloodlust",
+      "name": "Bloodlust",
+      "civilization": "civ_horde",
+      "description": "Drive all friendly units into a frenzy, massively increasing attack speed.",
+      "cooldown": 40,
+      "effects": [
+        {
+          "type": "buff_attack_speed",
+          "target": "all_friendly_units",
+          "value": 50,
+          "duration": 8,
+          "radius": 0
+        },
+        {
+          "type": "buff_speed",
+          "target": "all_friendly_units",
+          "value": 20,
+          "duration": 8,
+          "radius": 0
+        }
+      ],
+      "vfxPrefab": "VFX/Bloodlust",
+      "sfx": "Audio/SFX/war_cry",
+      "upgradeCosts": [0, 100, 250, 500]
+    },
+    {
+      "id": "ability_undead_raise_dead",
+      "name": "Raise Dead",
+      "civilization": "civ_undead",
+      "description": "Summon a group of skeletal warriors at the spawn point.",
+      "cooldown": 60,
+      "effects": [
+        {
+          "type": "spawn_units",
+          "target": "spawn_point",
+          "value": 0,
+          "duration": 0,
+          "radius": 0,
+          "spawnUnitId": "unit_skeleton",
+          "spawnCount": 5
+        }
+      ],
+      "vfxPrefab": "VFX/RaiseDead",
+      "sfx": "Audio/SFX/dark_magic",
+      "upgradeCosts": [0, 150, 300, 600]
+    }
+  ]
+}

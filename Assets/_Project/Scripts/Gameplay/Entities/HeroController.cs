@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TowerConquest.Combat;
 using TowerConquest.Core;
@@ -9,28 +10,58 @@ namespace TowerConquest.Gameplay.Entities
     public class HeroController : MonoBehaviour
     {
         public string HeroId { get; private set; }
+        public bool IsDead { get; private set; }
+
+        // Events
+        public event Action<HeroController> OnHeroDied;
 
         private Coroutine auraRoutine;
         private HeroDefinition heroDefinition;
+        private HealthComponent healthComponent;
         private float activeCooldownRemaining;
         private readonly EffectResolver effectResolver = new EffectResolver();
 
         public void Initialize(string heroId, float fallbackHp)
         {
             HeroId = heroId;
+            IsDead = false;
             heroDefinition = ServiceLocator.Get<JsonDatabase>().FindHero(heroId);
 
             float hp = heroDefinition?.stats?.hp ?? fallbackHp;
             float armor = heroDefinition?.stats?.armor ?? 0f;
 
-            HealthComponent health = GetComponent<HealthComponent>();
-            if (health == null)
+            healthComponent = GetComponent<HealthComponent>();
+            if (healthComponent == null)
             {
-                health = gameObject.AddComponent<HealthComponent>();
+                healthComponent = gameObject.AddComponent<HealthComponent>();
             }
 
-            health.Initialize(hp, armor);
+            healthComponent.Initialize(hp, armor);
+            healthComponent.OnDeath -= HandleDeath;
+            healthComponent.OnDeath += HandleDeath;
             StartAura();
+        }
+
+        private void HandleDeath()
+        {
+            if (IsDead) return;
+            IsDead = true;
+
+            if (auraRoutine != null)
+            {
+                StopCoroutine(auraRoutine);
+            }
+
+            UnityEngine.Debug.Log($"HeroController: Hero {HeroId} died!");
+            OnHeroDied?.Invoke(this);
+        }
+
+        private void OnDestroy()
+        {
+            if (healthComponent != null)
+            {
+                healthComponent.OnDeath -= HandleDeath;
+            }
         }
 
         private void Update()

@@ -1,0 +1,85 @@
+{
+  "civilizations": [
+    {
+      "id": "civ_kingdom",
+      "name": "Kingdom",
+      "description": "A noble realm of knights and archers. Strong defensive units with balanced offense.",
+      "color": "#3366CC",
+      "availableUnits": [
+        "unit_knight",
+        "unit_archer",
+        "unit_pikeman",
+        "unit_crossbowman",
+        "unit_cavalry",
+        "unit_siege_ram"
+      ],
+      "availableTowers": [
+        "tower_arrow",
+        "tower_ballista",
+        "tower_keep"
+      ],
+      "availableHeroes": [
+        "hero_paladin",
+        "hero_ranger"
+      ],
+      "specialAbility": "ability_kingdom_rally",
+      "unlockCost": 0,
+      "prefabPath": "Prefab/Civilizations/Kingdom",
+      "iconPath": "Icons/Civilizations/kingdom"
+    },
+    {
+      "id": "civ_horde",
+      "name": "Horde",
+      "description": "Savage warriors from the steppes. Fast, aggressive units that overwhelm enemies.",
+      "color": "#CC3333",
+      "availableUnits": [
+        "unit_orc_warrior",
+        "unit_goblin",
+        "unit_wolf_rider",
+        "unit_troll",
+        "unit_berserker",
+        "unit_shaman"
+      ],
+      "availableTowers": [
+        "tower_spike",
+        "tower_catapult",
+        "tower_war_drum"
+      ],
+      "availableHeroes": [
+        "hero_warchief",
+        "hero_shaman_elder"
+      ],
+      "specialAbility": "ability_horde_bloodlust",
+      "unlockCost": 0,
+      "prefabPath": "Prefab/Civilizations/Horde",
+      "iconPath": "Icons/Civilizations/horde"
+    },
+    {
+      "id": "civ_undead",
+      "name": "Undead",
+      "description": "An army of the risen dead. Endless hordes with dark magic support.",
+      "color": "#663399",
+      "availableUnits": [
+        "unit_skeleton",
+        "unit_zombie",
+        "unit_ghost",
+        "unit_bone_archer",
+        "unit_death_knight",
+        "unit_necromancer"
+      ],
+      "availableTowers": [
+        "tower_graveyard",
+        "tower_soul_trap",
+        "tower_dark_obelisk"
+      ],
+      "availableHeroes": [
+        "hero_lich_king",
+        "hero_vampire_lord"
+      ],
+      "specialAbility": "ability_undead_raise_dead",
+      "unlockCost": 500,
+      "prefabPath": "Prefab/Civilizations/Undead",
+      "iconPath": "Icons/Civilizations/undead"
+    }
+  ]
+}

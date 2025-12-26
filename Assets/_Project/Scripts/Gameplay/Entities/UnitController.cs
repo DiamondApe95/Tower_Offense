@@ -13,6 +13,7 @@ namespace TowerConquest.Gameplay.Entities
         public float BaseDamage { get; private set; } = 50f;
         public float AttacksPerSecond { get; private set; } = 1f;
         public bool IsAlive { get; private set; } = true;
+        public bool IsDead => !IsAlive;
 
         // Compatibility properties for AI systems
         public float damage => BaseDamage;

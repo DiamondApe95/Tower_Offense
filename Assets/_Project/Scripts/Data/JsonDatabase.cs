@@ -12,6 +12,8 @@ namespace TowerConquest.Data
         public List<TrapDefinition> Traps;
         public List<LevelDefinition> Levels;
         public List<HeroDefinition> Heroes;
+        public List<CivilizationDefinition> Civilizations;
+        public List<AbilityDefinition> Abilities;
         public GlobalRulesDto GlobalRules;
 
         public void LoadAll()
@@ -22,6 +24,8 @@ namespace TowerConquest.Data
             string towersPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/towers.json");
             string levelsPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/levels.json");
             string heroesPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/heroes.json");
+            string civilizationsPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/civilizations.json");
+            string abilitiesPath = Path.Combine(Application.streamingAssetsPath, "Data/JSON/abilities.json");
 
             Units = new List<UnitDefinition>();
             Spells = new List<SpellDefinition>();
@@ -29,6 +33,8 @@ namespace TowerConquest.Data
             Traps = new List<TrapDefinition>();
             Levels = new List<LevelDefinition>();
             Heroes = new List<HeroDefinition>();
+            Civilizations = new List<CivilizationDefinition>();
+            Abilities = new List<AbilityDefinition>();
             GlobalRules = null;
 
             string unitsText = loader.LoadText(unitsPath);
@@ -92,7 +98,31 @@ namespace TowerConquest.Data
                 }
             }
 
-            UnityEngine.Debug.Log($"JsonDatabase loaded: Units={Units.Count}, Spells={Spells.Count}, Towers={Towers.Count}, Traps={Traps.Count}, Levels={Levels.Count}.");
+            // Load Civilizations
+            string civilizationsText = loader.LoadText(civilizationsPath);
+            if (!string.IsNullOrWhiteSpace(civilizationsText))
+            {
+                var civilizationsRoot = JsonUtility.FromJson<CivilizationsJsonRoot>(civilizationsText);
+                if (civilizationsRoot != null && civilizationsRoot.civilizations != null)
+                {
+                    Civilizations.AddRange(civilizationsRoot.civilizations);
+                }
+            }
+
+            // Load Abilities
+            string abilitiesText = loader.LoadText(abilitiesPath);
+            if (!string.IsNullOrWhiteSpace(abilitiesText))
+            {
+                var abilitiesRoot = JsonUtility.FromJson<AbilitiesJsonRoot>(abilitiesText);
+                if (abilitiesRoot != null && abilitiesRoot.abilities != null)
+                {
+                    Abilities.AddRange(abilitiesRoot.abilities);
+                }
+            }
+
+            UnityEngine.Debug.Log($"JsonDatabase loaded: Units={Units.Count}, Spells={Spells.Count}, Towers={Towers.Count}, " +
+                $"Traps={Traps.Count}, Levels={Levels.Count}, Heroes={Heroes.Count}, " +
+                $"Civilizations={Civilizations.Count}, Abilities={Abilities.Count}.");
         }
 
         public UnitDefinition FindUnit(string id)
@@ -212,6 +242,123 @@ namespace TowerConquest.Data
             }
 
             UnityEngine.Debug.LogWarning($"Hero with id '{id}' was not found.");
+            return null;
+        }
+
+        public CivilizationDefinition FindCivilization(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                UnityEngine.Debug.LogWarning("FindCivilization called with empty id.");
+                return null;
+            }
+
+            for (int index = 0; index < Civilizations.Count; index++)
+            {
+                if (Civilizations[index].id == id)
+                {
+                    return Civilizations[index];
+                }
+            }
+
+            UnityEngine.Debug.LogWarning($"Civilization with id '{id}' was not found.");
+            return null;
+        }
+
+        public AbilityDefinition FindAbility(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                UnityEngine.Debug.LogWarning("FindAbility called with empty id.");
+                return null;
+            }
+
+            for (int index = 0; index < Abilities.Count; index++)
+            {
+                if (Abilities[index].id == id)
+                {
+                    return Abilities[index];
+                }
+            }
+
+            UnityEngine.Debug.LogWarning($"Ability with id '{id}' was not found.");
+            return null;
+        }
+
+        public List<UnitDefinition> GetUnitsForCivilization(string civId)
+        {
+            var result = new List<UnitDefinition>();
+            var civ = FindCivilization(civId);
+            if (civ == null || civ.availableUnits == null)
+            {
+                return result;
+            }
+
+            foreach (string unitId in civ.availableUnits)
+            {
+                var unit = FindUnit(unitId);
+                if (unit != null)
+                {
+                    result.Add(unit);
+                }
+            }
+            return result;
+        }
+
+        public List<TowerDefinition> GetTowersForCivilization(string civId)
+        {
+            var result = new List<TowerDefinition>();
+            var civ = FindCivilization(civId);
+            if (civ == null || civ.availableTowers == null)
+            {
+                return result;
+            }
+
+            foreach (string towerId in civ.availableTowers)
+            {
+                var tower = FindTower(towerId);
+                if (tower != null)
+                {
+                    result.Add(tower);
+                }
+            }
+            return result;
+        }
+
+        public List<HeroDefinition> GetHeroesForCivilization(string civId)
+        {
+            var result = new List<HeroDefinition>();
+            var civ = FindCivilization(civId);
+            if (civ == null || civ.availableHeroes == null)
+            {
+                return result;
+            }
+
+            foreach (string heroId in civ.availableHeroes)
+            {
+                var hero = FindHero(heroId);
+                if (hero != null)
+                {
+                    result.Add(hero);
+                }
+            }
+            return result;
+        }
+
+        public CivilizationDefinition GetDefaultCivilization()
+        {
+            if (Civilizations != null && Civilizations.Count > 0)
+            {
+                // Return first unlocked civilization (unlockCost == 0)
+                for (int i = 0; i < Civilizations.Count; i++)
+                {
+                    if (Civilizations[i].unlockCost == 0)
+                    {
+                        return Civilizations[i];
+                    }
+                }
+                return Civilizations[0];
+            }
             return null;
         }
     }
