@@ -101,13 +101,44 @@ namespace TowerConquest.Gameplay.Entities
                     }
 
                     isInCombat = true;
+
+                    // Face the target
+                    Vector3 direction = (currentTarget.transform.position - transform.position);
+                    if (direction.sqrMagnitude > 0.001f)
+                    {
+                        transform.forward = direction.normalized;
+                    }
+
                     TryAttack();
                 }
                 else if (distance <= detectionRange)
                 {
-                    // Move towards target
-                    isInCombat = true;
-                    MoveTowardsTarget();
+                    // Only chase targets if they're worth it (high priority)
+                    // Otherwise continue on path to base
+                    bool shouldChase = ShouldChaseTarget();
+
+                    if (shouldChase)
+                    {
+                        // Slow down path movement but don't stop completely
+                        if (unitMover != null)
+                        {
+                            unitMover.SetSpeedMultiplier(0.7f);
+                        }
+
+                        isInCombat = true;
+                        MoveTowardsTarget();
+                    }
+                    else
+                    {
+                        // Continue normal path movement
+                        if (unitMover != null)
+                        {
+                            unitMover.Resume();
+                            unitMover.SetSpeedMultiplier(1f);
+                        }
+                        currentTarget = null;
+                        isInCombat = false;
+                    }
                 }
                 else
                 {
@@ -117,6 +148,7 @@ namespace TowerConquest.Gameplay.Entities
                     if (unitMover != null)
                     {
                         unitMover.Resume();
+                        unitMover.SetSpeedMultiplier(1f);
                     }
                 }
             }
@@ -126,8 +158,29 @@ namespace TowerConquest.Gameplay.Entities
                 if (unitMover != null)
                 {
                     unitMover.Resume();
+                    unitMover.SetSpeedMultiplier(1f);
                 }
             }
+        }
+
+        /// <summary>
+        /// Determine if we should chase this target or continue on path
+        /// </summary>
+        private bool ShouldChaseTarget()
+        {
+            if (currentTarget == null) return false;
+
+            // Always chase enemy units (high priority)
+            var enemyUnit = currentTarget.GetComponent<UnitController>();
+            if (enemyUnit != null) return true;
+
+            // Chase towers that are attacking us
+            var tower = currentTarget.GetComponent<TowerController>();
+            if (tower != null && attackers.Contains(tower.gameObject)) return true;
+
+            // Don't chase construction sites - continue to base
+            // Don't chase bases - UnitMover handles that
+            return false;
         }
 
         private void FindBestTarget()
@@ -254,15 +307,25 @@ namespace TowerConquest.Gameplay.Entities
         {
             if (currentTarget == null) return;
 
-            Vector3 direction = (currentTarget.transform.position - transform.position).normalized;
+            Vector3 targetPos = currentTarget.transform.position;
+            Vector3 direction = (targetPos - transform.position);
+            float distance = direction.magnitude;
+
+            if (distance < 0.1f) return; // Too close, no need to move
+
+            direction.Normalize();
+
             float moveSpeed = unitMover != null ? unitMover.moveSpeed * unitMover.moveSpeedMultiplier : 2.5f;
 
-            transform.position += direction * moveSpeed * Time.deltaTime;
+            // Use MoveTowards for smoother movement
+            Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
+            transform.position = newPosition;
 
-            // Face target
+            // Smoothly rotate towards target
             if (direction.sqrMagnitude > 0.001f)
             {
-                transform.forward = direction;
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
             }
         }
 

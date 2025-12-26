@@ -17,6 +17,10 @@ namespace TowerConquest.Gameplay.Entities
         public float attacksPerSecond = 1f;
         public TowerDefinition.EffectDto[] effects;
 
+        [Header("Health")]
+        public float maxHp = 500f;
+        public float armor = 0.1f;
+
         [Header("Economy")]
         public int buildCost = 50;
         public int upgradeCost = 30;
@@ -27,12 +31,14 @@ namespace TowerConquest.Gameplay.Entities
         public float EstimatedDps { get; private set; }
         public int BuildCost => buildCost;
         public int UpgradeCost => upgradeCost;
+        public bool IsDestroyed { get; private set; }
 
         private float scanTimer;
         private float attackTimer;
         private UnitController currentTarget;
         private readonly EffectResolver effectResolver = new EffectResolver();
         private EntityRegistry entityRegistry;
+        private HealthComponent healthComponent;
 
         // Cached layer masks for efficient targeting
         private int enemyLayerMask;
@@ -42,6 +48,15 @@ namespace TowerConquest.Gameplay.Entities
         {
             UpdateDpsCache();
             ServiceLocator.TryGet(out entityRegistry);
+
+            // Initialize HealthComponent
+            healthComponent = GetComponent<HealthComponent>();
+            if (healthComponent == null)
+            {
+                healthComponent = gameObject.AddComponent<HealthComponent>();
+            }
+            healthComponent.Initialize(maxHp, armor);
+            healthComponent.OnDeath += HandleDeath;
         }
 
         private void OnEnable()
@@ -60,8 +75,35 @@ namespace TowerConquest.Gameplay.Entities
             }
         }
 
+        private void OnDestroy()
+        {
+            if (healthComponent != null)
+            {
+                healthComponent.OnDeath -= HandleDeath;
+            }
+        }
+
+        private void HandleDeath()
+        {
+            if (IsDestroyed) return;
+
+            IsDestroyed = true;
+            Log.Info($"[TowerController] Tower {towerId} destroyed!");
+
+            // Unregister before destruction
+            if (ServiceLocator.TryGet(out EntityRegistry registry))
+            {
+                registry.UnregisterTower(this);
+            }
+
+            // Destroy the tower game object
+            Destroy(gameObject);
+        }
+
         private void Update()
         {
+            if (IsDestroyed) return;
+
             scanTimer += Time.deltaTime;
             if (scanTimer >= 0.25f)
             {

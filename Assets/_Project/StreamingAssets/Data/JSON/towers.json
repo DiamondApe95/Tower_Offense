@@ -10,8 +10,8 @@
         {
           "tier": 1,
           "stats": {
-            "hp": 9999,
-            "armor": 0.0
+            "hp": 600,
+            "armor": 0.15
           },
           "attack": {
             "damage_type": "physical",
@@ -29,8 +29,8 @@
         {
           "tier": 2,
           "stats": {
-            "hp": 9999,
-            "armor": 0.0
+            "hp": 800,
+            "armor": 0.20
           },
           "attack": {
             "damage_type": "physical",
@@ -56,8 +56,8 @@
         {
           "tier": 1,
           "stats": {
-            "hp": 9999,
-            "armor": 0.0
+            "hp": 400,
+            "armor": 0.05
           },
           "attack": {
             "damage_type": "arcane",
@@ -93,8 +93,8 @@
         {
           "tier": 1,
           "stats": {
-            "hp": 9999,
-            "armor": 0.0
+            "hp": 450,
+            "armor": 0.10
           },
           "attack": {
             "damage_type": "fire",
