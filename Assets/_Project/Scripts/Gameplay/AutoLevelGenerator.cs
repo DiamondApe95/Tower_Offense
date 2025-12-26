@@ -217,8 +217,11 @@ public class AutoLevelGenerator : MonoBehaviour
     public float tileHeight = 0.2f;
     public GameObject tilePrefab; // optional, sonst Cube
 
+    [Tooltip("Auto-loaded from Assets/_Project/MAP/Mat_Build.mat")]
     public Material buildMat;
+    [Tooltip("Auto-loaded from Assets/_Project/MAP/Mat_Path.mat")]
     public Material pathMat;
+    [Tooltip("Auto-loaded from Assets/_Project/MAP/Mat_Blocked.mat")]
     public Material blockedMat;
 
     [Header("Layer Names (must exist, auto-created in Editor)")]
@@ -282,10 +285,13 @@ public class AutoLevelGenerator : MonoBehaviour
         EnsureProjectLayer(playerUnitLayerName);
         EnsureProjectLayer(towerLayerName);
 
-        // 2) Auto-load prefabs from Assets/Prefab
+        // 2) Auto-load materials from Assets/_Project/MAP
+        AutoLoadMaterialsEditorOnly();
+
+        // 3) Auto-load prefabs from Assets/Prefab
         AutoLoadPrefabsEditorOnly();
 
-        // 3) Auto-setup prefabs (Tower/Enemy)
+        // 4) Auto-setup prefabs (Tower/Enemy)
         if (autoSetupTowerPrefab) AutoSetupTowerPrefabEditorOnly();
         if (autoSetupEnemyPrefab) AutoSetupEnemyPrefabEditorOnly();
 #endif
@@ -464,7 +470,7 @@ public class AutoLevelGenerator : MonoBehaviour
         if (bm.mainCamera == null)
             bm.mainCamera = Camera.main;
 
-        // Setup tower prefab with fallback to Tower Mage
+        // Setup tower prefab with fallback to Tower_Archery
         if (bm.towerPrefab == null)
         {
             if (towerPrefab != null)
@@ -473,17 +479,17 @@ public class AutoLevelGenerator : MonoBehaviour
             }
             else
             {
-                // Fallback to Tower Mage if towerPrefab is not set
+                // Fallback to Tower_Archery if towerPrefab is not set
                 #if UNITY_EDITOR
-                GameObject towerMage = LoadPrefabByName("Tower Mage");
-                if (towerMage != null)
+                GameObject towerArchery = LoadPrefabByName("Tower_Archery");
+                if (towerArchery != null)
                 {
-                    bm.towerPrefab = towerMage;
-                    Log.Info("AutoLevelGenerator: Using 'Tower Mage' as fallback tower prefab.");
+                    bm.towerPrefab = towerArchery;
+                    Log.Info("AutoLevelGenerator: Using 'Tower_Archery' as fallback tower prefab.");
                 }
                 else
                 {
-                    Log.Warning("AutoLevelGenerator: No tower prefab found. Please assign towerPrefab or ensure 'Tower Mage' prefab exists.");
+                    Log.Warning("AutoLevelGenerator: No tower prefab found. Please assign towerPrefab or ensure 'Tower_Archery' prefab exists.");
                 }
                 #endif
             }
@@ -547,14 +553,47 @@ public class AutoLevelGenerator : MonoBehaviour
     // EDITOR: Auto-load + Auto-setup Prefabs + Ensure Layers
     // =========================================================
 #if UNITY_EDITOR
+    private void AutoLoadMaterialsEditorOnly()
+    {
+        string materialFolder = "Assets/_Project/MAP";
+
+        // Auto-load materials if not assigned
+        if (buildMat == null)
+        {
+            buildMat = AssetDatabase.LoadAssetAtPath<Material>($"{materialFolder}/Mat_Build.mat");
+            if (buildMat != null)
+                Log.Info("AutoLevelGenerator: Auto-loaded Mat_Build.mat");
+            else
+                Log.Warning($"AutoLevelGenerator: Could not load Mat_Build.mat from {materialFolder}");
+        }
+
+        if (pathMat == null)
+        {
+            pathMat = AssetDatabase.LoadAssetAtPath<Material>($"{materialFolder}/Mat_Path.mat");
+            if (pathMat != null)
+                Log.Info("AutoLevelGenerator: Auto-loaded Mat_Path.mat");
+            else
+                Log.Warning($"AutoLevelGenerator: Could not load Mat_Path.mat from {materialFolder}");
+        }
+
+        if (blockedMat == null)
+        {
+            blockedMat = AssetDatabase.LoadAssetAtPath<Material>($"{materialFolder}/Mat_Blocked.mat");
+            if (blockedMat != null)
+                Log.Info("AutoLevelGenerator: Auto-loaded Mat_Blocked.mat");
+            else
+                Log.Warning($"AutoLevelGenerator: Could not load Mat_Blocked.mat from {materialFolder}");
+        }
+    }
+
     private void AutoLoadPrefabsEditorOnly()
     {
         enemyPrefab ??= LoadPrefabByName("Enemy");
-        towerPrefab ??= LoadPrefabByName("TowerPrefab");
+        towerPrefab ??= LoadPrefabByName("Tower_Archery"); // Use Tower_Archery as default tower
         projectilePrefab ??= LoadPrefabByName("Projectile");
 
         if (enemyPrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Enemy.prefab from {prefabFolder}.");
-        if (towerPrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load TowerPrefab.prefab from {prefabFolder}.");
+        if (towerPrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Tower_Archery.prefab from {prefabFolder}.");
         if (projectilePrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Projectile.prefab from {prefabFolder}.");
     }
 
