@@ -341,7 +341,169 @@ Türme, Fallen und Hindernisse werden nicht sofort gebaut, sondern durchlaufen e
 
 ---
 
-## 16. Nächste Schritte
+## 16. Erweiterte Spielmechaniken
+
+### 16.1 Level-Start Countdown
+- **5-Sekunden-Timer** erscheint zu Beginn jedes Levels
+- Timer wird groß und zentral auf dem Bildschirm angezeigt
+- Bei **0** verschwindet der Timer und das Gameplay wird freigeschaltet
+- Während des Countdowns: Keine Aktionen möglich (Bauen, Spawnen, etc.)
+
+### 16.2 Erweitertes Baumeister-System
+
+#### Automatisches Spawnen
+- **Bei Turm-Baustelle**: 3 Baumeister spawnen automatisch nacheinander (2 Sekunden Abstand)
+- **Bei Fallen-Baustelle**: 1 Baumeister spawnt automatisch
+- Baumeister spawnen an der eigenen Basis und laufen zur Baustelle
+
+#### Fortschrittsanzeige
+- Jede Baustelle zeigt Fortschritt: **"0/3"** (aktuelle/benötigte Baumeister)
+- Aktualisiert sich in Echtzeit wenn Baumeister ankommen
+- Visuelles Feedback bei Fertigstellung
+
+### 16.3 Fallen-System
+
+#### Platzierung
+- Fallen können auf **jedem Path Tile** platziert werden
+- Path Tiles sind die Wege, auf denen Einheiten laufen
+- Fallen werden als Baustellen erstellt (1 Baumeister benötigt)
+
+#### Fallen-Typen
+- **Stachelfalle**: Verursacht Schaden bei Kontakt
+- **Verlangsamungsfalle**: Reduziert Bewegungsgeschwindigkeit
+- **Explosionfalle**: AoE-Schaden, zerstört sich selbst nach Aktivierung
+- **Giftfalle**: Vergiftet Einheiten über Zeit
+
+### 16.4 Platzierungsregeln
+
+#### Türme
+- Nur auf **Build Tiles** (spezielle Bauplätze)
+- **Nicht** wo bereits eine Baustelle oder ein Turm existiert
+- Kosten werden sofort abgezogen
+
+#### Fallen
+- Nur auf **Path Tiles** (Einheitenpfade)
+- Können mehrere Fallen auf dem gleichen Pfad existieren
+- Günstigere Kosten als Türme
+
+### 16.5 Angriffs-Prioritäten für Einheiten
+
+Einheiten folgen dieser Prioritätenliste:
+1. **Feindliche Einheiten** (höchste Priorität) - wenn in Reichweite
+2. **Türme** - wenn keine Einheiten in Reichweite und von Turm angegriffen
+3. **Baustellen** - wenn in Reichweite (niedriger als Türme)
+4. **Gegnerische Basis** (niedrigste Priorität) - Standard-Ziel
+
+#### Verhalten
+- **Ohne Feinde in Nähe**: Einheiten laufen Richtung gegnerische Basis
+- **Von Turm angegriffen**: Einheiten greifen den Turm an (wenn erreichbar)
+- **Einheiten in Nähe**: Sofortiger Kampf, pausieren Bewegung
+
+### 16.6 Zerstörbare Baustellen und Türme
+
+#### Baustellen
+- **Niedrige HP** (sehr anfällig)
+- Bei Zerstörung: Gegner erhält **Gold-Belohnung**
+- Keine Teilrückerstattung für den Besitzer
+
+#### Türme
+- **Höhere HP** als Baustellen
+- Bei Zerstörung: Gegner erhält **Gold-Belohnung** (wie bei Kills)
+- Können repariert werden (zukünftiges Feature)
+
+---
+
+## 17. Bau-Kategorien System
+
+Der Spieler hat Zugriff auf **drei Bau-Kategorien**:
+
+### 17.1 Einheiten
+- Spawnen an der eigenen Basis
+- **Spawn-Zeit**: Je nach Einheit variabel (z.B. 2-10 Sekunden Cooldown)
+- Kosten: Gold
+- Keine Baumeister erforderlich
+
+### 17.2 Türme
+- Platzierung auf Build Tiles
+- **Baustellen-Mechanik**: 3 Baumeister erforderlich
+- Kosten: Gold (sofort abgezogen)
+- Bauzeit: ~5-10 Sekunden
+
+### 17.3 Fallen
+- Platzierung auf Path Tiles
+- **Baustellen-Mechanik**: 1 Baumeister erforderlich
+- Günstigere Kosten als Türme
+- Bauzeit: ~3 Sekunden
+
+---
+
+## 18. Menü-System
+
+### 18.1 Hauptmenü
+- **Hintergrundbild** (thematisch passend zur Zivilisation/Epoche)
+- Buttons:
+  - **Spielen** → Weltkarte
+  - **Einstellungen** → Settings Panel
+  - **Credits** → Credits Panel
+  - **Beenden** → Spiel schließen
+
+### 18.2 Weltkarte (World Map)
+- **Übersichtskarte** mit allen verfügbaren Levels
+- **Hintergrundbild** der Spielwelt
+
+#### Level-Status Icons
+| Status | Icon | Beschreibung |
+|--------|------|--------------|
+| Gesperrt | 🔒 | Level noch nicht freigeschaltet |
+| Freigeschaltet | ⚔️ | Level spielbar, noch nicht abgeschlossen |
+| Abgeschlossen | ✓ | Level erfolgreich abgeschlossen |
+| Perfekt | ⭐ | Level mit perfektem Ergebnis abgeschlossen |
+
+#### Freischaltung
+- Erstes Level immer freigeschaltet
+- Weitere Level durch Abschluss vorheriger Level freigeschaltet
+- Optional: Bonus-Level durch besondere Leistungen
+
+### 18.3 Fame Shop
+- **Zugang** über Weltkarte
+- **Upgrade-Kategorien**:
+  - Einheiten verbessern (HP, Schaden, Geschwindigkeit)
+  - Helden freischalten und verbessern
+  - Türme verbessern
+  - Fallen verbessern
+  - Spezialfähigkeiten verbessern
+
+### 18.4 Level-Gameplay
+1. **Countdown Timer** (5 Sekunden)
+2. **Aktive Schlacht** (Live Battle)
+3. **Sieg/Niederlage Anzeige**
+
+### 18.5 Ergebnis-Bildschirm
+- **Sieg** oder **Niederlage** Anzeige
+- **Fame-Belohnung** (verdiente Fame-Punkte)
+- **Statistiken** (Kills, Einheiten gespawnt, Zeit)
+- **Buttons**:
+  - **Zur Weltkarte** → Zurück zur Level-Auswahl
+  - **Level wiederholen** → Gleiches Level neu starten
+  - **Nächstes Level** (nur bei Sieg und freigeschaltet)
+
+---
+
+## 19. Zivilisationen-System (Erweiterung)
+
+### Aktueller Stand
+- **Rom vs. Rom**: Anfangs kämpfen beide Seiten als Römer
+- Ermöglicht balanciertes Testing
+
+### Zukünftige Erweiterung
+- Jedes Level definiert:
+  - **Spieler-Zivilisation** (z.B. Rom)
+  - **Gegner-Zivilisation** (z.B. Gallier)
+- Unterschiedliche Einheiten und Spielstile pro Zivilisation
+
+---
+
+## 20. Nächste Schritte
 
 1. **Neue JSON-Strukturen** für Zivilisationen, Gold-Kosten, Fame-Werte
 2. **Core-Scripts implementieren** (GoldManager, AICommander, ConstructionSystem)

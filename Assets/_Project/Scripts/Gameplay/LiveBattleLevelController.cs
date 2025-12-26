@@ -21,6 +21,7 @@ namespace TowerConquest.Gameplay
         [Header("UI References")]
         public LiveBattleHUD hud;
         public ResultScreenView resultScreen;
+        public BattleCountdownTimer countdownTimer;
 
         [Header("Battle Settings")]
         [Tooltip("Starting gold for both player and AI")]
@@ -30,9 +31,15 @@ namespace TowerConquest.Gameplay
         [Tooltip("Time limit in seconds (0 = no limit)")]
         public float timeLimitSeconds = 0f;
 
+        [Header("Countdown Settings")]
+        [Tooltip("Duration of the pre-battle countdown")]
+        public float countdownDuration = 5f;
+        [Tooltip("Use countdown timer before battle starts")]
+        public bool useCountdown = true;
+
         [Header("Auto Start")]
         public bool autoStartBattle = true;
-        public float autoStartDelay = 2f;
+        public float autoStartDelay = 0.5f;
 
         // Runtime references
         public GoldManager PlayerGold { get; private set; }
@@ -47,6 +54,7 @@ namespace TowerConquest.Gameplay
         // State
         public bool IsBattleActive { get; private set; }
         public bool IsBattleEnded { get; private set; }
+        public bool IsCountingDown { get; private set; }
         public float BattleTime { get; private set; }
         public bool PlayerVictory { get; private set; }
 
@@ -85,6 +93,54 @@ namespace TowerConquest.Gameplay
             {
                 autoStartTimer = autoStartDelay;
                 autoStartPending = true;
+            }
+        }
+
+        /// <summary>
+        /// Setup countdown timer and start countdown
+        /// </summary>
+        private void SetupCountdownTimer()
+        {
+            // Find or create countdown timer
+            if (countdownTimer == null)
+            {
+                countdownTimer = FindFirstObjectByType<BattleCountdownTimer>();
+            }
+
+            if (countdownTimer == null)
+            {
+                GameObject timerGO = new GameObject("BattleCountdownTimer");
+                countdownTimer = timerGO.AddComponent<BattleCountdownTimer>();
+
+                // Create default UI
+                Canvas canvas = FindFirstObjectByType<Canvas>();
+                if (canvas != null)
+                {
+                    countdownTimer.CreateDefaultUI(canvas.transform);
+                }
+            }
+
+            countdownTimer.OnCountdownComplete += OnCountdownComplete;
+        }
+
+        private void OnCountdownComplete()
+        {
+            IsCountingDown = false;
+            ActuallyStartBattle();
+        }
+
+        private void ActuallyStartBattle()
+        {
+            IsBattleActive = true;
+            BattleTime = 0f;
+            passiveGoldTimer = 0f;
+
+            Debug.Log("LiveBattleLevelController: Battle started!");
+            OnBattleStarted?.Invoke();
+
+            if (hud != null)
+            {
+                hud.Refresh();
             }
         }
 
@@ -335,18 +391,18 @@ namespace TowerConquest.Gameplay
 
         public void StartBattle()
         {
-            if (IsBattleActive || IsBattleEnded) return;
+            if (IsBattleActive || IsBattleEnded || IsCountingDown) return;
 
-            IsBattleActive = true;
-            BattleTime = 0f;
-            passiveGoldTimer = 0f;
-
-            Debug.Log("LiveBattleLevelController: Battle started!");
-            OnBattleStarted?.Invoke();
-
-            if (hud != null)
+            if (useCountdown)
             {
-                hud.Refresh();
+                IsCountingDown = true;
+                SetupCountdownTimer();
+                countdownTimer.StartCountdown(countdownDuration);
+                Debug.Log("LiveBattleLevelController: Starting countdown...");
+            }
+            else
+            {
+                ActuallyStartBattle();
             }
         }
 
@@ -410,19 +466,19 @@ namespace TowerConquest.Gameplay
         // Public API for spawning units
         public bool TrySpawnPlayerUnit(int slotIndex)
         {
-            if (!IsBattleActive || PlayerSpawner == null) return false;
+            if (!CanPerformGameplayActions() || PlayerSpawner == null) return false;
             return PlayerSpawner.TrySpawnUnit(slotIndex);
         }
 
         public bool TrySpawnPlayerHero()
         {
-            if (!IsBattleActive || PlayerSpawner == null) return false;
+            if (!CanPerformGameplayActions() || PlayerSpawner == null) return false;
             return PlayerSpawner.TrySpawnHero();
         }
 
         public bool TryUseAbility()
         {
-            if (!IsBattleActive) return false;
+            if (!CanPerformGameplayActions()) return false;
 
             // Get civilization ability
             var civ = database.FindCivilization(PlayerDeck.CivilizationID);
@@ -466,6 +522,19 @@ namespace TowerConquest.Gameplay
             {
                 EnemyBase.OnBaseDestroyed -= OnEnemyBaseDestroyed;
             }
+
+            if (countdownTimer != null)
+            {
+                countdownTimer.OnCountdownComplete -= OnCountdownComplete;
+            }
+        }
+
+        /// <summary>
+        /// Check if gameplay actions are allowed (not during countdown)
+        /// </summary>
+        public bool CanPerformGameplayActions()
+        {
+            return IsBattleActive && !IsBattleEnded && !IsCountingDown;
         }
     }
 }

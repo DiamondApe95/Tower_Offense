@@ -5,9 +5,8 @@ using TowerConquest.Combat;
 namespace TowerConquest.Gameplay
 {
     /// <summary>
-    /// Controls a builder unit that constructs towers
+    /// Controls a builder unit that constructs towers and traps
     /// </summary>
-    [RequireComponent(typeof(NavMeshAgent))]
     public class BuilderController : MonoBehaviour
     {
         [Header("Settings")]
@@ -16,21 +15,28 @@ namespace TowerConquest.Gameplay
 
         [Header("Runtime")]
         [SerializeField] private ConstructionSite targetSite;
+        [SerializeField] private TrapConstructionSite targetTrapSite;
         [SerializeField] private bool isAssigned = false;
         [SerializeField] private bool hasArrived = false;
 
         private NavMeshAgent agent;
         private HealthComponent healthComponent;
         private GoldManager.Team ownerTeam;
+        private Transform targetPosition;
 
         public bool IsAssigned => isAssigned;
         public bool HasArrived => hasArrived;
         public ConstructionSite TargetSite => targetSite;
+        public TrapConstructionSite TargetTrapSite => targetTrapSite;
         public GoldManager.Team OwnerTeam => ownerTeam;
 
         private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
+            if (agent == null)
+            {
+                agent = gameObject.AddComponent<NavMeshAgent>();
+            }
             agent.speed = moveSpeed;
             agent.stoppingDistance = arrivalDistance;
 
@@ -47,6 +53,57 @@ namespace TowerConquest.Gameplay
         public void Initialize(GoldManager.Team team)
         {
             ownerTeam = team;
+        }
+
+        /// <summary>
+        /// Assign this builder to a trap construction site
+        /// </summary>
+        public void AssignToTrapSite(TrapConstructionSite trapSite)
+        {
+            if (trapSite == null)
+            {
+                Debug.LogWarning("[BuilderController] Cannot assign to null trap site");
+                return;
+            }
+
+            if (isAssigned)
+            {
+                Debug.LogWarning("[BuilderController] Builder already assigned");
+                return;
+            }
+
+            targetTrapSite = trapSite;
+            targetPosition = trapSite.transform;
+            isAssigned = true;
+            hasArrived = false;
+
+            // Listen for site destruction
+            targetTrapSite.OnConstructionDestroyed += OnTrapSiteDestroyed;
+
+            MoveToTarget();
+
+            Debug.Log($"[BuilderController] Assigned to trap site: {trapSite.TrapID}");
+        }
+
+        private void MoveToTarget()
+        {
+            if (agent == null) return;
+
+            Vector3 destination = Vector3.zero;
+            if (targetSite != null)
+            {
+                destination = targetSite.transform.position;
+            }
+            else if (targetTrapSite != null)
+            {
+                destination = targetTrapSite.transform.position;
+            }
+
+            if (destination != Vector3.zero)
+            {
+                agent.SetDestination(destination);
+                Debug.Log("[BuilderController] Moving to construction site");
+            }
         }
 
         /// <summary>
@@ -67,31 +124,25 @@ namespace TowerConquest.Gameplay
             }
 
             targetSite = site;
+            targetPosition = site.transform;
             isAssigned = true;
             hasArrived = false;
 
             // Listen for site destruction
             targetSite.OnConstructionDestroyed += OnSiteDestroyed;
 
-            MoveToSite();
+            MoveToTarget();
 
             Debug.Log($"[BuilderController] Assigned to site: {site.TowerID}");
         }
 
-        private void MoveToSite()
-        {
-            if (targetSite == null || agent == null) return;
-
-            agent.SetDestination(targetSite.transform.position);
-            Debug.Log("[BuilderController] Moving to construction site");
-        }
-
         private void Update()
         {
-            if (!isAssigned || hasArrived || targetSite == null) return;
+            if (!isAssigned || hasArrived) return;
+            if (targetSite == null && targetTrapSite == null) return;
 
             // Check if we've arrived
-            if (!agent.pathPending && agent.remainingDistance <= arrivalDistance)
+            if (agent != null && !agent.pathPending && agent.remainingDistance <= arrivalDistance)
             {
                 OnReachedSite();
             }
@@ -99,43 +150,50 @@ namespace TowerConquest.Gameplay
 
         private void OnReachedSite()
         {
-            if (hasArrived || targetSite == null) return;
+            if (hasArrived) return;
 
             hasArrived = true;
             Debug.Log("[BuilderController] Reached construction site");
 
-            // Notify the construction site
-            targetSite.OnBuilderArrived();
-
-            // Builder stays at site until construction is complete or site is destroyed
-            // Could add building animation here
-
-            // Listen for construction completion
-            targetSite.OnConstructionComplete += OnConstructionComplete;
+            // Notify the appropriate construction site
+            if (targetSite != null)
+            {
+                targetSite.OnBuilderArrived();
+                targetSite.OnConstructionComplete += OnConstructionComplete;
+            }
+            else if (targetTrapSite != null)
+            {
+                targetTrapSite.RegisterBuilderArrival();
+                targetTrapSite.OnConstructionComplete += OnTrapConstructionComplete;
+            }
         }
 
         private void OnConstructionComplete(ConstructionSite site)
         {
             Debug.Log("[BuilderController] Construction complete, builder leaving");
-
-            // Unassign and return to base or become idle
             UnassignFromSite();
+            Destroy(gameObject, 0.5f);
+        }
 
-            // For now, destroy the builder
-            // Later: could return to base or become available for next construction
-            Destroy(gameObject, 1f);
+        private void OnTrapConstructionComplete(TrapConstructionSite site)
+        {
+            Debug.Log("[BuilderController] Trap construction complete, builder leaving");
+            UnassignFromSite();
+            Destroy(gameObject, 0.5f);
         }
 
         private void OnSiteDestroyed(ConstructionSite site)
         {
             Debug.Log("[BuilderController] Construction site destroyed");
-
-            // Unassign
             UnassignFromSite();
+            Destroy(gameObject, 0.5f);
+        }
 
-            // For now, destroy the builder
-            // Later: could return to base or flee
-            Destroy(gameObject, 1f);
+        private void OnTrapSiteDestroyed(TrapConstructionSite site)
+        {
+            Debug.Log("[BuilderController] Trap construction site destroyed");
+            UnassignFromSite();
+            Destroy(gameObject, 0.5f);
         }
 
         private void UnassignFromSite()
@@ -146,7 +204,15 @@ namespace TowerConquest.Gameplay
                 targetSite.OnConstructionComplete -= OnConstructionComplete;
             }
 
+            if (targetTrapSite != null)
+            {
+                targetTrapSite.OnConstructionDestroyed -= OnTrapSiteDestroyed;
+                targetTrapSite.OnConstructionComplete -= OnTrapConstructionComplete;
+            }
+
             targetSite = null;
+            targetTrapSite = null;
+            targetPosition = null;
             isAssigned = false;
             hasArrived = false;
         }
@@ -154,11 +220,7 @@ namespace TowerConquest.Gameplay
         private void OnBuilderDied()
         {
             Debug.Log("[BuilderController] Builder killed");
-
-            // Unassign from site
             UnassignFromSite();
-
-            // TODO: Award gold to killer
         }
 
         private void OnDestroy()
@@ -173,10 +235,20 @@ namespace TowerConquest.Gameplay
 
         private void OnDrawGizmos()
         {
-            if (isAssigned && targetSite != null)
+            Vector3 target = Vector3.zero;
+            if (targetSite != null)
+            {
+                target = targetSite.transform.position;
+            }
+            else if (targetTrapSite != null)
+            {
+                target = targetTrapSite.transform.position;
+            }
+
+            if (isAssigned && target != Vector3.zero)
             {
                 Gizmos.color = hasArrived ? Color.green : Color.yellow;
-                Gizmos.DrawLine(transform.position, targetSite.transform.position);
+                Gizmos.DrawLine(transform.position, target);
             }
         }
     }
