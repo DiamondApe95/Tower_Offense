@@ -1,0 +1,79 @@
+{
+  "civilizations": [
+    {
+      "id": "kingdom",
+      "name": "Königreich",
+      "description": "Tapfere Ritter und mächtige Magier verteidigen das Königreich",
+      "color": "#3498db",
+      "availableUnits": [
+        "knight",
+        "archer",
+        "priest",
+        "catapult",
+        "swordsman"
+      ],
+      "availableTowers": [
+        "guard_tower",
+        "ballista",
+        "mage_tower"
+      ],
+      "availableHeroes": [
+        "king_arthur"
+      ],
+      "specialAbility": "divine_protection",
+      "unlockCost": 0,
+      "prefabPath": "Prefabs/Civilizations/Kingdom",
+      "iconPath": "UI/Icons/Civilizations/Kingdom"
+    },
+    {
+      "id": "horde",
+      "name": "Orks",
+      "description": "Wilde Krieger und brutale Belagerungswaffen der Horde",
+      "color": "#e74c3c",
+      "availableUnits": [
+        "orc_warrior",
+        "wolf_rider",
+        "shaman",
+        "troll",
+        "ram"
+      ],
+      "availableTowers": [
+        "spear_thrower",
+        "flame_tower",
+        "totem"
+      ],
+      "availableHeroes": [
+        "warchief_grok"
+      ],
+      "specialAbility": "bloodlust",
+      "unlockCost": 5000,
+      "prefabPath": "Prefabs/Civilizations/Horde",
+      "iconPath": "UI/Icons/Civilizations/Horde"
+    },
+    {
+      "id": "undead",
+      "name": "Untote",
+      "description": "Untote Legionen unter dem Kommando des Lich-Königs",
+      "color": "#9b59b6",
+      "availableUnits": [
+        "skeleton",
+        "zombie",
+        "ghost",
+        "necromancer",
+        "bone_golem"
+      ],
+      "availableTowers": [
+        "soul_tower",
+        "poison_tower",
+        "bone_spear"
+      ],
+      "availableHeroes": [
+        "lich_king"
+      ],
+      "specialAbility": "raise_dead",
+      "unlockCost": 10000,
+      "prefabPath": "Prefabs/Civilizations/Undead",
+      "iconPath": "UI/Icons/Civilizations/Undead"
+    }
+  ]
+}

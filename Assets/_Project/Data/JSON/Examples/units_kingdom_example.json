@@ -1,0 +1,140 @@
+{
+  "units": [
+    {
+      "id": "knight",
+      "display_name": "Ritter",
+      "civilization": "kingdom",
+      "faction": "kingdom",
+      "role": "tank",
+      "rarity": "common",
+      "tags": ["melee", "armored"],
+      "goldCost": 100,
+      "goldReward": 60,
+      "spawn": {
+        "count": 1,
+        "spacing": 0
+      },
+      "stats": {
+        "hp": 200,
+        "armor": 5,
+        "move_speed": 3.0,
+        "size": 1.0
+      },
+      "attack": {
+        "enabled": true,
+        "attack_type": "melee",
+        "damage_type": "physical",
+        "base_damage": 25,
+        "attacks_per_second": 1.0,
+        "range": 1.5,
+        "splash_radius": 0,
+        "targeting": {
+          "priority": "nearest",
+          "can_target_air": false
+        }
+      },
+      "abilities": [],
+      "upgradeLevels": [
+        {
+          "level": 1,
+          "fameCost": 0,
+          "hpBonus": 0,
+          "damageBonus": 0,
+          "speedBonus": 0,
+          "rangeBonus": 0,
+          "armorBonus": 0,
+          "attackSpeedBonus": 0
+        },
+        {
+          "level": 2,
+          "fameCost": 100,
+          "hpBonus": 50,
+          "damageBonus": 5,
+          "speedBonus": 0.2,
+          "rangeBonus": 0,
+          "armorBonus": 1,
+          "attackSpeedBonus": 0
+        },
+        {
+          "level": 3,
+          "fameCost": 300,
+          "hpBonus": 100,
+          "damageBonus": 10,
+          "speedBonus": 0.5,
+          "rangeBonus": 0,
+          "armorBonus": 2,
+          "attackSpeedBonus": 0.1
+        }
+      ],
+      "prefabPath": "Prefabs/Units/Kingdom/Knight"
+    },
+    {
+      "id": "archer",
+      "display_name": "Bogenschütze",
+      "civilization": "kingdom",
+      "faction": "kingdom",
+      "role": "ranged",
+      "rarity": "common",
+      "tags": ["ranged", "fast"],
+      "goldCost": 75,
+      "goldReward": 45,
+      "spawn": {
+        "count": 1,
+        "spacing": 0
+      },
+      "stats": {
+        "hp": 100,
+        "armor": 0,
+        "move_speed": 4.0,
+        "size": 1.0
+      },
+      "attack": {
+        "enabled": true,
+        "attack_type": "projectile",
+        "damage_type": "physical",
+        "base_damage": 20,
+        "attacks_per_second": 1.5,
+        "range": 8.0,
+        "splash_radius": 0,
+        "targeting": {
+          "priority": "nearest",
+          "can_target_air": true
+        }
+      },
+      "abilities": [],
+      "upgradeLevels": [
+        {
+          "level": 1,
+          "fameCost": 0,
+          "hpBonus": 0,
+          "damageBonus": 0,
+          "speedBonus": 0,
+          "rangeBonus": 0,
+          "armorBonus": 0,
+          "attackSpeedBonus": 0
+        },
+        {
+          "level": 2,
+          "fameCost": 80,
+          "hpBonus": 25,
+          "damageBonus": 5,
+          "speedBonus": 0.3,
+          "rangeBonus": 1.0,
+          "armorBonus": 0,
+          "attackSpeedBonus": 0.2
+        },
+        {
+          "level": 3,
+          "fameCost": 250,
+          "hpBonus": 50,
+          "damageBonus": 10,
+          "speedBonus": 0.5,
+          "rangeBonus": 2.0,
+          "armorBonus": 1,
+          "attackSpeedBonus": 0.5
+        }
+      ],
+      "prefabPath": "Prefabs/Units/Kingdom/Archer"
+    }
+  ]
+}

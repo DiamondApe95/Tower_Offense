@@ -9,11 +9,21 @@ namespace TowerConquest.Data
         public string role;
         public string rarity;
         public string[] tags;
-        public CardDto card;
+
+        // NEW: Gold & Civilization
+        public string civilization; // Which civilization this unit belongs to
+        public int goldCost; // Cost to spawn unit
+        public int goldReward; // Gold rewarded for killing this unit
+
+        public CardDto card; // DEPRECATED - kept for backward compatibility
         public SpawnDto spawn;
         public StatsDto stats;
         public AttackDto attack;
         public AbilityDto[] abilities;
+
+        // NEW: Upgrade System
+        public UpgradeLevel[] upgradeLevels;
+        public string prefabPath;
 
         [System.Serializable]
         public class CardDto
