@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TowerConquest.Core;
 using TowerConquest.Data;
 using TowerConquest.Gameplay;
+using TowerConquest.Gameplay.Entities;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -1173,7 +1173,7 @@ public class AutoLevelGenerator : MonoBehaviour
     // =========================================================
 
     private Canvas generatedCanvas;
-    private LevelHUD generatedHUD;
+    private LiveBattleHUD generatedHUD;
     private ResultScreenView generatedResultScreen;
     private GameObject generatedCardViewPrefab;
 
@@ -1278,7 +1278,7 @@ public class AutoLevelGenerator : MonoBehaviour
         // HUD Container
         var hudGO = new GameObject("LevelHUD");
         hudGO.transform.SetParent(generatedCanvas.transform, false);
-        generatedHUD = hudGO.AddComponent<LevelHUD>();
+        generatedHUD = hudGO.AddComponent<LiveBattleHUD>();
 
         var hudRect = hudGO.AddComponent<RectTransform>();
         hudRect.anchorMin = Vector2.zero;

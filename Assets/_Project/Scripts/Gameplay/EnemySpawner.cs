@@ -14,7 +14,7 @@ public class EnemySpawner : MonoBehaviour
     public float spawnInterval = 0.8f;
 
     [Header("Level Integration")]
-    public LevelController levelController;
+    public LiveBattleLevelController levelController;
 
     private Transform[] cachedWaypoints;
     private bool waypointsCached = false;
