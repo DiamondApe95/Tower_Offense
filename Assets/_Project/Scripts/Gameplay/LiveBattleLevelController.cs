@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TowerConquest.AI;
 using TowerConquest.Core;
 using TowerConquest.Data;
 using TowerConquest.Gameplay.Entities;
@@ -52,6 +53,8 @@ namespace TowerConquest.Gameplay
         public BaseController EnemyBase { get; private set; }
         public AbilityManager PlayerAbility { get; private set; }
         public AbilityManager AIAbility { get; private set; }
+        public ConstructionManager ConstructionMgr { get; private set; }
+        public AICommander AI { get; private set; }
 
         // State
         public bool IsBattleActive { get; private set; }
@@ -143,6 +146,13 @@ namespace TowerConquest.Gameplay
             BattleTime = 0f;
             passiveGoldTimer = 0f;
 
+            // Enable AI
+            if (AI != null)
+            {
+                AI.enabled = true;
+                Debug.Log("LiveBattleLevelController: AI enabled");
+            }
+
             Debug.Log("LiveBattleLevelController: Battle started!");
             OnBattleStarted?.Invoke();
 
@@ -191,6 +201,12 @@ namespace TowerConquest.Gameplay
 
             // Setup Abilities
             SetupAbilities();
+
+            // Setup Construction Manager
+            SetupConstructionManager();
+
+            // Setup AI
+            SetupAI();
 
             // Setup HUD
             if (hud != null)
@@ -375,6 +391,105 @@ namespace TowerConquest.Gameplay
             }
         }
 
+        private void SetupConstructionManager()
+        {
+            // Find existing or create new
+            ConstructionMgr = FindFirstObjectByType<ConstructionManager>();
+
+            if (ConstructionMgr == null)
+            {
+                GameObject conMgrGO = new GameObject("ConstructionManager");
+                ConstructionMgr = conMgrGO.AddComponent<ConstructionManager>();
+                Debug.Log("LiveBattleLevelController: Created ConstructionManager");
+            }
+
+            PrefabRegistry prefabRegistry = null;
+            ServiceLocator.TryGet(out prefabRegistry);
+            ConstructionMgr.Initialize(database, prefabRegistry);
+
+            Debug.Log("LiveBattleLevelController: ConstructionManager initialized");
+        }
+
+        private void SetupAI()
+        {
+            if (levelDefinition == null)
+            {
+                Debug.LogWarning("LiveBattleLevelController: Cannot setup AI without level definition");
+                return;
+            }
+
+            // Find existing or create new AI Commander
+            AI = FindFirstObjectByType<AICommander>();
+
+            if (AI == null)
+            {
+                GameObject aiGO = new GameObject("AICommander");
+                AI = aiGO.AddComponent<AICommander>();
+                Debug.Log("LiveBattleLevelController: Created AICommander");
+            }
+
+            // Parse difficulty
+            AICommander.Difficulty difficulty = AICommander.Difficulty.Normal;
+            if (!string.IsNullOrEmpty(levelDefinition.aiDifficulty))
+            {
+                switch (levelDefinition.aiDifficulty.ToLower())
+                {
+                    case "easy":
+                        difficulty = AICommander.Difficulty.Easy;
+                        break;
+                    case "hard":
+                        difficulty = AICommander.Difficulty.Hard;
+                        break;
+                    default:
+                        difficulty = AICommander.Difficulty.Normal;
+                        break;
+                }
+            }
+
+            // Parse strategy
+            AICommander.StrategyType strategy = AICommander.StrategyType.Balanced;
+            if (!string.IsNullOrEmpty(levelDefinition.aiStrategy))
+            {
+                switch (levelDefinition.aiStrategy.ToLower())
+                {
+                    case "aggressive":
+                        strategy = AICommander.StrategyType.Aggressive;
+                        break;
+                    case "defensive":
+                        strategy = AICommander.StrategyType.Defensive;
+                        break;
+                    default:
+                        strategy = AICommander.StrategyType.Balanced;
+                        break;
+                }
+            }
+
+            // Initialize AI with all required components
+            Transform aiBaseTransform = EnemyBase != null ? EnemyBase.transform : null;
+            if (aiBaseTransform == null)
+            {
+                Debug.LogWarning("LiveBattleLevelController: AI base not found, AI may not function correctly");
+            }
+
+            AI.Initialize(difficulty, strategy, AIDeck, AIGold, database, ConstructionMgr, aiBaseTransform);
+
+            // Connect AI to spawner
+            if (AISpawner != null)
+            {
+                AI.GetUnitSpawner().SetLiveBattleSpawner(AISpawner);
+                Debug.Log("LiveBattleLevelController: Connected AI to spawner");
+            }
+            else
+            {
+                Debug.LogWarning("LiveBattleLevelController: AI spawner not found, AI cannot spawn units");
+            }
+
+            // Enable AI when battle starts
+            AI.enabled = false; // Disabled until battle starts
+
+            Debug.Log($"LiveBattleLevelController: AI initialized with {difficulty} difficulty and {strategy} strategy");
+        }
+
         private void Update()
         {
             if (IsBattleEnded) return;
@@ -400,12 +515,13 @@ namespace TowerConquest.Gameplay
             passiveGoldTimer += Time.deltaTime;
             if (passiveGoldTimer >= 1f)
             {
-                passiveGoldTimer -= 1f;
+                passiveGoldTimer -= 1f; // Keep remainder for precise timing
                 int goldAmount = Mathf.RoundToInt(passiveGoldPerSecond);
                 if (goldAmount > 0)
                 {
-                    PlayerGold.AddGold(goldAmount);
-                    AIGold.AddGold(goldAmount);
+                    // Add null checks for safety
+                    PlayerGold?.AddGold(goldAmount);
+                    AIGold?.AddGold(goldAmount);
                 }
             }
 

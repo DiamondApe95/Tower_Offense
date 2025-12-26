@@ -35,6 +35,7 @@ namespace TowerConquest.Gameplay
         private float heroCooldownTimer;
         private bool heroAlive;
         private bool heroOnCooldown;
+        private HeroController currentHero; // Track hero reference for safety checks
 
         // Object pooling
         private readonly Dictionary<string, Queue<GameObject>> unitPools = new Dictionary<string, Queue<GameObject>>();
@@ -65,6 +66,7 @@ namespace TowerConquest.Gameplay
             heroCooldownTimer = 0f;
             heroAlive = false;
             heroOnCooldown = false;
+            currentHero = null;
 
             // Setup pool parent
             if (poolParent == null)
@@ -137,6 +139,17 @@ namespace TowerConquest.Gameplay
                 {
                     unitCooldowns[i] -= Time.deltaTime;
                 }
+            }
+
+            // Safety check: If hero is marked alive but reference is null/destroyed, trigger cooldown
+            // This handles edge cases where the hero GameObject was destroyed without firing OnHeroDied
+            if (heroAlive && (currentHero == null || currentHero.gameObject == null))
+            {
+                Debug.LogWarning($"[LiveBattleSpawnController] Hero was destroyed without firing death event for {team}. Triggering cooldown.");
+                heroAlive = false;
+                heroOnCooldown = true;
+                heroCooldownTimer = heroRespawnTime;
+                currentHero = null;
             }
 
             // Update hero cooldown
@@ -315,6 +328,7 @@ namespace TowerConquest.Gameplay
             if (hero != null)
             {
                 heroAlive = true;
+                currentHero = hero; // Track hero reference
                 OnHeroSpawned?.Invoke(hero);
                 return true;
             }
@@ -362,6 +376,7 @@ namespace TowerConquest.Gameplay
             heroAlive = false;
             heroOnCooldown = true;
             heroCooldownTimer = heroRespawnTime;
+            currentHero = null; // Clear hero reference
 
             Debug.Log($"[LiveBattleSpawnController] Hero died for {team}. Respawn in {heroRespawnTime}s");
         }
