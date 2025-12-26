@@ -168,7 +168,7 @@ public class AutoLevelGenerator : MonoBehaviour
     [ContextMenu("Generate Level Only")]
     public void GenerateNow() => Generate();
 
-    [Header("Prefabs (Auto-load in Editor from Assets/Prefab)")]
+    [Header("Prefabs (Auto-load in Editor from Assets/_Project/Prefab)")]
     [Tooltip("Editor-only auto load folder. In builds please assign prefabs manually.")]
     public string prefabFolder = "Assets/_Project/Prefab";
 
@@ -521,25 +521,50 @@ public class AutoLevelGenerator : MonoBehaviour
         towerPrefab ??= LoadPrefabByName("TowerPrefab");
         projectilePrefab ??= LoadPrefabByName("Projectile");
 
-        if (enemyPrefab == null) Log.Warning("AutoLevelGenerator(Editor): Could not auto-load Enemy.prefab from Assets/Prefab.");
-        if (towerPrefab == null) Log.Warning("AutoLevelGenerator(Editor): Could not auto-load TowerPrefab.prefab from Assets/Prefab.");
-        if (projectilePrefab == null) Log.Warning("AutoLevelGenerator(Editor): Could not auto-load Projectile.prefab from Assets/Prefab.");
+        if (enemyPrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Enemy.prefab from {prefabFolder}.");
+        if (towerPrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load TowerPrefab.prefab from {prefabFolder}.");
+        if (projectilePrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Projectile.prefab from {prefabFolder}.");
     }
 
     private GameObject LoadPrefabByName(string prefabNameNoExt)
     {
-        string[] guids = AssetDatabase.FindAssets($"{prefabNameNoExt} t:Prefab", new[] { prefabFolder });
-        if (guids == null || guids.Length == 0) return null;
+        if (string.IsNullOrEmpty(prefabFolder))
+        {
+            Log.Warning($"[AutoLevelGenerator] prefabFolder is not set, cannot load {prefabNameNoExt}.prefab");
+            return null;
+        }
 
+        string[] guids = AssetDatabase.FindAssets($"{prefabNameNoExt} t:Prefab", new[] { prefabFolder });
+
+        if (guids == null || guids.Length == 0)
+        {
+            Log.Warning($"[AutoLevelGenerator] No prefabs found matching '{prefabNameNoExt}' in folder '{prefabFolder}'");
+            return null;
+        }
+
+        // Try to find exact match first
         foreach (var g in guids)
         {
             string path = AssetDatabase.GUIDToAssetPath(g);
             if (path.EndsWith($"/{prefabNameNoExt}.prefab", StringComparison.OrdinalIgnoreCase))
-                return AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (prefab != null)
+                {
+                    Log.Info($"[AutoLevelGenerator] Successfully loaded {prefabNameNoExt}.prefab from {path}");
+                    return prefab;
+                }
+            }
         }
 
+        // Fall back to first result
         string firstPath = AssetDatabase.GUIDToAssetPath(guids[0]);
-        return AssetDatabase.LoadAssetAtPath<GameObject>(firstPath);
+        var fallbackPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(firstPath);
+        if (fallbackPrefab != null)
+        {
+            Log.Info($"[AutoLevelGenerator] Loaded {prefabNameNoExt} from fallback path: {firstPath}");
+        }
+        return fallbackPrefab;
     }
 
     private void AutoSetupTowerPrefabEditorOnly()
