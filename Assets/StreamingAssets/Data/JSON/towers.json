@@ -1,0 +1,126 @@
+{
+  "version": "1.0",
+  "tower_definitions": [
+    {
+      "id": "tower_ballista",
+      "display_name": "Ballista Tower",
+      "description": "Powerful siege weapon with high damage and range",
+      "category": "artillery",
+      "tags": ["siege", "ranged", "high_damage"],
+      "civilization": "civ_rome",
+      "goldCost": 150,
+      "goldReward": 75,
+      "constructionTime": 5.0,
+      "requiredBuilders": 2,
+      "baseStats": {
+        "hp": 500.0,
+        "armor": 0.3,
+        "constructionHP": 100.0
+      },
+      "baseAttack": {
+        "damage_type": "physical",
+        "base_damage": 100.0,
+        "attacks_per_second": 0.5,
+        "range": 12.0,
+        "splash_radius": 1.5,
+        "targeting": {
+          "priority": "strongest",
+          "can_target_air": false
+        }
+      },
+      "prefabPath": "Prefabs/Towers/Ballista",
+      "constructionSitePrefabPath": "Prefabs/Towers/ConstructionSite"
+    },
+    {
+      "id": "tower_archer_tower",
+      "display_name": "Archer Tower",
+      "description": "Standard defensive tower with good range and attack speed",
+      "category": "defensive",
+      "tags": ["defensive", "ranged"],
+      "civilization": "civ_rome",
+      "goldCost": 100,
+      "goldReward": 50,
+      "constructionTime": 3.0,
+      "requiredBuilders": 1,
+      "baseStats": {
+        "hp": 400.0,
+        "armor": 0.2,
+        "constructionHP": 80.0
+      },
+      "baseAttack": {
+        "damage_type": "physical",
+        "base_damage": 35.0,
+        "attacks_per_second": 1.5,
+        "range": 10.0,
+        "splash_radius": 0.0,
+        "targeting": {
+          "priority": "closest",
+          "can_target_air": true
+        }
+      },
+      "prefabPath": "Prefabs/Towers/ArcherTower",
+      "constructionSitePrefabPath": "Prefabs/Towers/ConstructionSite"
+    },
+    {
+      "id": "tower_wooden_fort",
+      "display_name": "Wooden Fort",
+      "description": "Basic Gallic defensive structure with moderate stats",
+      "category": "defensive",
+      "tags": ["defensive", "basic"],
+      "civilization": "civ_gaul",
+      "goldCost": 80,
+      "goldReward": 40,
+      "constructionTime": 2.5,
+      "requiredBuilders": 1,
+      "baseStats": {
+        "hp": 350.0,
+        "armor": 0.15,
+        "constructionHP": 70.0
+      },
+      "baseAttack": {
+        "damage_type": "physical",
+        "base_damage": 25.0,
+        "attacks_per_second": 1.8,
+        "range": 8.0,
+        "splash_radius": 0.0,
+        "targeting": {
+          "priority": "closest",
+          "can_target_air": false
+        }
+      },
+      "prefabPath": "Prefabs/Towers/WoodenFort",
+      "constructionSitePrefabPath": "Prefabs/Towers/ConstructionSite"
+    },
+    {
+      "id": "tower_spike_trap",
+      "display_name": "Spike Barrier",
+      "description": "Defensive barrier that damages passing enemies",
+      "category": "trap",
+      "tags": ["trap", "melee", "area"],
+      "civilization": "civ_gaul",
+      "goldCost": 60,
+      "goldReward": 30,
+      "constructionTime": 2.0,
+      "requiredBuilders": 1,
+      "baseStats": {
+        "hp": 200.0,
+        "armor": 0.1,
+        "constructionHP": 50.0
+      },
+      "baseAttack": {
+        "damage_type": "physical",
+        "base_damage": 40.0,
+        "attacks_per_second": 2.0,
+        "range": 2.0,
+        "splash_radius": 2.0,
+        "targeting": {
+          "priority": "closest",
+          "can_target_air": false
+        }
+      },
+      "prefabPath": "Prefabs/Towers/SpikeBarrier",
+      "constructionSitePrefabPath": "Prefabs/Towers/ConstructionSite"
+    }
+  ],
+  "trap_definitions": []
+}

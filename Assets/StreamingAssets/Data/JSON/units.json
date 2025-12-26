@@ -1,0 +1,222 @@
+{
+  "version": "1.0",
+  "unit_definitions": [
+    {
+      "id": "unit_legionary",
+      "display_name": "Roman Legionary",
+      "description": "Heavily armored infantry with balanced stats",
+      "faction": "rome",
+      "role": "tank",
+      "rarity": "common",
+      "tags": ["infantry", "melee"],
+      "civilization": "civ_rome",
+      "goldCost": 50,
+      "goldReward": 25,
+      "spawn": {
+        "count": 3,
+        "spacing": 1.5
+      },
+      "stats": {
+        "hp": 200.0,
+        "armor": 0.2,
+        "move_speed": 2.0,
+        "size": 1.0
+      },
+      "attack": {
+        "enabled": true,
+        "attack_type": "melee",
+        "damage_type": "physical",
+        "base_damage": 25.0,
+        "attacks_per_second": 1.0,
+        "range": 1.5,
+        "splash_radius": 0.0,
+        "targeting": {
+          "priority": "closest",
+          "can_target_air": false
+        }
+      },
+      "prefabPath": "Prefabs/Units/Legionary"
+    },
+    {
+      "id": "unit_archer",
+      "display_name": "Roman Archer",
+      "description": "Ranged unit with moderate damage",
+      "faction": "rome",
+      "role": "ranged",
+      "rarity": "common",
+      "tags": ["ranged", "archer"],
+      "civilization": "civ_rome",
+      "goldCost": 40,
+      "goldReward": 20,
+      "spawn": {
+        "count": 4,
+        "spacing": 1.0
+      },
+      "stats": {
+        "hp": 100.0,
+        "armor": 0.05,
+        "move_speed": 2.5,
+        "size": 1.0
+      },
+      "attack": {
+        "enabled": true,
+        "attack_type": "ranged",
+        "damage_type": "physical",
+        "base_damage": 30.0,
+        "attacks_per_second": 1.5,
+        "range": 8.0,
+        "splash_radius": 0.0,
+        "targeting": {
+          "priority": "closest",
+          "can_target_air": true
+        }
+      },
+      "prefabPath": "Prefabs/Units/Archer"
+    },
+    {
+      "id": "unit_cavalry",
+      "display_name": "Roman Cavalry",
+      "description": "Fast mounted unit with high damage",
+      "faction": "rome",
+      "role": "cavalry",
+      "rarity": "rare",
+      "tags": ["cavalry", "melee", "fast"],
+      "civilization": "civ_rome",
+      "goldCost": 80,
+      "goldReward": 40,
+      "spawn": {
+        "count": 2,
+        "spacing": 2.0
+      },
+      "stats": {
+        "hp": 250.0,
+        "armor": 0.1,
+        "move_speed": 5.0,
+        "size": 1.5
+      },
+      "attack": {
+        "enabled": true,
+        "attack_type": "melee",
+        "damage_type": "physical",
+        "base_damage": 50.0,
+        "attacks_per_second": 1.2,
+        "range": 2.0,
+        "splash_radius": 0.0,
+        "targeting": {
+          "priority": "closest",
+          "can_target_air": false
+        }
+      },
+      "prefabPath": "Prefabs/Units/Cavalry"
+    },
+    {
+      "id": "unit_gallic_warrior",
+      "display_name": "Gallic Warrior",
+      "description": "Fierce melee fighter with high damage but low armor",
+      "faction": "gaul",
+      "role": "melee",
+      "rarity": "common",
+      "tags": ["infantry", "melee", "aggressive"],
+      "civilization": "civ_gaul",
+      "goldCost": 45,
+      "goldReward": 22,
+      "spawn": {
+        "count": 3,
+        "spacing": 1.5
+      },
+      "stats": {
+        "hp": 150.0,
+        "armor": 0.05,
+        "move_speed": 3.0,
+        "size": 1.0
+      },
+      "attack": {
+        "enabled": true,
+        "attack_type": "melee",
+        "damage_type": "physical",
+        "base_damage": 35.0,
+        "attacks_per_second": 1.3,
+        "range": 1.5,
+        "splash_radius": 0.0,
+        "targeting": {
+          "priority": "closest",
+          "can_target_air": false
+        }
+      },
+      "prefabPath": "Prefabs/Units/GallicWarrior"
+    },
+    {
+      "id": "unit_slinger",
+      "display_name": "Gallic Slinger",
+      "description": "Light ranged unit with fast attack speed",
+      "faction": "gaul",
+      "role": "ranged",
+      "rarity": "common",
+      "tags": ["ranged", "light"],
+      "civilization": "civ_gaul",
+      "goldCost": 35,
+      "goldReward": 18,
+      "spawn": {
+        "count": 5,
+        "spacing": 1.0
+      },
+      "stats": {
+        "hp": 80.0,
+        "armor": 0.0,
+        "move_speed": 3.0,
+        "size": 1.0
+      },
+      "attack": {
+        "enabled": true,
+        "attack_type": "ranged",
+        "damage_type": "physical",
+        "base_damage": 20.0,
+        "attacks_per_second": 2.0,
+        "range": 7.0,
+        "splash_radius": 0.0,
+        "targeting": {
+          "priority": "closest",
+          "can_target_air": false
+        }
+      },
+      "prefabPath": "Prefabs/Units/Slinger"
+    },
+    {
+      "id": "unit_war_chariot",
+      "display_name": "Gallic War Chariot",
+      "description": "Fast chariot with splash damage",
+      "faction": "gaul",
+      "role": "cavalry",
+      "rarity": "rare",
+      "tags": ["cavalry", "melee", "fast", "splash"],
+      "civilization": "civ_gaul",
+      "goldCost": 75,
+      "goldReward": 38,
+      "spawn": {
+        "count": 2,
+        "spacing": 2.5
+      },
+      "stats": {
+        "hp": 200.0,
+        "armor": 0.08,
+        "move_speed": 5.5,
+        "size": 2.0
+      },
+      "attack": {
+        "enabled": true,
+        "attack_type": "melee",
+        "damage_type": "physical",
+        "base_damage": 40.0,
+        "attacks_per_second": 1.0,
+        "range": 2.0,
+        "splash_radius": 2.0,
+        "targeting": {
+          "priority": "closest",
+          "can_target_air": false
+        }
+      },
+      "prefabPath": "Prefabs/Units/WarChariot"
+    }
+  ],
+  "spell_definitions": []
+}

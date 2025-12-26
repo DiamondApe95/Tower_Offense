@@ -1,0 +1,129 @@
+{
+  "version": "1.0",
+  "global_rules": {
+    "mode": "tower_offense",
+    "hand_size": 5,
+    "draw_rules": {
+      "draw_on_play": true,
+      "reshuffle_on_empty": true
+    },
+    "wave_rules": {
+      "phase_based": false,
+      "allow_mid_wave_spawns": true,
+      "hero_every_n_waves": 5,
+      "speed_modes": [1.0, 1.5, 2.0]
+    }
+  },
+  "regions": [
+    {
+      "id": "region_italia",
+      "display_name": "Italia"
+    },
+    {
+      "id": "region_gaul",
+      "display_name": "Gaul"
+    }
+  ],
+  "levels": [
+    {
+      "id": "lvl_01_etruria_outpost",
+      "display_name": "Etruria Outpost",
+      "description": "The first battle begins at an ancient outpost. Prove your tactical prowess against a weak enemy position.",
+      "region_id": "region_italia",
+      "recommended_power": 100,
+      "estimated_duration_seconds": 300.0,
+      "playerCivilization": "civ_rome",
+      "enemyCivilization": "civ_gaul",
+      "aiDifficulty": "easy",
+      "aiStrategy": "defensive",
+      "startGold": 500,
+      "fameReward": {
+        "victory": 100,
+        "defeat": 20
+      },
+      "unlockRequirement": null
+    },
+    {
+      "id": "lvl_02_gallic_frontier",
+      "display_name": "Gallic Frontier",
+      "description": "The Gauls have fortified the frontier. Break through their defenses.",
+      "region_id": "region_gaul",
+      "recommended_power": 150,
+      "estimated_duration_seconds": 360.0,
+      "playerCivilization": "civ_rome",
+      "enemyCivilization": "civ_gaul",
+      "aiDifficulty": "easy",
+      "aiStrategy": "balanced",
+      "startGold": 500,
+      "fameReward": {
+        "victory": 120,
+        "defeat": 25
+      },
+      "unlockRequirement": "lvl_01_etruria_outpost"
+    },
+    {
+      "id": "lvl_03_carthage_siege",
+      "display_name": "Carthage Siege",
+      "description": "Lay siege to the Carthaginian stronghold. Their defenses are formidable.",
+      "region_id": "region_italia",
+      "recommended_power": 200,
+      "estimated_duration_seconds": 420.0,
+      "playerCivilization": "civ_rome",
+      "enemyCivilization": "civ_gaul",
+      "aiDifficulty": "normal",
+      "aiStrategy": "defensive",
+      "startGold": 600,
+      "fameReward": {
+        "victory": 150,
+        "defeat": 30
+      },
+      "unlockRequirement": "lvl_02_gallic_frontier"
+    },
+    {
+      "id": "lvl_04_greek_colony",
+      "display_name": "Greek Colony",
+      "description": "The Greeks defend their colony with phalanx tactics. Adapt your strategy.",
+      "region_id": "region_italia",
+      "recommended_power": 250,
+      "estimated_duration_seconds": 480.0,
+      "playerCivilization": "civ_rome",
+      "enemyCivilization": "civ_gaul",
+      "aiDifficulty": "normal",
+      "aiStrategy": "balanced",
+      "startGold": 600,
+      "fameReward": {
+        "victory": 180,
+        "defeat": 35
+      },
+      "unlockRequirement": "lvl_03_carthage_siege"
+    },
+    {
+      "id": "lvl_05_germanic_forest",
+      "display_name": "Germanic Forest",
+      "description": "Face the fierce Germanic tribes in their home territory. This will test your skills.",
+      "region_id": "region_gaul",
+      "recommended_power": 350,
+      "estimated_duration_seconds": 600.0,
+      "playerCivilization": "civ_rome",
+      "enemyCivilization": "civ_gaul",
+      "aiDifficulty": "hard",
+      "aiStrategy": "aggressive",
+      "startGold": 700,
+      "fameReward": {
+        "victory": 250,
+        "defeat": 50,
+        "bonus": [
+          {
+            "condition": "win_under_5_min",
+            "fame": 50
+          },
+          {
+            "condition": "no_tower_lost",
+            "fame": 30
+          }
+        ]
+      },
+      "unlockRequirement": "lvl_04_greek_colony"
+    }
+  ]
+}

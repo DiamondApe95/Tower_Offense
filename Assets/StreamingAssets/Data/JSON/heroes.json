@@ -1,0 +1,111 @@
+{
+  "version": "1.0",
+  "hero_definitions": [
+    {
+      "id": "hero_centurion",
+      "display_name": "Centurion Marcus",
+      "description": "Elite Roman commander who inspires nearby troops and leads from the front",
+      "role": "tank",
+      "rarity": "legendary",
+      "tags": ["hero", "melee", "leader", "inspire"],
+      "civilization": "civ_rome",
+      "unlockCost": 0,
+      "spawnCooldown": 120.0,
+      "stats": {
+        "hp": 800.0,
+        "armor": 0.35,
+        "move_speed": 2.5,
+        "size": 1.2
+      },
+      "attack": {
+        "enabled": true,
+        "attack_type": "melee",
+        "damage_type": "physical",
+        "base_damage": 60.0,
+        "attacks_per_second": 1.2,
+        "range": 2.0,
+        "splash_radius": 0.0,
+        "targeting": {
+          "priority": "strongest",
+          "can_target_air": false
+        }
+      },
+      "abilities": [
+        {
+          "id": "centurion_inspire",
+          "type": "buff",
+          "trigger": "passive_aura",
+          "cooldown_seconds": 0.0,
+          "interval_seconds": 1.0,
+          "effects": [
+            {
+              "effect_type": "buff",
+              "stat": "armor",
+              "mode": "multiply",
+              "value": 0.15,
+              "duration_seconds": 2.0,
+              "area": {
+                "shape": "circle",
+                "radius": 5.0
+              }
+            }
+          ]
+        }
+      ],
+      "prefabPath": "Prefabs/Heroes/Centurion"
+    },
+    {
+      "id": "hero_chieftain",
+      "display_name": "Chieftain Brennus",
+      "description": "Fearsome Gallic leader who boosts damage and strikes fear into enemies",
+      "role": "melee",
+      "rarity": "legendary",
+      "tags": ["hero", "melee", "aggressive", "fear"],
+      "civilization": "civ_gaul",
+      "unlockCost": 500,
+      "spawnCooldown": 100.0,
+      "stats": {
+        "hp": 700.0,
+        "armor": 0.25,
+        "move_speed": 3.5,
+        "size": 1.2
+      },
+      "attack": {
+        "enabled": true,
+        "attack_type": "melee",
+        "damage_type": "physical",
+        "base_damage": 80.0,
+        "attacks_per_second": 1.5,
+        "range": 2.0,
+        "splash_radius": 1.0,
+        "targeting": {
+          "priority": "closest",
+          "can_target_air": false
+        }
+      },
+      "abilities": [
+        {
+          "id": "chieftain_fury",
+          "type": "buff",
+          "trigger": "passive_aura",
+          "cooldown_seconds": 0.0,
+          "interval_seconds": 1.0,
+          "effects": [
+            {
+              "effect_type": "buff",
+              "stat": "damage",
+              "mode": "multiply",
+              "value": 0.2,
+              "duration_seconds": 2.0,
+              "area": {
+                "shape": "circle",
+                "radius": 6.0
+              }
+            }
+          ]
+        }
+      ],
+      "prefabPath": "Prefabs/Heroes/Chieftain"
+    }
+  ]
+}
