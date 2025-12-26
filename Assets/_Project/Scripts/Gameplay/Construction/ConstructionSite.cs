@@ -32,7 +32,7 @@ namespace TowerConquest.Gameplay
 
         public event Action<ConstructionSite> OnConstructionComplete;
         public event Action<ConstructionSite> OnConstructionDestroyed;
-        public event Action<int, int> OnBuilderArrived; // (current, required)
+        public event Action<int, int> OnBuilderCountChanged; // (current, required)
 
         private void Awake()
         {
@@ -78,7 +78,7 @@ namespace TowerConquest.Gameplay
             currentBuilders++;
             Debug.Log($"[ConstructionSite] Builder arrived ({currentBuilders}/{requiredBuilders})");
 
-            OnBuilderArrived?.Invoke(currentBuilders, requiredBuilders);
+            OnBuilderCountChanged?.Invoke(currentBuilders, requiredBuilders);
 
             if (currentBuilders >= requiredBuilders)
             {

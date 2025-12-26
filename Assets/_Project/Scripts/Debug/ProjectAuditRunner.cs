@@ -369,9 +369,9 @@ namespace TowerConquest.Debug
             return unit;
         }
 
-        private BaseController GetOrCreateBaseController()
+        private TowerConquest.Gameplay.Entities.BaseController GetOrCreateBaseController()
         {
-            BaseController baseController = FindAnyObjectByType<BaseController>();
+            TowerConquest.Gameplay.Entities.BaseController baseController = FindAnyObjectByType<TowerConquest.Gameplay.Entities.BaseController>();
             if (baseController != null)
             {
                 return baseController;
@@ -379,7 +379,7 @@ namespace TowerConquest.Debug
 
             GameObject baseObject = new GameObject("Audit_BaseController");
             spawnedObjects.Add(baseObject);
-            baseController = baseObject.AddComponent<BaseController>();
+            baseController = baseObject.AddComponent<TowerConquest.Gameplay.Entities.BaseController>();
             baseController.Initialize(1000f, 0f);
             return baseController;
         }
