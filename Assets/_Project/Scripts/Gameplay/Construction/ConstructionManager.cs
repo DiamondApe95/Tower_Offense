@@ -3,6 +3,7 @@ using TowerConquest.Debug;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using TowerConquest.Data;
 using TowerConquest.Core;
 using TowerConquest.Gameplay.Entities;
@@ -256,8 +257,20 @@ namespace TowerConquest.Gameplay
         /// </summary>
         private GameObject CreateDefaultBuilder(Vector3 position)
         {
+            // Try to find a valid NavMesh position near the spawn point
+            NavMeshHit hit;
+            Vector3 validPosition = position;
+            if (NavMesh.SamplePosition(position, out hit, 10f, NavMesh.AllAreas))
+            {
+                validPosition = hit.position;
+            }
+            else
+            {
+                Log.Warning("[ConstructionManager] No NavMesh found near builder spawn position. Builder will be created but cannot move. Please bake NavMesh in the scene.");
+            }
+
             GameObject builderObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            builderObj.transform.position = position;
+            builderObj.transform.position = validPosition;
             builderObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
             builderObj.transform.SetParent(builderParent);
 
@@ -270,7 +283,7 @@ namespace TowerConquest.Gameplay
             }
 
             // Add NavMeshAgent for pathfinding
-            var agent = builderObj.AddComponent<UnityEngine.AI.NavMeshAgent>();
+            var agent = builderObj.AddComponent<NavMeshAgent>();
             agent.speed = 5f;
             agent.stoppingDistance = 1.5f;
 
@@ -343,13 +356,17 @@ namespace TowerConquest.Gameplay
         /// </summary>
         public BuilderController SpawnBuilder(Vector3 position, GoldManager.Team team)
         {
-            if (builderPrefab == null)
+            GameObject builderObj;
+            if (builderPrefab != null)
             {
-                Log.Error("[ConstructionManager] Builder prefab not assigned");
-                return null;
+                builderObj = Instantiate(builderPrefab, position, Quaternion.identity, builderParent);
+            }
+            else
+            {
+                Log.Warning("[ConstructionManager] Builder prefab not assigned, using default builder");
+                builderObj = CreateDefaultBuilder(position);
             }
 
-            GameObject builderObj = Instantiate(builderPrefab, position, Quaternion.identity, builderParent);
             builderObj.name = $"Builder_{team}_{availableBuilders.Count}";
 
             var builder = builderObj.GetComponent<BuilderController>();

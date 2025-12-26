@@ -1,6 +1,7 @@
 using System;
 using TowerConquest.Debug;
 using UnityEngine;
+using UnityEngine.AI;
 using TowerConquest.Core;
 using TowerConquest.Data;
 using TowerConquest.Gameplay.Entities;
@@ -97,7 +98,18 @@ namespace TowerConquest.Gameplay
             }
 
             currentHero.name = $"Hero_{heroId}_{ownerTeam}";
-            currentHero.transform.position = spawnPoint != null ? spawnPoint.position : Vector3.zero;
+
+            // Position hero, try to find valid NavMesh position
+            Vector3 spawnPos = spawnPoint != null ? spawnPoint.position : Vector3.zero;
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(spawnPos, out hit, 10f, NavMesh.AllAreas))
+            {
+                currentHero.transform.position = hit.position;
+            }
+            else
+            {
+                currentHero.transform.position = spawnPos;
+            }
 
             // Setup HeroController
             var heroController = currentHero.GetComponent<HeroController>();
@@ -145,7 +157,21 @@ namespace TowerConquest.Gameplay
         /// </summary>
         private GameObject CreateDefaultHero(HeroDefinition heroDef)
         {
+            // Try to find a valid NavMesh position near the spawn point
+            Vector3 spawnPos = spawnPoint != null ? spawnPoint.position : Vector3.zero;
+            NavMeshHit hit;
+            Vector3 validPosition = spawnPos;
+            if (NavMesh.SamplePosition(spawnPos, out hit, 10f, NavMesh.AllAreas))
+            {
+                validPosition = hit.position;
+            }
+            else
+            {
+                Log.Warning("[HeroManager] No NavMesh found near hero spawn position. Hero will be created but cannot move. Please bake NavMesh in the scene.");
+            }
+
             GameObject heroObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            heroObj.transform.position = validPosition;
             heroObj.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
 
             var renderer = heroObj.GetComponent<Renderer>();
@@ -158,7 +184,7 @@ namespace TowerConquest.Gameplay
             }
 
             // Add NavMeshAgent for movement
-            var agent = heroObj.AddComponent<UnityEngine.AI.NavMeshAgent>();
+            var agent = heroObj.AddComponent<NavMeshAgent>();
             agent.speed = heroDef.stats?.move_speed ?? 4f;
             agent.stoppingDistance = 1.5f;
 
