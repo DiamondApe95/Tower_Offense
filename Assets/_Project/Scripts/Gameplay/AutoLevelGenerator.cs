@@ -170,7 +170,7 @@ public class AutoLevelGenerator : MonoBehaviour
 
     [Header("Prefabs (Auto-load in Editor from Assets/Prefab)")]
     [Tooltip("Editor-only auto load folder. In builds please assign prefabs manually.")]
-    public string prefabFolder = "Assets/Prefab";
+    public string prefabFolder = "Assets/_Project/Prefab";
 
     [Tooltip("Optional override. If null, auto-load Enemy.prefab in editor.")]
     public GameObject enemyPrefab;
@@ -393,6 +393,9 @@ public class AutoLevelGenerator : MonoBehaviour
         // Setup map boundaries
         SetupMapBoundaries();
 
+        // Setup NavMesh for unit pathfinding
+        SetupNavMeshBaker();
+
 #if UNITY_EDITOR
         if (!Application.isPlaying)
         {
@@ -480,6 +483,32 @@ public class AutoLevelGenerator : MonoBehaviour
         boundary.SetBoundaries(origin, width, height, tileSize);
 
         Log.Info($"AutoLevelGenerator: Map boundaries set - Min: {boundary.minBounds}, Max: {boundary.maxBounds}");
+    }
+
+    // =========================================================
+    // AUTO: NavMesh Baker for Unit Pathfinding
+    // =========================================================
+    private void SetupNavMeshBaker()
+    {
+        NavMeshRuntimeBaker baker = GetComponent<NavMeshRuntimeBaker>();
+        if (baker == null)
+        {
+            baker = gameObject.AddComponent<NavMeshRuntimeBaker>();
+            Log.Info("AutoLevelGenerator: Added NavMeshRuntimeBaker component");
+        }
+
+        // Configure the baker with correct layer names
+        baker.walkableLayers = new string[] { pathLayerName, buildLayerName };
+        baker.bakeOnStart = true;
+        baker.bakeDelay = 0.5f; // Wait for level generation to complete
+
+        // If we're already playing, bake now
+        if (Application.isPlaying)
+        {
+            baker.Invoke("BakeNavMesh", 0.5f);
+        }
+
+        Log.Info("AutoLevelGenerator: NavMesh baker configured");
     }
 
     // =========================================================
