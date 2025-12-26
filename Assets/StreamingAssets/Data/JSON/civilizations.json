@@ -1,0 +1,30 @@
+{
+  "civilizations": [
+    {
+      "id": "civ_rome",
+      "name": "Roman Empire",
+      "description": "Masters of discipline and engineering. Strong balanced units and defensive structures.",
+      "color": "#8B0000",
+      "availableUnits": ["unit_legionary", "unit_archer", "unit_cavalry"],
+      "availableTowers": ["tower_ballista", "tower_archer_tower"],
+      "availableHeroes": ["hero_centurion"],
+      "specialAbility": "ability_testudo",
+      "unlockCost": 0,
+      "prefabPath": "Prefabs/Civilizations/Rome",
+      "iconPath": "Icons/Civilizations/Rome"
+    },
+    {
+      "id": "civ_gaul",
+      "name": "Gallic Tribes",
+      "description": "Fierce warriors with fast, aggressive units and guerrilla tactics.",
+      "color": "#2E8B57",
+      "availableUnits": ["unit_gallic_warrior", "unit_slinger", "unit_war_chariot"],
+      "availableTowers": ["tower_wooden_fort", "tower_spike_trap"],
+      "availableHeroes": ["hero_chieftain"],
+      "specialAbility": "ability_war_cry",
+      "unlockCost": 500,
+      "prefabPath": "Prefabs/Civilizations/Gaul",
+      "iconPath": "Icons/Civilizations/Gaul"
+    }
+  ]
+}
