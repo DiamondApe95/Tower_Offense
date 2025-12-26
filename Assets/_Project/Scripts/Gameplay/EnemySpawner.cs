@@ -99,10 +99,54 @@ public class EnemySpawner : MonoBehaviour
 
         GameObject enemyGO = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
 
+        // Setup EnemyMover for basic movement
         EnemyMover mover = enemyGO.GetComponent<EnemyMover>();
         if (mover == null)
             mover = enemyGO.AddComponent<EnemyMover>();
 
         mover.Init(cachedWaypoints);
+
+        // Add combat capability
+        SetupEnemyCombat(enemyGO);
+
+        // Set enemy layer for targeting
+        SetLayerRecursively(enemyGO, LayerMask.NameToLayer("Enemy"));
+    }
+
+    private void SetupEnemyCombat(GameObject enemyGO)
+    {
+        // Add combat component if not exists
+        var combat = enemyGO.GetComponent<TowerConquest.Gameplay.Entities.UnitCombat>();
+        if (combat == null)
+        {
+            combat = enemyGO.AddComponent<TowerConquest.Gameplay.Entities.UnitCombat>();
+        }
+
+        // Add health component if not exists
+        var health = enemyGO.GetComponent<TowerConquest.Combat.HealthComponent>();
+        if (health == null)
+        {
+            health = enemyGO.AddComponent<TowerConquest.Combat.HealthComponent>();
+            health.Initialize(100f, 0f); // Default HP and armor
+        }
+
+        // Find enemy base (player base is the target for enemies)
+        var playerBase = FindFirstObjectByType<TowerConquest.Gameplay.Entities.BaseController>();
+
+        // Initialize combat with enemy team settings
+        combat.Initialize(GoldManager.Team.Enemy, 25f, 2f, 1f, playerBase);
+
+        Log.Info($"[EnemySpawner] Setup combat for spawned enemy");
+    }
+
+    private void SetLayerRecursively(GameObject obj, int layer)
+    {
+        if (layer < 0) return; // Invalid layer
+
+        obj.layer = layer;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
+        }
     }
 }

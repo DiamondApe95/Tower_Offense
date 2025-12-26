@@ -226,6 +226,8 @@ public class AutoLevelGenerator : MonoBehaviour
     public string pathLayerName = "Path";
     public string blockedLayerName = "Block";
     public string enemyLayerName = "Enemy";
+    public string playerUnitLayerName = "PlayerUnit";
+    public string towerLayerName = "Tower";
 
     [Header("Auto Setup Toggles")]
     public bool autoCreateEnemySpawners = true;
@@ -277,6 +279,8 @@ public class AutoLevelGenerator : MonoBehaviour
         EnsureProjectLayer(pathLayerName);
         EnsureProjectLayer(blockedLayerName);
         EnsureProjectLayer(enemyLayerName);
+        EnsureProjectLayer(playerUnitLayerName);
+        EnsureProjectLayer(towerLayerName);
 
         // 2) Auto-load prefabs from Assets/Prefab
         AutoLoadPrefabsEditorOnly();
@@ -460,8 +464,36 @@ public class AutoLevelGenerator : MonoBehaviour
         if (bm.mainCamera == null)
             bm.mainCamera = Camera.main;
 
-        if (bm.towerPrefab == null && towerPrefab != null)
-            bm.towerPrefab = towerPrefab;
+        // Setup tower prefab with fallback to Tower Mage
+        if (bm.towerPrefab == null)
+        {
+            if (towerPrefab != null)
+            {
+                bm.towerPrefab = towerPrefab;
+            }
+            else
+            {
+                // Fallback to Tower Mage if towerPrefab is not set
+                #if UNITY_EDITOR
+                GameObject towerMage = LoadPrefabByName("Tower Mage");
+                if (towerMage != null)
+                {
+                    bm.towerPrefab = towerMage;
+                    Log.Info("AutoLevelGenerator: Using 'Tower Mage' as fallback tower prefab.");
+                }
+                else
+                {
+                    Log.Warning("AutoLevelGenerator: No tower prefab found. Please assign towerPrefab or ensure 'Tower Mage' prefab exists.");
+                }
+                #endif
+            }
+        }
+
+        // Setup available tower list if empty
+        if (bm.availableTowerPrefabs.Count == 0 && bm.towerPrefab != null)
+        {
+            bm.availableTowerPrefabs.Add(bm.towerPrefab);
+        }
 
         int buildLayer = LayerMask.NameToLayer(buildLayerName);
         if (buildLayer >= 0)

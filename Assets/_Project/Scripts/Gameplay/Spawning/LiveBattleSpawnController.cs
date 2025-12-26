@@ -270,6 +270,9 @@ namespace TowerConquest.Gameplay
 
             controller.Initialize(unitId, path, targetBaseController);
 
+            // Setup combat system
+            SetupUnitCombat(unitObject, unitId, targetBaseController);
+
             // Subscribe to destruction for gold reward
             controller.OnUnitDestroyed += HandleUnitDestroyed;
 
@@ -464,6 +467,33 @@ namespace TowerConquest.Gameplay
             {
                 SetLayerRecursively(child.gameObject, layer);
             }
+        }
+
+        private void SetupUnitCombat(GameObject unitObject, string unitId, BaseController targetBase)
+        {
+            if (unitObject == null) return;
+
+            var unitDef = database?.FindUnit(unitId);
+            if (unitDef == null) return;
+
+            // Get damage and range from unit definition
+            float damage = unitDef.attack?.base_damage ?? 50f;
+            float range = unitDef.attack?.range ?? 2f;
+            float cooldown = unitDef.attack?.attacks_per_second > 0
+                ? 1f / unitDef.attack.attacks_per_second
+                : 1f;
+
+            // Use UnitCombat as the primary combat system
+            UnitCombat combat = unitObject.GetComponent<UnitCombat>();
+            if (combat == null)
+            {
+                combat = unitObject.AddComponent<UnitCombat>();
+            }
+
+            // Initialize combat with team and target base
+            combat.Initialize(team, damage, range, cooldown, targetBase);
+
+            Log.Info($"[LiveBattleSpawnController] Setup combat for {unitId}: damage={damage}, range={range}, cooldown={cooldown}");
         }
 
         public float GetUnitCooldown(int slotIndex)
