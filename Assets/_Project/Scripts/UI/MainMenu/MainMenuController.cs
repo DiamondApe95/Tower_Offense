@@ -29,7 +29,8 @@ namespace TowerConquest.UI.MainMenu
         public Button backFromCreditsButton;
         public Button backFromLevelSelectButton;
 
-        [Header("Mode Selection")]
+        [Header("Mode Selection (Legacy - nicht mehr verwendet)")]
+        [Tooltip("Diese Buttons werden nicht mehr verwendet. Das Spiel verwendet jetzt nur den Live Battle Modus.")]
         public Button offenseModeButton;
         public Button defenseModeButton;
 
@@ -157,8 +158,18 @@ namespace TowerConquest.UI.MainMenu
         private void OnPlayClicked()
         {
             PlayButtonSound();
-            SetPanelActive(mainPanel, false);
-            SetPanelActive(levelSelectPanel, true);
+
+            // Gemäß neuem GDD: "Spielen" führt direkt zur Weltkarte
+            if (Application.CanStreamedLevelBeLoaded("WorldMap"))
+            {
+                SceneManager.LoadScene("WorldMap");
+            }
+            else
+            {
+                // Fallback: zeige Level Select Panel
+                SetPanelActive(mainPanel, false);
+                SetPanelActive(levelSelectPanel, true);
+            }
         }
 
         private void OnContinueClicked()

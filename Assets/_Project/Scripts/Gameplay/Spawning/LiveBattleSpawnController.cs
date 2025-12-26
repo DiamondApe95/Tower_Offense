@@ -184,6 +184,12 @@ namespace TowerConquest.Gameplay
                 float cooldown = unitDef.card?.cooldown_seconds ?? spawnCooldown;
                 unitCooldowns[slotIndex] = cooldown;
 
+                // Track statistics for player team
+                if (team == GoldManager.Team.Player && LevelController != null)
+                {
+                    LevelController.RecordUnitSpawned();
+                }
+
                 OnUnitSpawned?.Invoke(unit);
                 return true;
             }
@@ -271,6 +277,9 @@ namespace TowerConquest.Gameplay
                     else
                     {
                         LevelController?.PlayerGold?.AddGold(reward);
+                        // Track enemy kill for player
+                        LevelController?.RecordEnemyKilled();
+                        LevelController?.RecordGoldEarned(reward);
                     }
                 }
             }

@@ -13,6 +13,11 @@ namespace TowerConquest.Progression
 
         public int TotalFame => totalFame;
 
+        /// <summary>
+        /// Alias for TotalFame (for compatibility)
+        /// </summary>
+        public int CurrentFame => totalFame;
+
         public event Action<int> OnFameChanged;
         public event Action<int, int> OnFameEarned; // (amount, new total)
         public event Action<int, int> OnFameSpent; // (amount, remaining)

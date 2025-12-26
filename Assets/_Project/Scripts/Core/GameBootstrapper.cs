@@ -1,4 +1,5 @@
 using TowerConquest.Data;
+using TowerConquest.Progression;
 using TowerConquest.Saving;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,6 +29,12 @@ namespace TowerConquest.Core
             ServiceLocator.Register(new GameTime());
             ServiceLocator.Register(new SaveManager());
             ServiceLocator.Register(new EntityRegistry());
+
+            // Create and register FameManager
+            GameObject fameManagerGO = new GameObject("FameManager");
+            fameManagerGO.transform.SetParent(transform);
+            FameManager fameManager = fameManagerGO.AddComponent<FameManager>();
+            ServiceLocator.Register(fameManager);
 
             var db = new JsonDatabase();
             db.LoadAll();

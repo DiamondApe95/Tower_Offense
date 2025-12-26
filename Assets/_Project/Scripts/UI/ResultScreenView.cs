@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using TowerConquest.Core;
+using TowerConquest.Data;
 using TowerConquest.Progression;
 using TowerConquest.Saving;
 using UnityEngine;
@@ -56,6 +58,7 @@ namespace TowerConquest.UI
         private bool isVictory;
         private int starsEarned;
         private string currentLevelId;
+        private string nextLevelId;
 
         private void Awake()
         {
@@ -139,14 +142,16 @@ namespace TowerConquest.UI
             starsEarned = CalculateStars(victory, stats);
             UpdateStarDisplay(starsEarned);
 
-            // Save progress
+            // Save progress (this also finds and unlocks next level)
             SaveResults(victory, starsEarned);
 
             // Navigation buttons
             if (nextLevelButton != null)
             {
-                nextLevelButton.gameObject.SetActive(victory && nextLevelUnlocked);
-                nextLevelButton.interactable = nextLevelUnlocked;
+                // Show next level button only if victory and next level exists
+                bool hasNextLevel = !string.IsNullOrEmpty(nextLevelId);
+                nextLevelButton.gameObject.SetActive(victory && hasNextLevel);
+                nextLevelButton.interactable = hasNextLevel;
             }
 
             Debug.Log($"ResultScreenView: Victory={victory}, Fame={fameEarned}, Stars={starsEarned}");
@@ -250,10 +255,45 @@ namespace TowerConquest.UI
                 progress.CompletLevel(currentLevelId, stars * 100, stars);
 
                 // Unlock next level
-                // TODO: Implement proper level progression
+                nextLevelId = FindNextLevel(currentLevelId);
+                if (!string.IsNullOrEmpty(nextLevelId))
+                {
+                    progress.UnlockLevel(nextLevelId);
+                    Debug.Log($"[ResultScreenView] Unlocked next level: {nextLevelId}");
+                }
             }
 
             saveManager.SaveProgress(progress);
+        }
+
+        /// <summary>
+        /// Find the next level after the current one
+        /// </summary>
+        private string FindNextLevel(string currentId)
+        {
+            if (!ServiceLocator.TryGet(out JsonDatabase database)) return null;
+
+            var levels = database.Levels;
+            if (levels == null || levels.Count == 0) return null;
+
+            // Find current level index
+            int currentIndex = -1;
+            for (int i = 0; i < levels.Count; i++)
+            {
+                if (levels[i]?.id == currentId)
+                {
+                    currentIndex = i;
+                    break;
+                }
+            }
+
+            // Return next level if exists
+            if (currentIndex >= 0 && currentIndex < levels.Count - 1)
+            {
+                return levels[currentIndex + 1]?.id;
+            }
+
+            return null;
         }
 
         private void OnWorldMapClicked()
@@ -286,8 +326,15 @@ namespace TowerConquest.UI
         {
             OnNextLevelRequested?.Invoke();
 
+            // Set next level as selected
+            if (!string.IsNullOrEmpty(nextLevelId) && ServiceLocator.TryGet(out SaveManager saveManager))
+            {
+                var progress = saveManager.GetOrCreateProgress();
+                progress.lastSelectedLevelId = nextLevelId;
+                saveManager.SaveProgress(progress);
+            }
+
             // Load next level
-            // TODO: Implement proper level progression
             if (Application.CanStreamedLevelBeLoaded("LevelGameplay"))
             {
                 SceneManager.LoadScene("LevelGameplay");
