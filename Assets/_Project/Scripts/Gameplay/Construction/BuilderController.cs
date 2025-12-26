@@ -38,8 +38,13 @@ namespace TowerConquest.Gameplay
             {
                 agent = gameObject.AddComponent<NavMeshAgent>();
             }
-            agent.speed = moveSpeed;
-            agent.stoppingDistance = arrivalDistance;
+
+            // Only configure agent if it's on a NavMesh
+            if (agent != null && agent.isOnNavMesh)
+            {
+                agent.speed = moveSpeed;
+                agent.stoppingDistance = arrivalDistance;
+            }
 
             healthComponent = GetComponent<HealthComponent>();
             if (healthComponent == null)
@@ -88,7 +93,14 @@ namespace TowerConquest.Gameplay
 
         private void MoveToTarget()
         {
-            if (agent == null) return;
+            if (agent == null || !agent.isOnNavMesh)
+            {
+                if (agent != null && !agent.isOnNavMesh)
+                {
+                    Log.Warning("[BuilderController] Agent is not on NavMesh, cannot move. Please bake NavMesh in the scene.");
+                }
+                return;
+            }
 
             Vector3 destination = Vector3.zero;
             if (targetSite != null)
@@ -142,8 +154,8 @@ namespace TowerConquest.Gameplay
             if (!isAssigned || hasArrived) return;
             if (targetSite == null && targetTrapSite == null) return;
 
-            // Check if we've arrived
-            if (agent != null && !agent.pathPending && agent.remainingDistance <= arrivalDistance)
+            // Check if we've arrived - only access agent properties if on NavMesh
+            if (agent != null && agent.isOnNavMesh && !agent.pathPending && agent.remainingDistance <= arrivalDistance)
             {
                 OnReachedSite();
             }
