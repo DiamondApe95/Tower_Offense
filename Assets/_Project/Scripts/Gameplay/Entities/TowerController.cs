@@ -77,6 +77,13 @@ namespace TowerConquest.Gameplay.Entities
                     effectResolver.ApplyEffects(gameObject, currentTarget.gameObject, effects);
                 }
 
+                // Notify the unit that this tower is attacking it (for priority targeting)
+                var unitCombat = currentTarget.GetComponent<UnitCombat>();
+                if (unitCombat != null)
+                {
+                    unitCombat.RegisterAttacker(gameObject);
+                }
+
                 UnityEngine.Debug.Log($"Tower hit unit {currentTarget.UnitId}");
             }
         }
