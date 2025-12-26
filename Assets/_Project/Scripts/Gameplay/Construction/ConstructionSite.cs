@@ -111,7 +111,7 @@ namespace TowerConquest.Gameplay
 
             if (healthComponent != null)
             {
-                healthComponent.TakeDamage(damage, DamageSystem.DamageType.Physical, null);
+                healthComponent.TakeDamage(damage, "physical", null);
             }
             else
             {

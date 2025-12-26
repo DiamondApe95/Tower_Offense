@@ -145,6 +145,14 @@ namespace TowerConquest.Data
             return null;
         }
 
+        /// <summary>
+        /// Alias for FindUnit - for compatibility with existing code
+        /// </summary>
+        public UnitDefinition GetUnit(string id)
+        {
+            return FindUnit(id);
+        }
+
         public SpellDefinition FindSpell(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -183,6 +191,14 @@ namespace TowerConquest.Data
 
             UnityEngine.Debug.LogWarning($"Tower with id '{id}' was not found.");
             return null;
+        }
+
+        /// <summary>
+        /// Alias for FindTower - for compatibility with existing code
+        /// </summary>
+        public TowerDefinition GetTower(string id)
+        {
+            return FindTower(id);
         }
 
         public TrapDefinition FindTrap(string id)
@@ -243,6 +259,14 @@ namespace TowerConquest.Data
 
             UnityEngine.Debug.LogWarning($"Hero with id '{id}' was not found.");
             return null;
+        }
+
+        /// <summary>
+        /// Alias for FindHero - for compatibility with existing code
+        /// </summary>
+        public HeroDefinition GetHero(string id)
+        {
+            return FindHero(id);
         }
 
         public CivilizationDefinition FindCivilization(string id)

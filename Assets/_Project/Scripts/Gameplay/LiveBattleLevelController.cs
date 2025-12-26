@@ -50,6 +50,8 @@ namespace TowerConquest.Gameplay
         public LiveBattleSpawnController AISpawner { get; private set; }
         public BaseController PlayerBase { get; private set; }
         public BaseController EnemyBase { get; private set; }
+        public AbilityManager PlayerAbility { get; private set; }
+        public AbilityManager AIAbility { get; private set; }
 
         // State
         public bool IsBattleActive { get; private set; }
@@ -180,6 +182,9 @@ namespace TowerConquest.Gameplay
 
             // Setup Bases
             SetupBases();
+
+            // Setup Abilities
+            SetupAbilities();
 
             // Setup HUD
             if (hud != null)
@@ -341,6 +346,29 @@ namespace TowerConquest.Gameplay
             }
         }
 
+        private void SetupAbilities()
+        {
+            // Get player civilization ability
+            var playerCiv = database?.FindCivilization(PlayerDeck?.CivilizationID);
+            if (playerCiv != null && !string.IsNullOrEmpty(playerCiv.specialAbility))
+            {
+                GameObject playerAbilityGO = new GameObject("PlayerAbilityManager");
+                PlayerAbility = playerAbilityGO.AddComponent<AbilityManager>();
+                PlayerAbility.Initialize(playerCiv.specialAbility, GoldManager.Team.Player, database);
+                Debug.Log($"LiveBattleLevelController: Set up player ability '{playerCiv.specialAbility}'");
+            }
+
+            // Get AI civilization ability
+            var aiCiv = database?.FindCivilization(AIDeck?.CivilizationID);
+            if (aiCiv != null && !string.IsNullOrEmpty(aiCiv.specialAbility))
+            {
+                GameObject aiAbilityGO = new GameObject("AIAbilityManager");
+                AIAbility = aiAbilityGO.AddComponent<AbilityManager>();
+                AIAbility.Initialize(aiCiv.specialAbility, GoldManager.Team.AI, database);
+                Debug.Log($"LiveBattleLevelController: Set up AI ability '{aiCiv.specialAbility}'");
+            }
+        }
+
         private void Update()
         {
             if (IsBattleEnded) return;
@@ -480,16 +508,43 @@ namespace TowerConquest.Gameplay
         {
             if (!CanPerformGameplayActions()) return false;
 
-            // Get civilization ability
-            var civ = database.FindCivilization(PlayerDeck.CivilizationID);
-            if (civ == null || string.IsNullOrEmpty(civ.specialAbility)) return false;
+            if (PlayerAbility == null)
+            {
+                Debug.LogWarning("LiveBattleLevelController: No ability manager available");
+                return false;
+            }
 
-            var ability = database.FindAbility(civ.specialAbility);
-            if (ability == null) return false;
+            if (!PlayerAbility.CanUse)
+            {
+                Debug.Log($"LiveBattleLevelController: Ability on cooldown ({PlayerAbility.CooldownRemaining:F1}s remaining)");
+                return false;
+            }
 
-            // TODO: Implement ability usage with cooldown
-            Debug.Log($"Using ability: {ability.name}");
-            return true;
+            return PlayerAbility.UseAbility();
+        }
+
+        /// <summary>
+        /// Get the remaining cooldown for the player's ability
+        /// </summary>
+        public float GetAbilityCooldown()
+        {
+            return PlayerAbility?.CooldownRemaining ?? 0f;
+        }
+
+        /// <summary>
+        /// Check if the player's ability can be used
+        /// </summary>
+        public bool CanUseAbility()
+        {
+            return PlayerAbility != null && PlayerAbility.CanUse && CanPerformGameplayActions();
+        }
+
+        /// <summary>
+        /// Get the ability name for display
+        /// </summary>
+        public string GetAbilityName()
+        {
+            return PlayerAbility?.AbilityName ?? "";
         }
 
         public float GetPlayerBaseHPPercent()

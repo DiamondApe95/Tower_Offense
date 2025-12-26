@@ -12,6 +12,7 @@ namespace TowerConquest.Combat
 
         public float CurrentHp => currentHp;
         public float MaxHp => maxHp;
+        public float Armor => armor;
         public float HealthPercent => maxHp > 0f ? currentHp / maxHp : 0f;
         public bool IsDead => currentHp <= 0f;
 
@@ -75,6 +76,14 @@ namespace TowerConquest.Combat
         public void ApplyArmorModifier(float amount)
         {
             armor = Mathf.Clamp01(armor + amount);
+        }
+
+        /// <summary>
+        /// Set armor to a specific value
+        /// </summary>
+        public void SetArmor(float value)
+        {
+            armor = Mathf.Clamp01(value);
         }
 
         public void ResetHealth()

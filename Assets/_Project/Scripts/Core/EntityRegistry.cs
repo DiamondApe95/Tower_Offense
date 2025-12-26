@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using TowerConquest.Gameplay.Entities;
@@ -19,6 +20,10 @@ namespace TowerConquest.Core
         private TowerController[] cachedTowers;
         private bool unitsDirty = true;
         private bool towersDirty = true;
+
+        // Events for kill tracking
+        public event Action<UnitController, GameObject> OnUnitDied; // (unit, killer)
+        public event Action<HeroController, GameObject> OnHeroDied; // (hero, killer)
 
         // === UNITS ===
         public void RegisterUnit(UnitController unit)
@@ -117,6 +122,28 @@ namespace TowerConquest.Core
                 }
             }
             return sum;
+        }
+
+        /// <summary>
+        /// Notify that a unit has died (for combo system and rewards)
+        /// </summary>
+        public void NotifyUnitDied(UnitController unit, GameObject killer)
+        {
+            if (unit != null)
+            {
+                OnUnitDied?.Invoke(unit, killer);
+            }
+        }
+
+        /// <summary>
+        /// Notify that a hero has died
+        /// </summary>
+        public void NotifyHeroDied(HeroController hero, GameObject killer)
+        {
+            if (hero != null)
+            {
+                OnHeroDied?.Invoke(hero, killer);
+            }
         }
 
         public void Clear()
