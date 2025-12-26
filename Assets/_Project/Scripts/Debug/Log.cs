@@ -7,17 +7,17 @@ namespace TowerConquest.Debug
     {
         public static void Info(object message)
         {
-            Log.Info(message);
+            UnityEngine.Debug.Log(message);
         }
 
         public static void Warning(object message)
         {
-            Log.Warning(message);
+            UnityEngine.Debug.LogWarning(message);
         }
 
         public static void Error(object message)
         {
-            Log.Error(message);
+            UnityEngine.Debug.LogError(message);
         }
     }
 }
