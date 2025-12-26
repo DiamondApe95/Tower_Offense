@@ -22,9 +22,73 @@ namespace TowerConquest.Gameplay
 
         private void LoadCivilizations()
         {
-            // This will be populated from JSON later
-            // For now, we'll create a simple method
-            Debug.Log("[CivilizationManager] Civilizations loaded");
+            // Load from JsonDatabase
+            if (database != null && database.Civilizations != null)
+            {
+                foreach (var civ in database.Civilizations)
+                {
+                    if (civ != null && !string.IsNullOrEmpty(civ.id))
+                    {
+                        civilizations[civ.id] = civ;
+                    }
+                }
+                Debug.Log($"[CivilizationManager] Loaded {civilizations.Count} civilizations from database");
+            }
+            else
+            {
+                Debug.LogWarning("[CivilizationManager] No civilizations in database, creating defaults");
+                CreateDefaultCivilizations();
+            }
+        }
+
+        /// <summary>
+        /// Create default civilizations when none are loaded from JSON
+        /// </summary>
+        private void CreateDefaultCivilizations()
+        {
+            // Kingdom civilization
+            var kingdom = new CivilizationDefinition
+            {
+                id = "civ_kingdom",
+                name = "Kingdom",
+                description = "A noble kingdom with balanced forces",
+                unlockCost = 0,
+                availableUnits = new string[] { "unit_swordsman", "unit_archer", "unit_knight", "unit_priest", "unit_catapult" },
+                availableTowers = new string[] { "tower_watchtower", "tower_ballista", "tower_mage" },
+                availableHeroes = new string[] { "hero_artus" },
+                specialAbility = "ability_divine_protection"
+            };
+            civilizations[kingdom.id] = kingdom;
+
+            // Horde civilization
+            var horde = new CivilizationDefinition
+            {
+                id = "civ_horde",
+                name = "Horde",
+                description = "Fierce warriors with overwhelming force",
+                unlockCost = 500,
+                availableUnits = new string[] { "unit_warrior", "unit_wolfrider", "unit_shaman", "unit_troll", "unit_ram" },
+                availableTowers = new string[] { "tower_spear", "tower_flame", "tower_totem" },
+                availableHeroes = new string[] { "hero_grok" },
+                specialAbility = "ability_bloodlust"
+            };
+            civilizations[horde.id] = horde;
+
+            // Undead civilization
+            var undead = new CivilizationDefinition
+            {
+                id = "civ_undead",
+                name = "Undead",
+                description = "Risen dead serving a dark master",
+                unlockCost = 1000,
+                availableUnits = new string[] { "unit_skeleton", "unit_zombie", "unit_ghost", "unit_necromancer", "unit_bone_golem" },
+                availableTowers = new string[] { "tower_soul", "tower_poison", "tower_bone_spike" },
+                availableHeroes = new string[] { "hero_lich" },
+                specialAbility = "ability_raise_dead"
+            };
+            civilizations[undead.id] = undead;
+
+            Debug.Log($"[CivilizationManager] Created {civilizations.Count} default civilizations");
         }
 
         public void RegisterCivilization(CivilizationDefinition civDef)
@@ -119,11 +183,43 @@ namespace TowerConquest.Gameplay
         public AbilityDefinition GetCivilizationAbility(string civId)
         {
             var civ = GetCivilization(civId);
-            if (civ == null) return null;
+            if (civ == null || string.IsNullOrEmpty(civ.specialAbility)) return null;
 
-            // TODO: Load from abilities database
-            // For now return null
-            return null;
+            // Load from abilities database
+            return database?.FindAbility(civ.specialAbility);
+        }
+
+        /// <summary>
+        /// Get the default (first unlocked) civilization
+        /// </summary>
+        public CivilizationDefinition GetDefaultCivilization()
+        {
+            // Return first with unlockCost == 0
+            foreach (var civ in civilizations.Values)
+            {
+                if (civ.unlockCost == 0)
+                {
+                    return civ;
+                }
+            }
+            // Return first if none are free
+            return civilizations.Values.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Check if a civilization is unlocked for the player
+        /// </summary>
+        public bool IsCivilizationUnlocked(string civId)
+        {
+            var civ = GetCivilization(civId);
+            if (civ == null) return false;
+
+            // Free civilizations are always unlocked
+            if (civ.unlockCost == 0) return true;
+
+            // TODO: Check against PlayerProgress to see if purchased
+            // For now, assume only free civs are unlocked
+            return false;
         }
     }
 }

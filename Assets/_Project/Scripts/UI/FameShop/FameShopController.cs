@@ -95,19 +95,20 @@ namespace TowerConquest.UI.FameShop
         public void Initialize()
         {
             database = ServiceLocator.Get<JsonDatabase>();
-            saveManager = ServiceLocator.Get<SaveManager>();
+            ServiceLocator.TryGet(out saveManager);
 
             if (!ServiceLocator.TryGet(out fameManager))
             {
                 // Create fame manager if not exists
                 var fameGO = new GameObject("FameManager");
                 fameManager = fameGO.AddComponent<FameManager>();
+                ServiceLocator.Register(fameManager);
             }
 
-            if (!ServiceLocator.TryGet(out upgradeSystem))
+            // UpgradeSystem is a regular class, not a MonoBehaviour
+            if (upgradeSystem == null)
             {
-                var upgradeGO = new GameObject("UpgradeSystem");
-                upgradeSystem = upgradeGO.AddComponent<UpgradeSystem>();
+                upgradeSystem = new UpgradeSystem(database, fameManager);
             }
 
             UpdateFameDisplay();
@@ -406,7 +407,6 @@ namespace TowerConquest.UI.FameShop
 
             int currentLevel = GetUpgradeLevel(selectedItemId);
             int maxLevel = GetMaxLevel(selectedItemId);
-            int upgradeCost = GetUpgradeCost(selectedItemId, currentLevel + 1);
 
             if (currentLevel >= maxLevel)
             {
@@ -414,17 +414,31 @@ namespace TowerConquest.UI.FameShop
                 return;
             }
 
-            if (!fameManager.SpendFame(upgradeCost))
+            bool upgraded = false;
+
+            // Apply upgrade based on category
+            switch (currentCategory)
             {
-                Debug.Log("[FameShop] Not enough fame");
-                return;
+                case UpgradeCategory.Units:
+                    upgraded = upgradeSystem?.UpgradeUnit(selectedItemId) ?? false;
+                    break;
+                case UpgradeCategory.Heroes:
+                    upgraded = upgradeSystem?.UpgradeHero(selectedItemId) ?? false;
+                    break;
+                case UpgradeCategory.Towers:
+                    int towerCost = GetUpgradeCost(selectedItemId, currentLevel + 1);
+                    upgraded = upgradeSystem?.UpgradeTower(selectedItemId, towerCost) ?? false;
+                    break;
+                default:
+                    Debug.Log($"[FameShop] Upgrade for {currentCategory} not yet implemented");
+                    return;
             }
 
-            // Apply upgrade
-            upgradeSystem?.UpgradeItem(selectedItemId, currentCategory.ToString());
-
-            // Save progress
-            SaveUpgradeLevel(selectedItemId, currentLevel + 1);
+            if (!upgraded)
+            {
+                Debug.Log("[FameShop] Upgrade failed (not enough fame or already max level)");
+                return;
+            }
 
             // Refresh display
             UpdateFameDisplay();
@@ -451,22 +465,53 @@ namespace TowerConquest.UI.FameShop
 
         private int GetUpgradeLevel(string itemId)
         {
-            // Get from save data
-            var progress = saveManager?.GetOrCreateProgress();
-            // TODO: Implement proper upgrade level storage
-            return 0;
+            if (upgradeSystem == null) return 1;
+
+            switch (currentCategory)
+            {
+                case UpgradeCategory.Units:
+                    return upgradeSystem.GetUnitLevel(itemId);
+                case UpgradeCategory.Heroes:
+                    return upgradeSystem.GetHeroLevel(itemId);
+                case UpgradeCategory.Towers:
+                    return upgradeSystem.GetTowerLevel(itemId);
+                default:
+                    return 1;
+            }
         }
 
         private int GetMaxLevel(string itemId)
         {
-            return 5; // Default max level
+            // Check upgrade levels defined in data
+            switch (currentCategory)
+            {
+                case UpgradeCategory.Units:
+                    var unit = database?.FindUnit(itemId);
+                    return (unit?.upgradeLevels?.Length ?? 0) + 1;
+                case UpgradeCategory.Heroes:
+                    var hero = database?.FindHero(itemId);
+                    return (hero?.upgradeLevels?.Length ?? 0) + 1;
+                default:
+                    return 5; // Default max level
+            }
         }
 
         private int GetUpgradeCost(string itemId, int targetLevel)
         {
-            // Base cost * level multiplier
-            int baseCost = 100;
-            return baseCost * targetLevel;
+            if (upgradeSystem == null)
+            {
+                return 100 * targetLevel;
+            }
+
+            switch (currentCategory)
+            {
+                case UpgradeCategory.Units:
+                    return upgradeSystem.GetUnitUpgradeCost(itemId);
+                case UpgradeCategory.Heroes:
+                    return upgradeSystem.GetHeroUpgradeCost(itemId);
+                default:
+                    return 100 * targetLevel;
+            }
         }
 
         private string GetDisplayName(string itemId)
@@ -490,7 +535,17 @@ namespace TowerConquest.UI.FameShop
 
         private string GetDescription(string itemId)
         {
-            return $"Upgrade {GetDisplayName(itemId)} to improve its stats.";
+            switch (currentCategory)
+            {
+                case UpgradeCategory.Units:
+                    return database?.FindUnit(itemId)?.description ?? $"Upgrade {GetDisplayName(itemId)} to improve its stats.";
+                case UpgradeCategory.Heroes:
+                    return database?.FindHero(itemId)?.description ?? $"Upgrade {GetDisplayName(itemId)} to improve its stats.";
+                case UpgradeCategory.Towers:
+                    return database?.GetTower(itemId)?.description ?? $"Upgrade {GetDisplayName(itemId)} to improve its stats.";
+                default:
+                    return $"Upgrade {GetDisplayName(itemId)} to improve its stats.";
+            }
         }
 
         private string GetUpgradeEffect(string itemId, int level)
@@ -498,9 +553,19 @@ namespace TowerConquest.UI.FameShop
             switch (currentCategory)
             {
                 case UpgradeCategory.Units:
+                    var unitUpgrade = upgradeSystem?.GetUnitUpgradeBonus(itemId);
+                    if (unitUpgrade != null)
+                    {
+                        return $"+{unitUpgrade.hpBonus}% HP, +{unitUpgrade.damageBonus}% Damage";
+                    }
                     return $"+{level * 10}% HP, +{level * 5}% Damage";
                 case UpgradeCategory.Heroes:
-                    return $"+{level * 15}% HP, +{level * 10}% Damage, +{level * 5}% Abilities";
+                    var heroUpgrade = upgradeSystem?.GetHeroUpgradeBonus(itemId);
+                    if (heroUpgrade != null)
+                    {
+                        return $"+{heroUpgrade.hpBonus}% HP, +{heroUpgrade.damageBonus}% Damage";
+                    }
+                    return $"+{level * 15}% HP, +{level * 10}% Damage";
                 case UpgradeCategory.Towers:
                     return $"+{level * 10}% Damage, +{level * 5}% Range";
                 case UpgradeCategory.Traps:
@@ -510,12 +575,6 @@ namespace TowerConquest.UI.FameShop
                 default:
                     return "Improved stats";
             }
-        }
-
-        private void SaveUpgradeLevel(string itemId, int level)
-        {
-            // TODO: Implement proper upgrade level storage
-            Debug.Log($"[FameShop] Saved {itemId} level {level}");
         }
 
         #endregion

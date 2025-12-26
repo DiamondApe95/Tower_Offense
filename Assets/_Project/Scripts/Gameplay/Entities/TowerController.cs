@@ -20,6 +20,9 @@ namespace TowerConquest.Gameplay.Entities
         public int buildCost = 50;
         public int upgradeCost = 30;
 
+        [Header("Team")]
+        public GoldManager.Team ownerTeam = GoldManager.Team.Player;
+
         public float EstimatedDps { get; private set; }
         public int BuildCost => buildCost;
         public int UpgradeCost => upgradeCost;
@@ -29,6 +32,10 @@ namespace TowerConquest.Gameplay.Entities
         private UnitController currentTarget;
         private readonly EffectResolver effectResolver = new EffectResolver();
         private EntityRegistry entityRegistry;
+
+        // Cached layer masks for efficient targeting
+        private int enemyLayerMask;
+        private bool layerMaskInitialized;
 
         private void Awake()
         {
@@ -90,6 +97,12 @@ namespace TowerConquest.Gameplay.Entities
 
         private void AcquireTarget()
         {
+            // Initialize layer mask if needed
+            if (!layerMaskInitialized)
+            {
+                InitializeLayerMask();
+            }
+
             UnitController[] units;
             if (entityRegistry != null)
             {
@@ -106,7 +119,13 @@ namespace TowerConquest.Gameplay.Entities
             Vector3 towerPosition = transform.position;
             foreach (UnitController unit in units)
             {
-                if (unit == null)
+                if (unit == null || !unit.IsAlive)
+                {
+                    continue;
+                }
+
+                // Check if this unit is an enemy (on the opposite team)
+                if (!IsEnemy(unit.gameObject))
                 {
                     continue;
                 }
@@ -120,6 +139,49 @@ namespace TowerConquest.Gameplay.Entities
             }
 
             currentTarget = closest;
+        }
+
+        private void InitializeLayerMask()
+        {
+            // Player towers target enemy units, AI towers target player units
+            if (ownerTeam == GoldManager.Team.Player)
+            {
+                int enemyLayer = LayerMask.NameToLayer("Enemy");
+                if (enemyLayer >= 0)
+                {
+                    enemyLayerMask = 1 << enemyLayer;
+                }
+            }
+            else
+            {
+                int playerLayer = LayerMask.NameToLayer("PlayerUnit");
+                if (playerLayer >= 0)
+                {
+                    enemyLayerMask = 1 << playerLayer;
+                }
+            }
+            layerMaskInitialized = true;
+        }
+
+        private bool IsEnemy(GameObject target)
+        {
+            if (target == null) return false;
+
+            // Check layer
+            if (enemyLayerMask != 0)
+            {
+                return ((1 << target.layer) & enemyLayerMask) != 0;
+            }
+
+            // Fallback: check tag
+            if (ownerTeam == GoldManager.Team.Player)
+            {
+                return target.CompareTag("Enemy") || target.CompareTag("EnemyUnit");
+            }
+            else
+            {
+                return target.CompareTag("Player") || target.CompareTag("PlayerUnit");
+            }
         }
 
         public void UpdateDpsCache()

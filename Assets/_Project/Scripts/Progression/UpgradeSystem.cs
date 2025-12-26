@@ -147,22 +147,166 @@ namespace TowerConquest.Progression
 
         private void LoadUpgrades()
         {
-            // TODO: Load from SaveManager/PlayerProgress
-            string unitLevelsJson = PlayerPrefs.GetString("UnitLevels", "{}");
-            string heroLevelsJson = PlayerPrefs.GetString("HeroLevels", "{}");
+            // Load unit levels
+            string unitLevelsJson = PlayerPrefs.GetString("UnitLevels", "");
+            if (!string.IsNullOrEmpty(unitLevelsJson))
+            {
+                try
+                {
+                    var wrapper = JsonUtility.FromJson<UpgradeLevelsWrapper>(unitLevelsJson);
+                    if (wrapper != null && wrapper.entries != null)
+                    {
+                        foreach (var entry in wrapper.entries)
+                        {
+                            if (!string.IsNullOrEmpty(entry.id))
+                            {
+                                unitLevels[entry.id] = entry.level;
+                            }
+                        }
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"[UpgradeSystem] Failed to parse unit levels: {e.Message}");
+                }
+            }
 
-            // Parse JSON
-            // For now, leave empty (all start at level 1)
-            Debug.Log("[UpgradeSystem] Loaded upgrades");
+            // Load hero levels
+            string heroLevelsJson = PlayerPrefs.GetString("HeroLevels", "");
+            if (!string.IsNullOrEmpty(heroLevelsJson))
+            {
+                try
+                {
+                    var wrapper = JsonUtility.FromJson<UpgradeLevelsWrapper>(heroLevelsJson);
+                    if (wrapper != null && wrapper.entries != null)
+                    {
+                        foreach (var entry in wrapper.entries)
+                        {
+                            if (!string.IsNullOrEmpty(entry.id))
+                            {
+                                heroLevels[entry.id] = entry.level;
+                            }
+                        }
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"[UpgradeSystem] Failed to parse hero levels: {e.Message}");
+                }
+            }
+
+            // Load tower levels
+            string towerLevelsJson = PlayerPrefs.GetString("TowerLevels", "");
+            if (!string.IsNullOrEmpty(towerLevelsJson))
+            {
+                try
+                {
+                    var wrapper = JsonUtility.FromJson<UpgradeLevelsWrapper>(towerLevelsJson);
+                    if (wrapper != null && wrapper.entries != null)
+                    {
+                        foreach (var entry in wrapper.entries)
+                        {
+                            if (!string.IsNullOrEmpty(entry.id))
+                            {
+                                towerLevels[entry.id] = entry.level;
+                            }
+                        }
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"[UpgradeSystem] Failed to parse tower levels: {e.Message}");
+                }
+            }
+
+            Debug.Log($"[UpgradeSystem] Loaded upgrades: {unitLevels.Count} units, {heroLevels.Count} heroes, {towerLevels.Count} towers");
         }
 
         private void SaveUpgrades()
         {
-            // TODO: Save via SaveManager/PlayerProgress
-            // For now, use PlayerPrefs
-            // string unitLevelsJson = JsonUtility.ToJson(unitLevels);
-            // PlayerPrefs.SetString("UnitLevels", unitLevelsJson);
+            // Save unit levels
+            var unitWrapper = new UpgradeLevelsWrapper();
+            foreach (var kvp in unitLevels)
+            {
+                unitWrapper.entries.Add(new UpgradeLevelEntry { id = kvp.Key, level = kvp.Value });
+            }
+            PlayerPrefs.SetString("UnitLevels", JsonUtility.ToJson(unitWrapper));
+
+            // Save hero levels
+            var heroWrapper = new UpgradeLevelsWrapper();
+            foreach (var kvp in heroLevels)
+            {
+                heroWrapper.entries.Add(new UpgradeLevelEntry { id = kvp.Key, level = kvp.Value });
+            }
+            PlayerPrefs.SetString("HeroLevels", JsonUtility.ToJson(heroWrapper));
+
+            // Save tower levels
+            var towerWrapper = new UpgradeLevelsWrapper();
+            foreach (var kvp in towerLevels)
+            {
+                towerWrapper.entries.Add(new UpgradeLevelEntry { id = kvp.Key, level = kvp.Value });
+            }
+            PlayerPrefs.SetString("TowerLevels", JsonUtility.ToJson(towerWrapper));
+
             PlayerPrefs.Save();
+            Debug.Log("[UpgradeSystem] Saved upgrades");
         }
+
+        /// <summary>
+        /// Get current level of a tower
+        /// </summary>
+        public int GetTowerLevel(string towerId)
+        {
+            return towerLevels.ContainsKey(towerId) ? towerLevels[towerId] : 1;
+        }
+
+        /// <summary>
+        /// Upgrade a tower
+        /// </summary>
+        public bool UpgradeTower(string towerId, int cost)
+        {
+            if (!fameManager.SpendFame(cost))
+            {
+                return false;
+            }
+
+            int currentLevel = GetTowerLevel(towerId);
+            towerLevels[towerId] = currentLevel + 1;
+
+            Debug.Log($"[UpgradeSystem] Upgraded tower {towerId} to level {towerLevels[towerId]}");
+            SaveUpgrades();
+            return true;
+        }
+
+        /// <summary>
+        /// Reset all upgrades (for testing)
+        /// </summary>
+        public void ResetAllUpgrades()
+        {
+            unitLevels.Clear();
+            heroLevels.Clear();
+            towerLevels.Clear();
+            SaveUpgrades();
+            Debug.Log("[UpgradeSystem] Reset all upgrades");
+        }
+    }
+
+    /// <summary>
+    /// Wrapper class for serializing upgrade levels to JSON
+    /// </summary>
+    [System.Serializable]
+    public class UpgradeLevelsWrapper
+    {
+        public System.Collections.Generic.List<UpgradeLevelEntry> entries = new System.Collections.Generic.List<UpgradeLevelEntry>();
+    }
+
+    /// <summary>
+    /// Single upgrade level entry for serialization
+    /// </summary>
+    [System.Serializable]
+    public class UpgradeLevelEntry
+    {
+        public string id;
+        public int level;
     }
 }

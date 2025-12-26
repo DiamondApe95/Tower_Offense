@@ -10,6 +10,7 @@ namespace TowerConquest.Progression
     {
         [Header("Runtime")]
         [SerializeField] private int totalFame = 0;
+        [SerializeField] private int totalFameEarned = 0;
 
         public int TotalFame => totalFame;
 
@@ -17,6 +18,11 @@ namespace TowerConquest.Progression
         /// Alias for TotalFame (for compatibility)
         /// </summary>
         public int CurrentFame => totalFame;
+
+        /// <summary>
+        /// Total fame ever earned (historical, doesn't decrease when spent)
+        /// </summary>
+        public int TotalFameEarned => totalFameEarned;
 
         public event Action<int> OnFameChanged;
         public event Action<int, int> OnFameEarned; // (amount, new total)
@@ -40,10 +46,11 @@ namespace TowerConquest.Progression
             }
 
             totalFame += amount;
+            totalFameEarned += amount;
             OnFameEarned?.Invoke(amount, totalFame);
             OnFameChanged?.Invoke(totalFame);
 
-            Debug.Log($"[FameManager] Earned {amount} fame (total: {totalFame})");
+            Debug.Log($"[FameManager] Earned {amount} fame (total: {totalFame}, lifetime: {totalFameEarned})");
 
             SaveFame();
         }
@@ -98,15 +105,15 @@ namespace TowerConquest.Progression
 
         private void LoadFame()
         {
-            // TODO: Load from SaveManager/PlayerProgress
             totalFame = PlayerPrefs.GetInt("PlayerFame", 0);
-            Debug.Log($"[FameManager] Loaded fame: {totalFame}");
+            totalFameEarned = PlayerPrefs.GetInt("PlayerTotalFameEarned", totalFame);
+            Debug.Log($"[FameManager] Loaded fame: {totalFame}, lifetime: {totalFameEarned}");
         }
 
         private void SaveFame()
         {
-            // TODO: Save via SaveManager/PlayerProgress
             PlayerPrefs.SetInt("PlayerFame", totalFame);
+            PlayerPrefs.SetInt("PlayerTotalFameEarned", totalFameEarned);
             PlayerPrefs.Save();
         }
 
