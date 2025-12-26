@@ -26,7 +26,9 @@ namespace TowerConquest.Gameplay.Entities
         [Tooltip("Priority 3: Construction sites in range")]
         [SerializeField] private float constructionPriority = 50f;
         [Tooltip("Priority 4: Enemy base (default target)")]
+        #pragma warning disable 0414 // Field assigned but never used (base targeting handled by UnitMover)
         [SerializeField] private float basePriority = 25f;
+        #pragma warning restore 0414
 
         [Header("Runtime")]
         [SerializeField] private GameObject currentTarget;

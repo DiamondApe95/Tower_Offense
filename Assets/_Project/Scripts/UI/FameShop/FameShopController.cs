@@ -522,7 +522,7 @@ namespace TowerConquest.UI.FameShop
                 case UpgradeCategory.Units:
                     return database?.FindUnit(itemId)?.display_name ?? itemId;
                 case UpgradeCategory.Heroes:
-                    return database?.FindHero(itemId)?.name ?? itemId;
+                    return database?.FindHero(itemId)?.display_name ?? itemId;
                 case UpgradeCategory.Towers:
                     return database?.GetTower(itemId)?.display_name ?? itemId;
                 case UpgradeCategory.Traps:

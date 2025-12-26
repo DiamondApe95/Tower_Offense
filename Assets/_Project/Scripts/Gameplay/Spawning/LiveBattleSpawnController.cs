@@ -359,7 +359,7 @@ namespace TowerConquest.Gameplay
             }
 
             var heroDef = database.FindHero(heroId);
-            float hp = heroDef?.baseStats?.hp ?? 500f;
+            float hp = heroDef?.stats?.hp ?? 500f;
             controller.Initialize(heroId, hp);
 
             // Subscribe to death
