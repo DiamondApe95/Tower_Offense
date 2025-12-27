@@ -55,5 +55,34 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e1d44c1b80b95d244bcc639030886299, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6895963976740334485}
   m_SourcePrefab: {fileID: 100100000, guid: e1d44c1b80b95d244bcc639030886299, type: 3}
+--- !u!1 &4342648135525928955 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e1d44c1b80b95d244bcc639030886299, type: 3}
+  m_PrefabInstance: {fileID: 3496278379173524138}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6895963976740334485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4342648135525928955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ce4c2fa1869900458f734d99556cc1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerShooter
+  firePoint: {fileID: 0}
+  projectilePrefab: {fileID: 2458910278127870607, guid: 6d4773f49f1889748baa0730ac9db35f, type: 3}
+  range: 6
+  fireRate: 1.2
+  damage: 3
+  projectileSpeed: 10
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 0

@@ -18,8 +18,8 @@ TagManager:
   - Enemy
   - Path
   - Block
-  - 
-  - 
+  - PlayerUnit
+  - Tower
   - 
   - 
   - 
