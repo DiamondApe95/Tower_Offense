@@ -35,10 +35,11 @@ namespace TowerConquest.Gameplay.Entities
 
         private float scanTimer;
         private float attackTimer;
-        private UnitController currentTarget;
+        private Transform currentTarget;
         private readonly EffectResolver effectResolver = new EffectResolver();
         private EntityRegistry entityRegistry;
         private HealthComponent healthComponent;
+        private TargetingSystem targetingSystem;
 
         // Cached layer masks for efficient targeting
         private int enemyLayerMask;
@@ -48,6 +49,7 @@ namespace TowerConquest.Gameplay.Entities
         {
             UpdateDpsCache();
             ServiceLocator.TryGet(out entityRegistry);
+            targetingSystem = new TargetingSystem();
 
             // Initialize HealthComponent
             healthComponent = GetComponent<HealthComponent>();
@@ -134,7 +136,8 @@ namespace TowerConquest.Gameplay.Entities
                     unitCombat.RegisterAttacker(gameObject);
                 }
 
-                Log.Info($"Tower hit unit {currentTarget.UnitId}");
+                var unit = currentTarget.GetComponent<UnitController>();
+                Log.Info($"Tower hit target {(unit != null ? unit.UnitId : currentTarget.name)}");
             }
         }
 
@@ -146,6 +149,29 @@ namespace TowerConquest.Gameplay.Entities
                 InitializeLayerMask();
             }
 
+            // Target prioritization: 1. Units, 2. Towers, 3. Base
+            // Within each category, prioritize by distance (nearest first)
+
+            // 1. Try to find enemy units first
+            Transform target = FindEnemyUnits();
+
+            // 2. If no units in range, target enemy towers
+            if (target == null)
+            {
+                target = FindEnemyTowers();
+            }
+
+            // 3. If no towers in range, target enemy base
+            if (target == null)
+            {
+                target = FindEnemyBase();
+            }
+
+            currentTarget = target;
+        }
+
+        private Transform FindEnemyUnits()
+        {
             UnitController[] units;
             if (entityRegistry != null)
             {
@@ -181,7 +207,89 @@ namespace TowerConquest.Gameplay.Entities
                 }
             }
 
-            currentTarget = closest;
+            return closest != null ? closest.transform : null;
+        }
+
+        private Transform FindEnemyTowers()
+        {
+            TowerController[] towers;
+            if (entityRegistry != null)
+            {
+                towers = entityRegistry.GetAllTowers();
+            }
+            else
+            {
+                towers = FindObjectsByType<TowerController>(FindObjectsSortMode.None);
+            }
+
+            TowerController closest = null;
+            float closestDistance = float.MaxValue;
+
+            Vector3 towerPosition = transform.position;
+            foreach (TowerController tower in towers)
+            {
+                if (tower == null || tower.IsDestroyed || tower == this)
+                {
+                    continue;
+                }
+
+                // Check if this tower is an enemy (on the opposite team)
+                if (tower.ownerTeam == this.ownerTeam)
+                {
+                    continue;
+                }
+
+                float distance = Vector3.Distance(towerPosition, tower.transform.position);
+                if (distance <= range && distance < closestDistance)
+                {
+                    closest = tower;
+                    closestDistance = distance;
+                }
+            }
+
+            return closest != null ? closest.transform : null;
+        }
+
+        private Transform FindEnemyBase()
+        {
+            BaseController[] bases = FindObjectsByType<BaseController>(FindObjectsSortMode.None);
+
+            BaseController enemyBase = null;
+            float closestDistance = float.MaxValue;
+
+            Vector3 towerPosition = transform.position;
+            foreach (BaseController baseCtrl in bases)
+            {
+                if (baseCtrl == null)
+                {
+                    continue;
+                }
+
+                // Check if this is an enemy base
+                bool isEnemyBase = false;
+                if (ownerTeam == GoldManager.Team.Player)
+                {
+                    isEnemyBase = baseCtrl.CompareTag("EnemyBase") || baseCtrl.gameObject.name.Contains("Enemy");
+                }
+                else
+                {
+                    isEnemyBase = baseCtrl.CompareTag("PlayerBase") || baseCtrl.gameObject.name.Contains("Player");
+                }
+
+                if (!isEnemyBase)
+                {
+                    continue;
+                }
+
+                float distance = Vector3.Distance(towerPosition, baseCtrl.transform.position);
+                if (distance <= range && distance < closestDistance)
+                {
+                    enemyBase = baseCtrl;
+                    closestDistance = distance;
+                }
+            }
+
+            return enemyBase != null ? enemyBase.transform : null;
         }
 
         private void InitializeLayerMask()
