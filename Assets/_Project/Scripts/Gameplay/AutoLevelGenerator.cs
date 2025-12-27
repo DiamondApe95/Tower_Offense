@@ -231,6 +231,16 @@ public class AutoLevelGenerator : MonoBehaviour
     [Tooltip("Auto-loaded from Assets/_Project/MAP/Mat_Blocked.mat")]
     public Material blockedMat;
 
+    [Header("Enhanced Map Aesthetics")]
+    [Tooltip("Enable enhanced visual variety for generated maps")]
+    public bool enhancedAesthetics = true;
+    [Tooltip("Color variation intensity (0-1)")]
+    [Range(0f, 0.3f)] public float colorVariation = 0.12f;
+    [Tooltip("Height variation for blocked tiles")]
+    [Range(0f, 0.5f)] public float heightVariation = 0.15f;
+    [Tooltip("Add decorative elements")]
+    public bool addDecorations = true;
+
     [Header("Layer Names (must exist, auto-created in Editor)")]
     public string buildLayerName = "BuildTile";
     public string pathLayerName = "Path";
@@ -1239,6 +1249,14 @@ public class AutoLevelGenerator : MonoBehaviour
         if (pathLayer >= 0) pathParent.gameObject.layer = pathLayer;
         if (blockedLayer >= 0) blockedParent.gameObject.layer = blockedLayer;
 
+        // Create decoration parent if needed
+        Transform decorationParent = null;
+        if (addDecorations)
+        {
+            decorationParent = new GameObject("Decorations").transform;
+            decorationParent.SetParent(transform, false);
+        }
+
         for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
             {
@@ -1248,44 +1266,268 @@ public class AutoLevelGenerator : MonoBehaviour
                 switch (c)
                 {
                     case 'B':
-                        CreateTile($"Build_{x}_{y}", pos, buildMat, buildLayer, buildParent);
+                        CreateEnhancedTile($"Build_{x}_{y}", pos, buildMat, buildLayer, buildParent,
+                            TileType.Build, x, y);
                         break;
 
                     case 'P':
                     case 'S':
                     case 'G':
-                        CreateTile($"Path_{x}_{y}", pos, pathMat, pathLayer, pathParent);
+                        CreateEnhancedTile($"Path_{x}_{y}", pos, pathMat, pathLayer, pathParent,
+                            TileType.Path, x, y);
                         break;
 
                     default:
-                        CreateTile($"Block_{x}_{y}", pos, blockedMat, blockedLayer, blockedParent);
+                        CreateEnhancedTile($"Block_{x}_{y}", pos, blockedMat, blockedLayer, blockedParent,
+                            TileType.Blocked, x, y);
+                        // Add decorations on blocked tiles
+                        if (addDecorations && decorationParent != null)
+                        {
+                            TryAddDecoration(pos, x, y, decorationParent);
+                        }
                         break;
                 }
             }
+
+        // Add path edge decorations
+        if (addDecorations && decorationParent != null)
+        {
+            AddPathEdgeDecorations(decorationParent);
+        }
     }
 
-    private GameObject CreateTile(string name, Vector3 pos, Material mat, int layer, Transform parent)
+    private enum TileType { Build, Path, Blocked }
+
+    private GameObject CreateEnhancedTile(string name, Vector3 pos, Material baseMat, int layer, Transform parent,
+        TileType tileType, int x, int y)
     {
+        // Calculate height variation for blocked tiles
+        float extraHeight = 0f;
+        if (enhancedAesthetics && tileType == TileType.Blocked && heightVariation > 0f)
+        {
+            float noise = Mathf.PerlinNoise(x * 0.3f, y * 0.3f);
+            extraHeight = noise * heightVariation;
+        }
+
         GameObject go;
         if (tilePrefab != null)
         {
-            go = Instantiate(tilePrefab, pos, Quaternion.identity, parent);
+            go = Instantiate(tilePrefab, pos + Vector3.up * extraHeight * 0.5f, Quaternion.identity, parent);
         }
         else
         {
             go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.transform.SetParent(parent, true);
-            go.transform.position = pos;
-            go.transform.localScale = new Vector3(tileSize, tileHeight, tileSize);
+            go.transform.position = pos + Vector3.up * extraHeight * 0.5f;
+            go.transform.localScale = new Vector3(tileSize, tileHeight + extraHeight, tileSize);
         }
 
         go.name = name;
         if (layer >= 0) go.layer = layer;
 
         var r = go.GetComponent<Renderer>();
-        if (r != null && mat != null) r.sharedMaterial = mat;
+        if (r != null)
+        {
+            if (enhancedAesthetics && baseMat != null)
+            {
+                // Create material instance with color variation
+                Material variantMat = new Material(baseMat);
+                Color baseColor = baseMat.color;
+
+                // Apply color variation based on position
+                float variation = (Mathf.PerlinNoise(x * 0.5f, y * 0.5f) - 0.5f) * 2f * colorVariation;
+
+                switch (tileType)
+                {
+                    case TileType.Build:
+                        // Green/grass tones for build areas
+                        baseColor = new Color(
+                            0.35f + variation * 0.5f,
+                            0.55f + variation,
+                            0.25f + variation * 0.3f,
+                            1f);
+                        break;
+                    case TileType.Path:
+                        // Sandy/stone tones for paths
+                        baseColor = new Color(
+                            0.65f + variation,
+                            0.55f + variation * 0.8f,
+                            0.4f + variation * 0.5f,
+                            1f);
+                        break;
+                    case TileType.Blocked:
+                        // Rocky/earth tones for blocked areas
+                        float darken = Mathf.PerlinNoise(x * 0.7f, y * 0.7f) * 0.15f;
+                        baseColor = new Color(
+                            0.3f + variation * 0.5f - darken,
+                            0.28f + variation * 0.4f - darken,
+                            0.25f + variation * 0.3f - darken,
+                            1f);
+                        break;
+                }
+
+                variantMat.color = baseColor;
+                r.material = variantMat;
+            }
+            else if (baseMat != null)
+            {
+                r.sharedMaterial = baseMat;
+            }
+        }
 
         return go;
+    }
+
+    private void TryAddDecoration(Vector3 tilePos, int x, int y, Transform parent)
+    {
+        // Only add decorations on some blocked tiles
+        float decorChance = Mathf.PerlinNoise(x * 0.8f + 100f, y * 0.8f + 100f);
+        if (decorChance < 0.7f) return;
+
+        // Determine decoration type
+        float decorType = Mathf.PerlinNoise(x * 1.2f, y * 1.2f);
+
+        if (decorType < 0.4f)
+        {
+            // Rock
+            CreateRockDecoration(tilePos, parent, x, y);
+        }
+        else if (decorType < 0.7f)
+        {
+            // Small pillar/column
+            CreatePillarDecoration(tilePos, parent, x, y);
+        }
+        // Otherwise no decoration
+    }
+
+    private void CreateRockDecoration(Vector3 tilePos, Transform parent, int x, int y)
+    {
+        var rock = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        rock.name = $"Rock_{x}_{y}";
+        rock.transform.SetParent(parent, true);
+
+        float offsetX = (Mathf.PerlinNoise(x * 2f, y * 2f) - 0.5f) * tileSize * 0.4f;
+        float offsetZ = (Mathf.PerlinNoise(x * 2f + 50f, y * 2f + 50f) - 0.5f) * tileSize * 0.4f;
+
+        float scale = 0.3f + Mathf.PerlinNoise(x * 1.5f, y * 1.5f) * 0.5f;
+        rock.transform.position = tilePos + new Vector3(offsetX, tileHeight * 0.5f + scale * 0.3f, offsetZ);
+        rock.transform.localScale = new Vector3(scale, scale * 0.7f, scale);
+        rock.transform.rotation = Quaternion.Euler(0f, rng.Next(0, 360), 0f);
+
+        var r = rock.GetComponent<Renderer>();
+        if (r != null)
+        {
+            var mat = new Material(Shader.Find("Standard"));
+            float grayValue = 0.35f + (float)rng.NextDouble() * 0.2f;
+            mat.color = new Color(grayValue, grayValue * 0.95f, grayValue * 0.9f, 1f);
+            mat.SetFloat("_Smoothness", 0.2f);
+            r.material = mat;
+        }
+
+        // Remove collider from decoration
+        var col = rock.GetComponent<Collider>();
+        if (col != null) DestroyImmediate(col);
+    }
+
+    private void CreatePillarDecoration(Vector3 tilePos, Transform parent, int x, int y)
+    {
+        var pillar = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        pillar.name = $"Pillar_{x}_{y}";
+        pillar.transform.SetParent(parent, true);
+
+        float offsetX = (Mathf.PerlinNoise(x * 2f + 25f, y * 2f) - 0.5f) * tileSize * 0.3f;
+        float offsetZ = (Mathf.PerlinNoise(x * 2f, y * 2f + 25f) - 0.5f) * tileSize * 0.3f;
+
+        float heightScale = 0.4f + Mathf.PerlinNoise(x * 1.5f + 10f, y * 1.5f + 10f) * 0.6f;
+        float widthScale = 0.15f + (float)rng.NextDouble() * 0.1f;
+
+        pillar.transform.position = tilePos + new Vector3(offsetX, tileHeight * 0.5f + heightScale * 0.5f, offsetZ);
+        pillar.transform.localScale = new Vector3(widthScale, heightScale, widthScale);
+
+        var r = pillar.GetComponent<Renderer>();
+        if (r != null)
+        {
+            var mat = new Material(Shader.Find("Standard"));
+            // Ancient Roman stone color
+            float stoneValue = 0.6f + (float)rng.NextDouble() * 0.15f;
+            mat.color = new Color(stoneValue, stoneValue * 0.92f, stoneValue * 0.85f, 1f);
+            mat.SetFloat("_Smoothness", 0.3f);
+            r.material = mat;
+        }
+
+        // Remove collider from decoration
+        var col = pillar.GetComponent<Collider>();
+        if (col != null) DestroyImmediate(col);
+    }
+
+    private void AddPathEdgeDecorations(Transform parent)
+    {
+        // Add subtle edge markers along paths
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (grid[x, y] != 'P') continue;
+
+                // Check if this is an edge path tile
+                bool isEdge = false;
+                foreach (var n in Neighbors4(new Vector2Int(x, y)))
+                {
+                    if (!Inside(n) || grid[n.x, n.y] == '.')
+                    {
+                        isEdge = true;
+                        break;
+                    }
+                }
+
+                if (isEdge && rng.NextDouble() < 0.3f)
+                {
+                    Vector3 pos = CellToWorld(new Vector2Int(x, y));
+                    CreatePathEdgeStone(pos, parent, x, y);
+                }
+            }
+        }
+    }
+
+    private void CreatePathEdgeStone(Vector3 tilePos, Transform parent, int x, int y)
+    {
+        var stone = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        stone.name = $"EdgeStone_{x}_{y}";
+        stone.transform.SetParent(parent, true);
+
+        // Position on edge of path
+        float edgeOffset = tileSize * 0.45f;
+        Vector3 offset = Vector3.zero;
+
+        // Determine which edge based on neighbors
+        if (x > 0 && grid[x - 1, y] == '.') offset = new Vector3(-edgeOffset, 0, 0);
+        else if (x < width - 1 && grid[x + 1, y] == '.') offset = new Vector3(edgeOffset, 0, 0);
+        else if (y > 0 && grid[x, y - 1] == '.') offset = new Vector3(0, 0, edgeOffset);
+        else if (y < height - 1 && grid[x, y + 1] == '.') offset = new Vector3(0, 0, -edgeOffset);
+
+        float stoneHeight = 0.1f + (float)rng.NextDouble() * 0.15f;
+        stone.transform.position = tilePos + offset + new Vector3(0, tileHeight * 0.5f + stoneHeight * 0.5f, 0);
+        stone.transform.localScale = new Vector3(0.3f, stoneHeight, 0.3f);
+        stone.transform.rotation = Quaternion.Euler(0f, rng.Next(0, 360), 0f);
+
+        var r = stone.GetComponent<Renderer>();
+        if (r != null)
+        {
+            var mat = new Material(Shader.Find("Standard"));
+            float grayValue = 0.5f + (float)rng.NextDouble() * 0.15f;
+            mat.color = new Color(grayValue, grayValue * 0.95f, grayValue * 0.88f, 1f);
+            r.material = mat;
+        }
+
+        // Remove collider from decoration
+        var col = stone.GetComponent<Collider>();
+        if (col != null) DestroyImmediate(col);
+    }
+
+    // Legacy method for backwards compatibility
+    private GameObject CreateTile(string name, Vector3 pos, Material mat, int layer, Transform parent)
+    {
+        return CreateEnhancedTile(name, pos, mat, layer, parent, TileType.Blocked, 0, 0);
     }
 
     private Transform CreateMarker(string name, Vector3 pos, Color color)
