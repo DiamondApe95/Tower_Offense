@@ -70,7 +70,7 @@ namespace TowerConquest.UI
             rectTransform.offsetMin = Vector2.zero;
             rectTransform.offsetMax = Vector2.zero;
 
-            Debug.Log($"[SafeAreaHandler] Applied safe area: {safeArea} with {additionalMargin}px additional margin");
+            UnityEngine.Debug.Log($"[SafeAreaHandler] Applied safe area: {safeArea} with {additionalMargin}px additional margin");
         }
     }
 }
