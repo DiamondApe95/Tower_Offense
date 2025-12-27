@@ -15,6 +15,9 @@ namespace TowerConquest.Gameplay.Entities
         public bool IsAlive { get; private set; } = true;
         public bool IsDead => !IsAlive;
 
+        // Team ownership
+        public GoldManager.Team OwnerTeam { get; private set; } = GoldManager.Team.Player;
+
         // Compatibility properties for AI systems
         public float damage => BaseDamage;
         public float attacksPerSecond => AttacksPerSecond;
@@ -45,10 +48,11 @@ namespace TowerConquest.Gameplay.Entities
             }
         }
 
-        public void Initialize(string unitId, IReadOnlyList<Vector3> path, BaseController baseController)
+        public void Initialize(string unitId, IReadOnlyList<Vector3> path, BaseController baseController, GoldManager.Team team = GoldManager.Team.Player)
         {
             UnitId = unitId;
             IsAlive = true;
+            OwnerTeam = team;
 
             UnitDefinition definition = ServiceLocator.Get<JsonDatabase>()?.FindUnit(unitId);
             float hp = definition?.stats?.hp ?? 100f;
