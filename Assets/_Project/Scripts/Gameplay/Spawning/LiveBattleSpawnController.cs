@@ -257,8 +257,11 @@ namespace TowerConquest.Gameplay
                 SetLayerRecursively(unitObject, layer);
             }
 
-            // Initialize with target
+            // Initialize with target - path goes from spawn point to base
             var path = new List<Vector3>();
+            // Add spawn position as starting point
+            path.Add(position);
+            // Add base position as target
             if (targetBase != null)
             {
                 path.Add(targetBase.position);
