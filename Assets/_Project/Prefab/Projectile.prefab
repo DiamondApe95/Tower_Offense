@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7141069465810093428}
   - component: {fileID: 7437791039760695726}
   - component: {fileID: 1498455450184066754}
+  - component: {fileID: -7605544946694835118}
   m_Layer: 0
   m_Name: Projectile
   m_TagString: Untagged
@@ -112,3 +113,15 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-7605544946694835118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3170180797354132005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 056a15fb19fb4474faf5f182f0e1905b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Projectile

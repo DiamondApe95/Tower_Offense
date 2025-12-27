@@ -59,6 +59,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6a68fa9597bd29243adcd37697908027, type: 3}
       insertIndex: -1
       addedObject: {fileID: 807369232512432363}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6a68fa9597bd29243adcd37697908027, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8703493625534121541}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6a68fa9597bd29243adcd37697908027, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -6617399037974268643}
   m_SourcePrefab: {fileID: 100100000, guid: 6a68fa9597bd29243adcd37697908027, type: 3}
 --- !u!1 &553585868232242587 stripped
 GameObject:
@@ -86,3 +92,46 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 0
+--- !u!114 &8703493625534121541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 553585868232242587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38db524b55ea09745918a5a28b7b39a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerConquest.Gameplay.Entities.TowerController
+  towerId: tower_basic
+  range: 6
+  damage: 20
+  attacksPerSecond: 1
+  effects: []
+  maxHp: 500
+  armor: 0.1
+  buildCost: 50
+  upgradeCost: 30
+  ownerTeam: 0
+--- !u!65 &-6617399037974268643
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 553585868232242587}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.01441258, y: 0.014463833, z: 0.019946953}
+  m_Center: {x: -0.000008669915, y: -0.0000042349575, z: 0.000007925091}

@@ -59,6 +59,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e1d44c1b80b95d244bcc639030886299, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6895963976740334485}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e1d44c1b80b95d244bcc639030886299, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2885723381660050788}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e1d44c1b80b95d244bcc639030886299, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 174050134326845937}
   m_SourcePrefab: {fileID: 100100000, guid: e1d44c1b80b95d244bcc639030886299, type: 3}
 --- !u!1 &4342648135525928955 stripped
 GameObject:
@@ -86,3 +92,46 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 0
+--- !u!114 &2885723381660050788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4342648135525928955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38db524b55ea09745918a5a28b7b39a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerConquest.Gameplay.Entities.TowerController
+  towerId: tower_basic
+  range: 6
+  damage: 20
+  attacksPerSecond: 1
+  effects: []
+  maxHp: 500
+  armor: 0.1
+  buildCost: 50
+  upgradeCost: 30
+  ownerTeam: 0
+--- !u!65 &174050134326845937
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4342648135525928955}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.01766824, y: 0.017631983, z: 0.020073215}
+  m_Center: {x: 0.000024150126, y: 0.000056030243, z: 0.000037935104}

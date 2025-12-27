@@ -59,6 +59,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b385d3ccbf355040aa772a81d1fb2c4, type: 3}
       insertIndex: -1
       addedObject: {fileID: -7348349924424859655}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b385d3ccbf355040aa772a81d1fb2c4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3083716329743800096}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b385d3ccbf355040aa772a81d1fb2c4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3551599560008492269}
   m_SourcePrefab: {fileID: 100100000, guid: 9b385d3ccbf355040aa772a81d1fb2c4, type: 3}
 --- !u!1 &2783385585846194140 stripped
 GameObject:
@@ -86,3 +92,46 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 0
+--- !u!114 &3083716329743800096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2783385585846194140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38db524b55ea09745918a5a28b7b39a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerConquest.Gameplay.Entities.TowerController
+  towerId: tower_basic
+  range: 6
+  damage: 20
+  attacksPerSecond: 1
+  effects: []
+  maxHp: 500
+  armor: 0.1
+  buildCost: 50
+  upgradeCost: 30
+  ownerTeam: 0
+--- !u!65 &3551599560008492269
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2783385585846194140}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.017245369, y: 0.016128313, z: 0.019823434}
+  m_Center: {x: -0.00019305479, y: -0.00007767512, z: 0.00014402487}
