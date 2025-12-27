@@ -181,6 +181,9 @@ public class AutoLevelGenerator : MonoBehaviour
     [Tooltip("Optional override. If null, auto-load Projectile.prefab in editor.")]
     public GameObject projectilePrefab;
 
+    [Tooltip("Base prefab for player and enemy bases")]
+    public GameObject basePrefab;
+
     [Header("Difficulty & Complexity")]
     public Difficulty difficulty = Difficulty.Normal;
     public Complexity complexity = Complexity.Medium;
@@ -629,10 +632,12 @@ public class AutoLevelGenerator : MonoBehaviour
         enemyPrefab ??= LoadPrefabByName("Enemy");
         towerPrefab ??= LoadPrefabByName("Tower_Archery"); // Use Tower_Archery as default tower
         projectilePrefab ??= LoadPrefabByName("Projectile");
+        basePrefab ??= LoadPrefabByName("Base");
 
         if (enemyPrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Enemy.prefab from {prefabFolder}.");
         if (towerPrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Tower_Archery.prefab from {prefabFolder}.");
         if (projectilePrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Projectile.prefab from {prefabFolder}.");
+        if (basePrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Base.prefab from {prefabFolder}.");
     }
 
     private GameObject LoadPrefabByName(string prefabNameNoExt)
@@ -2046,31 +2051,80 @@ public class AutoLevelGenerator : MonoBehaviour
 
     private void CreateBase(string name, bool isPlayerBase, Vector3 position)
     {
-        var baseGO = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        baseGO.name = name;
-        baseGO.transform.position = position;
-        baseGO.transform.localScale = new Vector3(2f, 2f, 2f);
+        GameObject baseGO;
+
+        // Try to instantiate from prefab first
+        if (basePrefab != null)
+        {
+            baseGO = Instantiate(basePrefab, position, Quaternion.identity);
+            baseGO.name = name;
+            Log.Info($"AutoLevelGenerator: Instantiated {name} from Base prefab at {position}.");
+        }
+        else
+        {
+            // Fallback to primitive if no prefab available
+            baseGO = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            baseGO.name = name;
+            baseGO.transform.position = position;
+            baseGO.transform.localScale = new Vector3(2f, 2f, 2f);
+            Log.Warning($"AutoLevelGenerator: Created {name} from primitive (no Base prefab found).");
+        }
+
         baseGO.tag = isPlayerBase ? "PlayerBase" : "EnemyBase";
 
-        var baseController = baseGO.AddComponent<TowerConquest.Gameplay.Entities.BaseController>();
+        // Get or add BaseController
+        var baseController = baseGO.GetComponent<TowerConquest.Gameplay.Entities.BaseController>();
+        if (baseController == null)
+        {
+            baseController = baseGO.AddComponent<TowerConquest.Gameplay.Entities.BaseController>();
+        }
+
+        // Initialize base stats
         baseController.isPlayerBase = isPlayerBase;
         baseController.maxHp = 2000f;
         baseController.armor = 0.1f;
+        baseController.Initialize(2000f, 0.1f);
 
-        // Set color
-        var renderer = baseGO.GetComponent<Renderer>();
-        if (renderer != null)
+        // Only modify visuals if we created from primitive (prefab should have its own materials)
+        if (basePrefab == null)
         {
-            var mat = new Material(Shader.Find("Standard"));
-            mat.color = isPlayerBase ? new Color(0.2f, 0.5f, 0.8f, 1f) : new Color(0.8f, 0.2f, 0.2f, 1f);
-            renderer.material = mat;
+            // Set color
+            var renderer = baseGO.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                var mat = new Material(Shader.Find("Standard"));
+                mat.color = isPlayerBase ? new Color(0.2f, 0.5f, 0.8f, 1f) : new Color(0.8f, 0.2f, 0.2f, 1f);
+                renderer.material = mat;
+            }
+
+            // Create a model child for shake effects
+            if (baseController.modelTransform == null)
+            {
+                var modelGO = new GameObject("Model");
+                modelGO.transform.SetParent(baseGO.transform, false);
+                baseController.modelTransform = modelGO.transform;
+            }
+        }
+        else
+        {
+            // Make sure modelTransform is set if prefab has a Model child
+            if (baseController.modelTransform == null)
+            {
+                Transform modelChild = baseGO.transform.Find("Model");
+                if (modelChild != null)
+                {
+                    baseController.modelTransform = modelChild;
+                }
+                else
+                {
+                    // Create model transform if not found
+                    var modelGO = new GameObject("Model");
+                    modelGO.transform.SetParent(baseGO.transform, false);
+                    baseController.modelTransform = modelGO.transform;
+                }
+            }
         }
 
-        // Create a model child for shake effects
-        var modelGO = new GameObject("Model");
-        modelGO.transform.SetParent(baseGO.transform, false);
-        baseController.modelTransform = modelGO.transform;
-
-        Log.Info($"AutoLevelGenerator: Created {name} at {position}.");
+        Log.Info($"AutoLevelGenerator: Configured {name} (HP: {baseController.maxHp}, Armor: {baseController.armor}).");
     }
 }

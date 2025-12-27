@@ -55,6 +55,7 @@ namespace TowerConquest.Gameplay
         public AbilityManager PlayerAbility { get; private set; }
         public AbilityManager AIAbility { get; private set; }
         public ConstructionManager ConstructionMgr { get; private set; }
+        public BuildCategoryManager BuildCategoryMgr { get; private set; }
         public AICommander AI { get; private set; }
 
         // State
@@ -205,6 +206,9 @@ namespace TowerConquest.Gameplay
 
             // Setup Construction Manager
             SetupConstructionManager();
+
+            // Setup Build Category Manager (for player tower placement)
+            SetupBuildCategoryManager();
 
             // Setup AI
             SetupAI();
@@ -411,6 +415,24 @@ namespace TowerConquest.Gameplay
             Log.Info("LiveBattleLevelController: ConstructionManager initialized");
         }
 
+        private void SetupBuildCategoryManager()
+        {
+            // Find existing or create new
+            BuildCategoryMgr = FindFirstObjectByType<BuildCategoryManager>();
+
+            if (BuildCategoryMgr == null)
+            {
+                GameObject buildMgrGO = new GameObject("BuildCategoryManager");
+                BuildCategoryMgr = buildMgrGO.AddComponent<BuildCategoryManager>();
+                Log.Info("LiveBattleLevelController: Created BuildCategoryManager");
+            }
+
+            // Initialize with level controller reference
+            BuildCategoryMgr.Initialize(this);
+
+            Log.Info("LiveBattleLevelController: BuildCategoryManager initialized - Player can now place towers");
+        }
+
         private void SetupAI()
         {
             if (levelDefinition == null)
@@ -538,6 +560,14 @@ namespace TowerConquest.Gameplay
             {
                 hud.Refresh();
             }
+        }
+
+        /// <summary>
+        /// Check if the player can perform gameplay actions (spawn units, build towers, etc.)
+        /// </summary>
+        public bool CanPerformGameplayActions()
+        {
+            return IsBattleActive && !IsBattleEnded && !IsCountingDown;
         }
 
         public void StartBattle()

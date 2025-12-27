@@ -505,6 +505,13 @@ namespace TowerConquest.Gameplay
             towerController.buildCost = towerDef.goldCost;
             towerController.ownerTeam = site.OwnerTeam;
 
+            // Set HP and armor from definition
+            if (towerDef.baseStats != null)
+            {
+                towerController.maxHp = towerDef.baseStats.hp > 0 ? towerDef.baseStats.hp : 500f;
+                towerController.armor = towerDef.baseStats.armor;
+            }
+
             if (towerDef.baseAttack != null)
             {
                 towerController.range = towerDef.baseAttack.range > 0 ? towerDef.baseAttack.range : 6f;

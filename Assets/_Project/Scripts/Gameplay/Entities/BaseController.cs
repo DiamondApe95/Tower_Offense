@@ -62,6 +62,8 @@ namespace TowerConquest.Gameplay.Entities
 
             currentHp -= finalDamage;
 
+            Log.Info($"[BaseController] {baseId} took {finalDamage} damage (raw: {rawDamage}, armor: {armor}). HP: {currentHp}/{maxHp}");
+
             OnDamageTaken?.Invoke(this, finalDamage);
 
             // Visual feedback
@@ -128,17 +130,23 @@ namespace TowerConquest.Gameplay.Entities
         {
             float duration = 1f;
             float elapsed = 0f;
-            Vector3 startScale = modelTransform.localScale;
-            Vector3 startPos = modelTransform.localPosition;
+            Vector3 startScale = modelTransform != null ? modelTransform.localScale : Vector3.one;
+            Vector3 startPos = modelTransform != null ? modelTransform.localPosition : Vector3.zero;
 
             while (elapsed < duration)
             {
                 float t = elapsed / duration;
-                modelTransform.localScale = Vector3.Lerp(startScale, startScale * 0.5f, t);
-                modelTransform.localPosition = startPos + Vector3.down * t * 2f;
+                if (modelTransform != null)
+                {
+                    modelTransform.localScale = Vector3.Lerp(startScale, startScale * 0.5f, t);
+                    modelTransform.localPosition = startPos + Vector3.down * t * 2f;
+                }
                 elapsed += Time.deltaTime;
                 yield return null;
             }
+
+            // Actually destroy the game object after animation
+            Destroy(gameObject, 0.5f);
         }
 
         public float GetHPPercent()

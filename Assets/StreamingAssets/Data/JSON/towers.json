@@ -3,124 +3,166 @@
   "tower_definitions": [
     {
       "id": "tower_ballista",
-      "display_name": "Ballista Tower",
-      "description": "Powerful siege weapon with high damage and range",
-      "category": "artillery",
-      "tags": ["siege", "ranged", "high_damage"],
-      "civilization": "civ_rome",
-      "goldCost": 150,
-      "goldReward": 75,
-      "constructionTime": 5.0,
-      "requiredBuilders": 2,
-      "baseStats": {
-        "hp": 500.0,
-        "armor": 0.3,
-        "constructionHP": 100.0
-      },
-      "baseAttack": {
-        "damage_type": "physical",
-        "base_damage": 100.0,
-        "attacks_per_second": 0.5,
-        "range": 12.0,
-        "splash_radius": 1.5,
-        "targeting": {
-          "priority": "strongest",
-          "can_target_air": false
+      "display_name": "Ballista",
+      "category": "projectile_tower",
+      "tags": [ "roman", "physical" ],
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": {
+            "hp": 600,
+            "armor": 0.15
+          },
+          "attack": {
+            "damage_type": "physical",
+            "base_damage": 28,
+            "attacks_per_second": 0.9,
+            "range": 6.5,
+            "splash_radius": 0.0,
+            "targeting": {
+              "priority": "nearest_enemy",
+              "can_target_air": false
+            }
+          },
+          "effects": []
+        },
+        {
+          "tier": 2,
+          "stats": {
+            "hp": 800,
+            "armor": 0.20
+          },
+          "attack": {
+            "damage_type": "physical",
+            "base_damage": 38,
+            "attacks_per_second": 1.0,
+            "range": 7.0,
+            "splash_radius": 0.0,
+            "targeting": {
+              "priority": "nearest_enemy",
+              "can_target_air": false
+            }
+          },
+          "effects": []
         }
-      },
-      "prefabPath": "Prefabs/Towers/Ballista",
-      "constructionSitePrefabPath": "Prefabs/Towers/ConstructionSite"
+      ]
     },
     {
-      "id": "tower_archer_tower",
-      "display_name": "Archer Tower",
-      "description": "Standard defensive tower with good range and attack speed",
-      "category": "defensive",
-      "tags": ["defensive", "ranged"],
-      "civilization": "civ_rome",
-      "goldCost": 100,
-      "goldReward": 50,
-      "constructionTime": 3.0,
-      "requiredBuilders": 1,
-      "baseStats": {
-        "hp": 400.0,
-        "armor": 0.2,
-        "constructionHP": 80.0
-      },
-      "baseAttack": {
-        "damage_type": "physical",
-        "base_damage": 35.0,
-        "attacks_per_second": 1.5,
-        "range": 10.0,
-        "splash_radius": 0.0,
-        "targeting": {
-          "priority": "closest",
-          "can_target_air": true
+      "id": "tower_mage_obelisk",
+      "display_name": "Runen-Obelisk",
+      "category": "magic_tower",
+      "tags": [ "magic", "druidic" ],
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": {
+            "hp": 400,
+            "armor": 0.05
+          },
+          "attack": {
+            "damage_type": "arcane",
+            "base_damage": 20,
+            "attacks_per_second": 1.2,
+            "range": 6.0,
+            "splash_radius": 0.0,
+            "targeting": {
+              "priority": "lowest_hp",
+              "can_target_air": false
+            }
+          },
+          "effects": [
+            {
+              "effect_type": "status_on_hit",
+              "status": {
+                "apply": "slow",
+                "chance": 0.35,
+                "duration_seconds": 2.5,
+                "slow_percent": 0.35
+              }
+            }
+          ]
         }
-      },
-      "prefabPath": "Prefabs/Towers/ArcherTower",
-      "constructionSitePrefabPath": "Prefabs/Towers/ConstructionSite"
+      ]
     },
     {
-      "id": "tower_wooden_fort",
-      "display_name": "Wooden Fort",
-      "description": "Basic Gallic defensive structure with moderate stats",
-      "category": "defensive",
-      "tags": ["defensive", "basic"],
-      "civilization": "civ_gaul",
-      "goldCost": 80,
-      "goldReward": 40,
-      "constructionTime": 2.5,
-      "requiredBuilders": 1,
-      "baseStats": {
-        "hp": 350.0,
-        "armor": 0.15,
-        "constructionHP": 70.0
-      },
-      "baseAttack": {
-        "damage_type": "physical",
-        "base_damage": 25.0,
-        "attacks_per_second": 1.8,
-        "range": 8.0,
-        "splash_radius": 0.0,
-        "targeting": {
-          "priority": "closest",
-          "can_target_air": false
+      "id": "tower_flame_brazier",
+      "display_name": "Feuerbecken",
+      "category": "aoe_tower",
+      "tags": [ "fire" ],
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": {
+            "hp": 450,
+            "armor": 0.10
+          },
+          "attack": {
+            "damage_type": "fire",
+            "base_damage": 10,
+            "attacks_per_second": 4.0,
+            "range": 4.5,
+            "splash_radius": 1.8,
+            "targeting": {
+              "priority": "cluster",
+              "can_target_air": false
+            }
+          },
+          "effects": [
+            {
+              "effect_type": "status_on_hit",
+              "status": {
+                "apply": "burn",
+                "chance": 0.25,
+                "duration_seconds": 3,
+                "tick_damage": 6,
+                "tick_interval_seconds": 1
+              }
+            }
+          ]
         }
-      },
-      "prefabPath": "Prefabs/Towers/WoodenFort",
-      "constructionSitePrefabPath": "Prefabs/Towers/ConstructionSite"
-    },
-    {
-      "id": "tower_spike_trap",
-      "display_name": "Spike Barrier",
-      "description": "Defensive barrier that damages passing enemies",
-      "category": "trap",
-      "tags": ["trap", "melee", "area"],
-      "civilization": "civ_gaul",
-      "goldCost": 60,
-      "goldReward": 30,
-      "constructionTime": 2.0,
-      "requiredBuilders": 1,
-      "baseStats": {
-        "hp": 200.0,
-        "armor": 0.1,
-        "constructionHP": 50.0
-      },
-      "baseAttack": {
-        "damage_type": "physical",
-        "base_damage": 40.0,
-        "attacks_per_second": 2.0,
-        "range": 2.0,
-        "splash_radius": 2.0,
-        "targeting": {
-          "priority": "closest",
-          "can_target_air": false
-        }
-      },
-      "prefabPath": "Prefabs/Towers/SpikeBarrier",
-      "constructionSitePrefabPath": "Prefabs/Towers/ConstructionSite"
+      ]
     }
   ],
-  "trap_definitions": []
+  "trap_definitions": [
+    {
+      "id": "trap_spike_pit",
+      "display_name": "Stachelgrube",
+      "category": "trap",
+      "trigger": {
+        "type": "on_enter",
+        "cooldown_seconds": 4
+      },
+      "effects": [
+        {
+          "effect_type": "damage",
+          "damage_type": "physical",
+          "value": 55,
+          "area": {
+            "shape": "cell",
+            "radius": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "trap_tar",
+      "display_name": "Teerfeld",
+      "category": "trap",
+      "trigger": {
+        "type": "on_enter",
+        "cooldown_seconds": 0
+      },
+      "effects": [
+        {
+          "effect_type": "status",
+          "status": {
+            "apply": "slow",
+            "chance": 1.0,
+            "duration_seconds": 4,
+            "slow_percent": 0.45
+          }
+        }
+      ]
+    }
+  ]
 }
