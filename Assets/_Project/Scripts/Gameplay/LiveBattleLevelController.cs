@@ -739,14 +739,6 @@ namespace TowerConquest.Gameplay
             }
         }
 
-        /// <summary>
-        /// Check if gameplay actions are allowed (not during countdown)
-        /// </summary>
-        public bool CanPerformGameplayActions()
-        {
-            return IsBattleActive && !IsBattleEnded && !IsCountingDown;
-        }
-
         #region Statistics Tracking
 
         /// <summary>
