@@ -154,7 +154,8 @@ namespace TowerConquest.UI
             buttonGO.transform.SetParent(unitButtonContainer, false);
 
             var rectTransform = buttonGO.AddComponent<RectTransform>();
-            rectTransform.sizeDelta = new Vector2(80, 100);
+            // Increased from 80x100 to 140x160 for better smartphone visibility
+            rectTransform.sizeDelta = new Vector2(140, 160);
 
             var image = buttonGO.AddComponent<Image>();
             image.color = new Color(0.2f, 0.2f, 0.25f, 0.9f);
@@ -176,7 +177,8 @@ namespace TowerConquest.UI
             var labelText = labelGO.AddComponent<Text>();
             labelText.text = unitId;
             labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            labelText.fontSize = 12;
+            // Increased from 12 to 24 for better smartphone readability
+            labelText.fontSize = 24;
             labelText.alignment = TextAnchor.MiddleCenter;
             labelText.color = Color.white;
             unitButton.nameText = labelText;
@@ -192,7 +194,8 @@ namespace TowerConquest.UI
             var costText = costGO.AddComponent<Text>();
             costText.text = "0";
             costText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            costText.fontSize = 14;
+            // Increased from 14 to 28 for better smartphone readability
+            costText.fontSize = 28;
             costText.fontStyle = FontStyle.Bold;
             costText.alignment = TextAnchor.MiddleCenter;
             costText.color = new Color(1f, 0.85f, 0.3f, 1f);
