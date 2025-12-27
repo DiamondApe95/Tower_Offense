@@ -379,7 +379,16 @@ namespace TowerConquest.Data
         {
             if (Civilizations != null && Civilizations.Count > 0)
             {
-                // Return first unlocked civilization (unlockCost == 0)
+                // First, check for explicitly marked default civilization
+                for (int i = 0; i < Civilizations.Count; i++)
+                {
+                    if (Civilizations[i].isDefault)
+                    {
+                        return Civilizations[i];
+                    }
+                }
+
+                // Fallback: Return first unlocked civilization (unlockCost == 0)
                 for (int i = 0; i < Civilizations.Count; i++)
                 {
                     if (Civilizations[i].unlockCost == 0)

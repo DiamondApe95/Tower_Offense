@@ -16,5 +16,6 @@ namespace TowerConquest.Data
         public int unlockCost; // Fame cost to unlock (0 = default unlocked)
         public string prefabPath;
         public string iconPath;
+        public bool isDefault; // Whether this is the default civilization
     }
 }
