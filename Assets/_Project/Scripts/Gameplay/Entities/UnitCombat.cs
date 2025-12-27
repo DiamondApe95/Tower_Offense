@@ -331,17 +331,44 @@ namespace TowerConquest.Gameplay.Entities
 
         private bool IsEnemy(GameObject obj)
         {
+            if (obj == null) return false;
+
             int playerLayer = LayerMask.NameToLayer("PlayerUnit");
             int enemyLayer = LayerMask.NameToLayer("Enemy");
 
+            // Check by layer first (most reliable)
             if (ownerTeam == GoldManager.Team.Player)
             {
-                return obj.layer == enemyLayer;
+                if (obj.layer == enemyLayer) return true;
             }
             else
             {
-                return obj.layer == playerLayer || obj.layer == 0;
+                if (obj.layer == playerLayer) return true;
             }
+
+            // Fallback: Check UnitController team
+            var unitController = obj.GetComponent<UnitController>();
+            if (unitController != null)
+            {
+                return unitController.OwnerTeam != ownerTeam;
+            }
+
+            // Fallback: Check TowerController team
+            var towerController = obj.GetComponent<TowerController>();
+            if (towerController != null)
+            {
+                return towerController.ownerTeam != ownerTeam;
+            }
+
+            // Fallback: Check BaseController
+            var baseController = obj.GetComponent<BaseController>();
+            if (baseController != null)
+            {
+                bool isPlayerBase = baseController.isPlayerBase;
+                return (ownerTeam == GoldManager.Team.Player) ? !isPlayerBase : isPlayerBase;
+            }
+
+            return false;
         }
 
         private bool IsEnemySite(ConstructionSite site)

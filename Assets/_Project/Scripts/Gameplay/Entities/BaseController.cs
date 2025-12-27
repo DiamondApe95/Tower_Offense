@@ -15,10 +15,17 @@ namespace TowerConquest.Gameplay.Entities
         public float armor = 0.15f;
         public bool isPlayerBase = false;
 
+        [Header("Team")]
+        public GoldManager.Team ownerTeam = GoldManager.Team.Player;
+
         [Header("Visual")]
         public Transform modelTransform;
         public ParticleSystem damageVFX;
         public ParticleSystem destroyVFX;
+
+        [Header("HP Display")]
+        public bool showHPDisplay = true;
+        private GUIStyle hpStyle;
 
         // Runtime state
         public float currentHp { get; private set; }
@@ -33,15 +40,23 @@ namespace TowerConquest.Gameplay.Entities
             currentHp = maxHp;
             IsDestroyed = false;
 
-            // Set tag based on type
+            // Set tag and team based on type
             if (isPlayerBase)
             {
                 gameObject.tag = "PlayerBase";
+                ownerTeam = GoldManager.Team.Player;
             }
             else
             {
                 gameObject.tag = "EnemyBase";
+                ownerTeam = GoldManager.Team.AI;
             }
+
+            // Initialize HP display style
+            hpStyle = new GUIStyle();
+            hpStyle.fontSize = 14;
+            hpStyle.fontStyle = FontStyle.Bold;
+            hpStyle.alignment = TextAnchor.MiddleCenter;
         }
 
         public void Initialize(float hp, float armorValue)
@@ -167,6 +182,57 @@ namespace TowerConquest.Gameplay.Entities
         public void ApplyDamage(float damage)
         {
             TakeDamage(damage);
+        }
+
+        private void OnGUI()
+        {
+            if (!showHPDisplay || IsDestroyed) return;
+            if (Camera.main == null) return;
+
+            // Convert world position to screen position
+            Vector3 worldPos = transform.position + Vector3.up * 3f;
+            Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPos);
+
+            // Check if in front of camera
+            if (screenPos.z < 0) return;
+
+            // Convert to GUI coordinates (Y is inverted)
+            float guiY = Screen.height - screenPos.y;
+
+            // Calculate HP percentage
+            float hpPercent = currentHp / maxHp;
+
+            // Set color based on HP
+            if (hpPercent > 0.6f)
+                hpStyle.normal.textColor = Color.green;
+            else if (hpPercent > 0.3f)
+                hpStyle.normal.textColor = Color.yellow;
+            else
+                hpStyle.normal.textColor = Color.red;
+
+            // Draw HP bar background
+            float barWidth = 80f;
+            float barHeight = 12f;
+            Rect bgRect = new Rect(screenPos.x - barWidth / 2, guiY - 25, barWidth, barHeight);
+            GUI.Box(bgRect, "");
+
+            // Draw HP bar fill
+            Rect fillRect = new Rect(bgRect.x + 2, bgRect.y + 2, (barWidth - 4) * hpPercent, barHeight - 4);
+            Color oldColor = GUI.color;
+            GUI.color = hpStyle.normal.textColor;
+            GUI.DrawTexture(fillRect, Texture2D.whiteTexture);
+            GUI.color = oldColor;
+
+            // Draw HP text
+            string hpText = $"{Mathf.CeilToInt(currentHp)}/{Mathf.CeilToInt(maxHp)}";
+            Rect textRect = new Rect(screenPos.x - 60, guiY - 5, 120, 20);
+            GUI.Label(textRect, hpText, hpStyle);
+
+            // Draw base name
+            string baseName = isPlayerBase ? "YOUR BASE" : "ENEMY BASE";
+            hpStyle.normal.textColor = isPlayerBase ? Color.cyan : Color.magenta;
+            Rect nameRect = new Rect(screenPos.x - 60, guiY - 45, 120, 20);
+            GUI.Label(nameRect, baseName, hpStyle);
         }
     }
 }

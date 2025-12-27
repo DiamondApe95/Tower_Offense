@@ -271,7 +271,7 @@ namespace TowerConquest.Gameplay
                 ? LevelController?.EnemyBase
                 : LevelController?.PlayerBase;
 
-            controller.Initialize(unitId, path, targetBaseController);
+            controller.Initialize(unitId, path, targetBaseController, team);
 
             // Setup combat system
             SetupUnitCombat(unitObject, unitId, targetBaseController);

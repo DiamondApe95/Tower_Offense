@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TowerConquest.Debug;
 using UnityEngine;
+using TowerConquest.Gameplay;
 using TowerConquest.Gameplay.Entities;
 using TowerConquest.Combat;
 using TowerConquest.Core;
@@ -60,6 +61,9 @@ namespace TowerConquest.AI
         private List<Transform> nearbyEnemies = new List<Transform>();
         private EntityRegistry entityRegistry;
 
+        // Team reference for enemy detection
+        private GoldManager.Team ownerTeam = GoldManager.Team.Player;
+
         private void Awake()
         {
             unitController = GetComponent<UnitController>();
@@ -70,6 +74,12 @@ namespace TowerConquest.AI
         private void Start()
         {
             ServiceLocator.TryGet(out entityRegistry);
+
+            // Get team from UnitController
+            if (unitController != null)
+            {
+                ownerTeam = unitController.OwnerTeam;
+            }
 
             if (health != null)
             {
@@ -106,34 +116,53 @@ namespace TowerConquest.AI
         {
             nearbyEnemies.Clear();
 
-            // Verwende EntityRegistry wenn verfügbar
+            // Detect enemy towers
+            TowerController[] towers;
             if (entityRegistry != null)
             {
-                var towers = entityRegistry.GetTowers();
-                foreach (var tower in towers)
-                {
-                    if (tower == null) continue;
-
-                    float distance = Vector3.Distance(transform.position, tower.transform.position);
-                    if (distance <= aggroRange)
-                    {
-                        nearbyEnemies.Add(tower.transform);
-                    }
-                }
+                towers = entityRegistry.GetAllTowers();
             }
             else
             {
-                // Fallback: FindObjectsByType
-                var towers = FindObjectsByType<TowerController>(FindObjectsSortMode.None);
-                foreach (var tower in towers)
-                {
-                    if (tower == null) continue;
+                towers = FindObjectsByType<TowerController>(FindObjectsSortMode.None);
+            }
 
-                    float distance = Vector3.Distance(transform.position, tower.transform.position);
-                    if (distance <= aggroRange)
-                    {
-                        nearbyEnemies.Add(tower.transform);
-                    }
+            foreach (var tower in towers)
+            {
+                if (tower == null || tower.IsDestroyed) continue;
+
+                // Only target enemy towers (different team)
+                if (tower.ownerTeam == ownerTeam) continue;
+
+                float distance = Vector3.Distance(transform.position, tower.transform.position);
+                if (distance <= aggroRange)
+                {
+                    nearbyEnemies.Add(tower.transform);
+                }
+            }
+
+            // Detect enemy units
+            UnitController[] units;
+            if (entityRegistry != null)
+            {
+                units = entityRegistry.GetAllUnits();
+            }
+            else
+            {
+                units = FindObjectsByType<UnitController>(FindObjectsSortMode.None);
+            }
+
+            foreach (var unit in units)
+            {
+                if (unit == null || unit.IsDead || unit == unitController) continue;
+
+                // Only target enemy units (different team)
+                if (unit.OwnerTeam == ownerTeam) continue;
+
+                float distance = Vector3.Distance(transform.position, unit.transform.position);
+                if (distance <= aggroRange)
+                {
+                    nearbyEnemies.Add(unit.transform);
                 }
             }
 
@@ -223,26 +252,36 @@ namespace TowerConquest.AI
             }
             else
             {
-                // Suche weiter entfernte Ziele
+                // Suche weiter entfernte Ziele (enemy towers only)
+                TowerController[] towers;
                 if (entityRegistry != null)
                 {
-                    var towers = entityRegistry.GetTowers();
-                    float closestDist = float.MaxValue;
-                    TowerController closest = null;
-
-                    foreach (var tower in towers)
-                    {
-                        if (tower == null) continue;
-                        float dist = Vector3.Distance(transform.position, tower.transform.position);
-                        if (dist < closestDist)
-                        {
-                            closestDist = dist;
-                            closest = tower;
-                        }
-                    }
-
-                    CurrentTarget = closest?.transform;
+                    towers = entityRegistry.GetAllTowers();
                 }
+                else
+                {
+                    towers = FindObjectsByType<TowerController>(FindObjectsSortMode.None);
+                }
+
+                float closestDist = float.MaxValue;
+                TowerController closest = null;
+
+                foreach (var tower in towers)
+                {
+                    if (tower == null || tower.IsDestroyed) continue;
+
+                    // Only target enemy towers
+                    if (tower.ownerTeam == ownerTeam) continue;
+
+                    float dist = Vector3.Distance(transform.position, tower.transform.position);
+                    if (dist < closestDist)
+                    {
+                        closestDist = dist;
+                        closest = tower;
+                    }
+                }
+
+                CurrentTarget = closest?.transform;
             }
         }
 
