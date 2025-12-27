@@ -16,7 +16,8 @@ namespace TowerConquest.Core
         public string backgroundImagePath = "Assets/_Project/Menu/Main_Menu_Background.png";
 
         [Header("References")]
-        public Image backgroundImage;
+        [Tooltip("Use RawImage for better compatibility with various image formats")]
+        public RawImage backgroundRawImage;
         public Canvas mainCanvas;
 
         private void Awake()
@@ -60,13 +61,27 @@ namespace TowerConquest.Core
                 }
             }
 
-            // Find background image if not assigned
-            if (backgroundImage == null && mainCanvas != null)
+            // Find background RawImage if not assigned
+            if (backgroundRawImage == null && mainCanvas != null)
             {
                 var bgTransform = mainCanvas.transform.Find("Background");
                 if (bgTransform != null)
                 {
-                    backgroundImage = bgTransform.GetComponent<Image>();
+                    // First try RawImage
+                    backgroundRawImage = bgTransform.GetComponent<RawImage>();
+
+                    // If not found, check if there's an Image and convert it
+                    if (backgroundRawImage == null)
+                    {
+                        var oldImage = bgTransform.GetComponent<Image>();
+                        if (oldImage != null)
+                        {
+                            // Replace Image with RawImage
+                            DestroyImmediate(oldImage);
+                            backgroundRawImage = bgTransform.gameObject.AddComponent<RawImage>();
+                            Log.Info("MainMenuSceneConfigurator: Converted background Image to RawImage.");
+                        }
+                    }
                 }
             }
         }
@@ -74,20 +89,19 @@ namespace TowerConquest.Core
         private void ConfigureBackground()
         {
 #if UNITY_EDITOR
-            if (backgroundImage == null)
+            if (backgroundRawImage == null)
             {
-                Log.Warning("MainMenuSceneConfigurator: No background Image found to configure.");
+                Log.Warning("MainMenuSceneConfigurator: No background RawImage found to configure.");
                 return;
             }
 
-            // Load background sprite
-            Sprite bgSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(backgroundImagePath);
-            if (bgSprite != null)
+            // Load background texture directly (RawImage uses Texture, not Sprite)
+            Texture bgTexture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture>(backgroundImagePath);
+            if (bgTexture != null)
             {
-                backgroundImage.sprite = bgSprite;
-                backgroundImage.type = Image.Type.Simple;
-                backgroundImage.preserveAspect = true;
-                Log.Info($"MainMenuSceneConfigurator: Background image set from {backgroundImagePath}");
+                backgroundRawImage.texture = bgTexture;
+                backgroundRawImage.color = Color.white; // Full color to show texture properly
+                Log.Info($"MainMenuSceneConfigurator: Background texture set from {backgroundImagePath}");
             }
             else
             {

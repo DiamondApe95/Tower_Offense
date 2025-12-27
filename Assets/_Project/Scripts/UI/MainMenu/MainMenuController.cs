@@ -55,7 +55,8 @@ namespace TowerConquest.UI.MainMenu
 
         private void Awake()
         {
-            SetupButtonListeners();
+            // Button listeners are set up in Start to ensure they work
+            // even after AutoMenuGenerator regenerates the menu
         }
 
         private void Start()
@@ -70,6 +71,10 @@ namespace TowerConquest.UI.MainMenu
             }
 
             LoadSettings();
+
+            // Setup button listeners after potential menu regeneration
+            SetupButtonListeners();
+
             RefreshUI();
             ShowMainPanel();
 
@@ -79,7 +84,10 @@ namespace TowerConquest.UI.MainMenu
             }
         }
 
-        private void SetupButtonListeners()
+        /// <summary>
+        /// Sets up all button click listeners. Call this after menu regeneration.
+        /// </summary>
+        public void SetupButtonListeners()
         {
             // Main Menu
             if (playButton != null)

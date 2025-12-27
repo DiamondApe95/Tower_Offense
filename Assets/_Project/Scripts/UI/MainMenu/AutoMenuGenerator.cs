@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TowerConquest.Debug;
 using UnityEngine;
@@ -38,7 +39,8 @@ namespace TowerConquest.UI.MainMenu
         public int subtitleFontSize = 24;
 
         [Header("Background")]
-        public Sprite backgroundSprite;
+        [Tooltip("Background texture for RawImage (supports any image format)")]
+        public Texture backgroundTexture;
         public Color backgroundColor = new Color(0.05f, 0.08f, 0.12f, 1f);
 
         [Header("Generated References")]
@@ -55,21 +57,36 @@ namespace TowerConquest.UI.MainMenu
         {
             if (autoGenerateOnStart)
             {
-                LoadBackgroundSprite();
+                LoadBackgroundTexture();
                 GenerateCompleteMenu();
+
+                // Ensure button listeners are set up after menu regeneration
+                StartCoroutine(SetupButtonListenersDelayed());
             }
         }
 
-        private void LoadBackgroundSprite()
+        private IEnumerator SetupButtonListenersDelayed()
+        {
+            // Wait one frame to ensure all components are initialized
+            yield return null;
+
+            if (menuController != null)
+            {
+                menuController.SetupButtonListeners();
+                Log.Info("AutoMenuGenerator: Button listeners refreshed after menu generation.");
+            }
+        }
+
+        private void LoadBackgroundTexture()
         {
 #if UNITY_EDITOR
-            if (backgroundSprite == null)
+            if (backgroundTexture == null)
             {
                 string bgPath = "Assets/_Project/Menu/Main_Menu_Background.png";
-                backgroundSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(bgPath);
-                if (backgroundSprite != null)
+                backgroundTexture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture>(bgPath);
+                if (backgroundTexture != null)
                 {
-                    Log.Info($"AutoMenuGenerator: Loaded background from {bgPath}");
+                    Log.Info($"AutoMenuGenerator: Loaded background texture from {bgPath}");
                 }
             }
 #endif
@@ -79,7 +96,7 @@ namespace TowerConquest.UI.MainMenu
         public void GenerateCompleteMenu()
         {
             Log.Info("AutoMenuGenerator: Starting Complete Menu Generation...");
-            LoadBackgroundSprite();
+            LoadBackgroundTexture();
 
             CleanupOldMenu();
             CreateCanvas();
@@ -147,7 +164,7 @@ namespace TowerConquest.UI.MainMenu
                 eventSystemGO.AddComponent<InputSystemUIInputModule>();
             }
 
-            // Background
+            // Background using RawImage for better texture compatibility
             var bgGO = new GameObject("Background");
             bgGO.transform.SetParent(canvasGO.transform, false);
             var bgRect = bgGO.AddComponent<RectTransform>();
@@ -156,18 +173,18 @@ namespace TowerConquest.UI.MainMenu
             bgRect.offsetMin = Vector2.zero;
             bgRect.offsetMax = Vector2.zero;
 
-            var bgImage = bgGO.AddComponent<Image>();
-            if (backgroundSprite != null)
+            var bgRawImage = bgGO.AddComponent<RawImage>();
+            if (backgroundTexture != null)
             {
-                bgImage.sprite = backgroundSprite;
-                bgImage.type = Image.Type.Sliced;
+                bgRawImage.texture = backgroundTexture;
+                bgRawImage.color = Color.white; // Full color to show texture properly
             }
             else
             {
-                bgImage.color = backgroundColor;
+                bgRawImage.color = backgroundColor;
             }
 
-            Log.Info("AutoMenuGenerator: Canvas created.");
+            Log.Info("AutoMenuGenerator: Canvas created with RawImage background.");
         }
 
         private void CreateMainPanel()
