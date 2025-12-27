@@ -9,7 +9,7 @@ public class TowerShooter : MonoBehaviour
 
     [Header("Stats")]
     public float range = 6f;
-    public float fireRate = 1.2f;   // Schüsse pro Sekunde
+    public float fireRate = 1.2f;   // Schï¿½sse pro Sekunde
     public float damage = 3f;
     public float projectileSpeed = 10f;
 
@@ -50,7 +50,7 @@ public class TowerShooter : MonoBehaviour
         Collider[] hits = Physics.OverlapSphere(transform.position, range, enemyMask);
         if (hits.Length == 0) return null;
 
-        // Nächstes Ziel
+        // Nï¿½chstes Ziel
         Transform best = null;
         float bestDist = float.MaxValue;
 
@@ -83,9 +83,23 @@ public class TowerShooter : MonoBehaviour
             return;
         }
 
-        Transform fp = firePoint != null ? firePoint : transform;
+        // Fallback: Wenn kein FirePoint gesetzt, nutze die Mitte des Objekts (leicht erhÃ¶ht)
+        Vector3 spawnPosition;
+        Quaternion spawnRotation;
 
-        GameObject go = Instantiate(projectilePrefab, fp.position, fp.rotation);
+        if (firePoint != null)
+        {
+            spawnPosition = firePoint.position;
+            spawnRotation = firePoint.rotation;
+        }
+        else
+        {
+            // Mitte des Objekts + Y-Offset fÃ¼r bessere Sichtbarkeit
+            spawnPosition = transform.position + Vector3.up * 1.0f;
+            spawnRotation = transform.rotation;
+        }
+
+        GameObject go = Instantiate(projectilePrefab, spawnPosition, spawnRotation);
         Projectile p = go.GetComponent<Projectile>();
         if (p == null) p = go.AddComponent<Projectile>();
 

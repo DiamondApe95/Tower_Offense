@@ -181,8 +181,11 @@ public class AutoLevelGenerator : MonoBehaviour
     [Tooltip("Optional override. If null, auto-load Projectile.prefab in editor.")]
     public GameObject projectilePrefab;
 
-    [Tooltip("Base prefab for player and enemy bases")]
-    public GameObject basePrefab;
+    [Tooltip("Base prefab for player base (Roman)")]
+    public GameObject playerBasePrefab;
+
+    [Tooltip("Base prefab for enemy base")]
+    public GameObject enemyBasePrefab;
 
     [Header("Difficulty & Complexity")]
     public Difficulty difficulty = Difficulty.Normal;
@@ -216,8 +219,9 @@ public class AutoLevelGenerator : MonoBehaviour
     [Range(0f, 1f)] public float buildFill = 0.70f;
 
     [Header("Tiles")]
-    public float tileSize = 1f;
-    public float tileHeight = 0.2f;
+    [Tooltip("Größe der Tiles - 4x für bessere Turm-Passform")]
+    public float tileSize = 4f;
+    public float tileHeight = 0.3f;
     public GameObject tilePrefab; // optional, sonst Cube
 
     [Tooltip("Auto-loaded from Assets/_Project/MAP/Mat_Build.mat")]
@@ -632,12 +636,16 @@ public class AutoLevelGenerator : MonoBehaviour
         enemyPrefab ??= LoadPrefabByName("Enemy");
         towerPrefab ??= LoadPrefabByName("Tower_Archery"); // Use Tower_Archery as default tower
         projectilePrefab ??= LoadPrefabByName("Projectile");
-        basePrefab ??= LoadPrefabByName("Base");
+
+        // Load specific base prefabs
+        playerBasePrefab ??= LoadPrefabByName("Prefab_Roman_Base");
+        enemyBasePrefab ??= LoadPrefabByName("Prefab_Enemy_Base");
 
         if (enemyPrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Enemy.prefab from {prefabFolder}.");
         if (towerPrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Tower_Archery.prefab from {prefabFolder}.");
         if (projectilePrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Projectile.prefab from {prefabFolder}.");
-        if (basePrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Base.prefab from {prefabFolder}.");
+        if (playerBasePrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Prefab_Roman_Base.prefab from {prefabFolder}.");
+        if (enemyBasePrefab == null) Log.Warning($"AutoLevelGenerator(Editor): Could not auto-load Prefab_Enemy_Base.prefab from {prefabFolder}.");
     }
 
     private GameObject LoadPrefabByName(string prefabNameNoExt)
@@ -1781,9 +1789,13 @@ public class AutoLevelGenerator : MonoBehaviour
     // LIGHTING SETUP
     // =========================================================
 
+    [Header("Lighting Settings")]
+    [Tooltip("Deaktiviert das Directional Light standardmäßig")]
+    public bool disableDirectionalLight = true;
+
     private void SetupLighting()
     {
-        // Suche oder erstelle Directional Light
+        // Suche vorhandenes Directional Light
         Light dirLight = null;
         var lights = FindObjectsByType<Light>(FindObjectsSortMode.None);
         foreach (var l in lights)
@@ -1795,6 +1807,18 @@ public class AutoLevelGenerator : MonoBehaviour
             }
         }
 
+        // Standard: Directional Light deaktivieren
+        if (disableDirectionalLight)
+        {
+            if (dirLight != null)
+            {
+                dirLight.gameObject.SetActive(false);
+                Log.Info("AutoLevelGenerator: Directional Light deaktiviert.");
+            }
+            return;
+        }
+
+        // Falls nicht deaktiviert, Lighting konfigurieren
         if (dirLight == null)
         {
             var lightGO = new GameObject("Directional Light");
@@ -2053,12 +2077,15 @@ public class AutoLevelGenerator : MonoBehaviour
     {
         GameObject baseGO;
 
+        // Select the correct prefab based on team
+        GameObject prefabToUse = isPlayerBase ? playerBasePrefab : enemyBasePrefab;
+
         // Try to instantiate from prefab first
-        if (basePrefab != null)
+        if (prefabToUse != null)
         {
-            baseGO = Instantiate(basePrefab, position, Quaternion.identity);
+            baseGO = Instantiate(prefabToUse, position, Quaternion.identity);
             baseGO.name = name;
-            Log.Info($"AutoLevelGenerator: Instantiated {name} from Base prefab at {position}.");
+            Log.Info($"AutoLevelGenerator: Instantiated {name} from {prefabToUse.name} prefab at {position}.");
         }
         else
         {
@@ -2067,7 +2094,7 @@ public class AutoLevelGenerator : MonoBehaviour
             baseGO.name = name;
             baseGO.transform.position = position;
             baseGO.transform.localScale = new Vector3(2f, 2f, 2f);
-            Log.Warning($"AutoLevelGenerator: Created {name} from primitive (no Base prefab found).");
+            Log.Warning($"AutoLevelGenerator: Created {name} from primitive (no {(isPlayerBase ? "Player" : "Enemy")} Base prefab found).");
         }
 
         baseGO.tag = isPlayerBase ? "PlayerBase" : "EnemyBase";
@@ -2086,7 +2113,7 @@ public class AutoLevelGenerator : MonoBehaviour
         baseController.Initialize(2000f, 0.1f);
 
         // Only modify visuals if we created from primitive (prefab should have its own materials)
-        if (basePrefab == null)
+        if (prefabToUse == null)
         {
             // Set color
             var renderer = baseGO.GetComponent<Renderer>();
