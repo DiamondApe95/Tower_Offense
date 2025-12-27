@@ -1,6 +1,37 @@
 {
   "civilizations": [
     {
+      "id": "civ_roman",
+      "name": "Roman Empire",
+      "description": "The mighty Roman legions. Disciplined infantry with powerful siege weapons.",
+      "color": "#8B0000",
+      "availableUnits": [
+        "unit_archer",
+        "unit_cavalelry",
+        "unit_ballista",
+        "unit_builder",
+        "unit_legionary",
+        "unit_slinger",
+        "unit_warhound"
+      ],
+      "availableTowers": [
+        "tower_basic",
+        "tower_archery",
+        "tower_crossbow",
+        "tower_fire",
+        "tower_pillum",
+        "tower_slinger"
+      ],
+      "availableHeroes": [
+        "hero_centurion"
+      ],
+      "specialAbility": "ability_roman_testudo",
+      "unlockCost": 0,
+      "prefabPath": "Prefab",
+      "iconPath": "Icons/Civilizations/roman",
+      "isDefault": true
+    },
+    {
       "id": "civ_kingdom",
       "name": "Kingdom",
       "description": "A noble realm of knights and archers. Strong defensive units with balanced offense.",

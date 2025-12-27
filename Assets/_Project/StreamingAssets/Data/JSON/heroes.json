@@ -2,6 +2,46 @@
   "version": "2.0",
   "hero_definitions": [
     {
+      "id": "hero_centurion",
+      "name": "Centurion",
+      "display_name": "Centurion",
+      "civilization": "civ_roman",
+      "role": "tank",
+      "rarity": "rare",
+      "tags": ["melee", "leader", "armored"],
+      "description": "A battle-hardened Roman commander who leads legions to victory.",
+      "baseStats": {
+        "hp": 700,
+        "damage": 45,
+        "speed": 3.0,
+        "armor": 0.45,
+        "attackRange": 1.5,
+        "attackSpeed": 1.0
+      },
+      "stats": { "hp": 700, "armor": 0.45, "move_speed": 3.0, "size": 1.2 },
+      "attack": {
+        "enabled": true,
+        "attack_type": "melee",
+        "damage_type": "physical",
+        "base_damage": 45,
+        "attacks_per_second": 1.0,
+        "range": 1.5,
+        "splash_radius": 0
+      },
+      "spawnCooldown": 60,
+      "abilities": [
+        {
+          "id": "centurion_rally",
+          "type": "active",
+          "trigger": "manual",
+          "cooldown_seconds": 30,
+          "effects": [{ "effect_type": "buff", "stat": "damage", "mode": "mul", "value": 1.5, "duration_seconds": 8, "area": { "shape": "circle", "radius": 8.0 } }]
+        }
+      ],
+      "prefabPath": "Prefab/Hero_Centurion",
+      "unlockCost": 0
+    },
+    {
       "id": "hero_paladin",
       "name": "Paladin",
       "display_name": "Paladin",

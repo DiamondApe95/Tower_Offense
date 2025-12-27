@@ -2,6 +2,170 @@
   "version": "1.0",
   "tower_definitions": [
     {
+      "id": "tower_basic",
+      "display_name": "Basic Tower",
+      "category": "projectile_tower",
+      "tags": [ "roman", "physical", "fallback" ],
+      "goldCost": 50,
+      "prefabPath": "Prefab/Tower_Basic",
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": { "hp": 400, "armor": 0.10 },
+          "attack": {
+            "damage_type": "physical",
+            "base_damage": 15,
+            "attacks_per_second": 1.0,
+            "range": 5.0,
+            "splash_radius": 0.0,
+            "targeting": { "priority": "nearest_enemy", "can_target_air": false }
+          },
+          "effects": []
+        }
+      ]
+    },
+    {
+      "id": "tower_archery",
+      "display_name": "Archer Tower",
+      "category": "projectile_tower",
+      "tags": [ "roman", "physical", "ranged" ],
+      "goldCost": 80,
+      "prefabPath": "Prefab/Tower_Archery",
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": { "hp": 350, "armor": 0.05 },
+          "attack": {
+            "damage_type": "physical",
+            "base_damage": 20,
+            "attacks_per_second": 1.5,
+            "range": 7.0,
+            "splash_radius": 0.0,
+            "targeting": { "priority": "nearest_enemy", "can_target_air": true }
+          },
+          "effects": []
+        }
+      ]
+    },
+    {
+      "id": "tower_crossbow",
+      "display_name": "Crossbow Tower",
+      "category": "projectile_tower",
+      "tags": [ "roman", "physical", "armor-piercing" ],
+      "goldCost": 120,
+      "prefabPath": "Prefab/Tower_Crossbow",
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": { "hp": 400, "armor": 0.10 },
+          "attack": {
+            "damage_type": "physical",
+            "base_damage": 35,
+            "attacks_per_second": 0.8,
+            "range": 9.0,
+            "splash_radius": 0.0,
+            "targeting": { "priority": "strongest", "can_target_air": true }
+          },
+          "effects": [
+            {
+              "effect_type": "armor_pierce",
+              "value": 0.3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tower_fire",
+      "display_name": "Fire Tower",
+      "category": "aoe_tower",
+      "tags": [ "roman", "fire", "aoe" ],
+      "goldCost": 150,
+      "prefabPath": "Prefab/Tower_Fire",
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": { "hp": 300, "armor": 0.05 },
+          "attack": {
+            "damage_type": "fire",
+            "base_damage": 12,
+            "attacks_per_second": 2.0,
+            "range": 5.0,
+            "splash_radius": 2.0,
+            "targeting": { "priority": "cluster", "can_target_air": false }
+          },
+          "effects": [
+            {
+              "effect_type": "status_on_hit",
+              "status": {
+                "apply": "burn",
+                "chance": 0.3,
+                "duration_seconds": 3,
+                "tick_damage": 5,
+                "tick_interval_seconds": 1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tower_pillum",
+      "display_name": "Pilum Tower",
+      "category": "projectile_tower",
+      "tags": [ "roman", "physical", "slow" ],
+      "goldCost": 100,
+      "prefabPath": "Prefab/Tower_Pillum",
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": { "hp": 450, "armor": 0.15 },
+          "attack": {
+            "damage_type": "physical",
+            "base_damage": 40,
+            "attacks_per_second": 0.6,
+            "range": 8.0,
+            "splash_radius": 0.0,
+            "targeting": { "priority": "nearest_enemy", "can_target_air": false }
+          },
+          "effects": [
+            {
+              "effect_type": "status_on_hit",
+              "status": {
+                "apply": "slow",
+                "chance": 0.5,
+                "duration_seconds": 2.0,
+                "slow_percent": 0.4
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tower_slinger",
+      "display_name": "Slinger Tower",
+      "category": "projectile_tower",
+      "tags": [ "roman", "physical", "fast" ],
+      "goldCost": 60,
+      "prefabPath": "Prefab/Tower_Slinger",
+      "tiers": [
+        {
+          "tier": 1,
+          "stats": { "hp": 300, "armor": 0.05 },
+          "attack": {
+            "damage_type": "physical",
+            "base_damage": 10,
+            "attacks_per_second": 2.5,
+            "range": 6.0,
+            "splash_radius": 0.0,
+            "targeting": { "priority": "nearest_enemy", "can_target_air": true }
+          },
+          "effects": []
+        }
+      ]
+    },
+    {
       "id": "tower_ballista",
       "display_name": "Ballista",
       "category": "projectile_tower",
