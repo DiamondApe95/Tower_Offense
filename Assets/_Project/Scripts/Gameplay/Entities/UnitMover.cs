@@ -15,7 +15,19 @@ namespace TowerConquest.Gameplay.Entities
         public event Action<int> OnWaypointReached;
 
         public bool HasReachedGoal { get; private set; }
-        public float Progress => path != null && path.Count > 1 ? (float)waypointIndex / (path.Count - 1) : 0f;
+        public float Progress
+        {
+            get
+            {
+                if (path == null || path.Count < 2) return 0f;
+                Vector3 start = path[0];
+                Vector3 end = path[path.Count - 1];
+                float totalDistance = Vector3.Distance(start, end);
+                if (totalDistance <= 0f) return 1f;
+                float distanceFromStart = Vector3.Distance(start, transform.position);
+                return Mathf.Clamp01(distanceFromStart / totalDistance);
+            }
+        }
         public int CurrentWaypointIndex => waypointIndex;
 
         private IReadOnlyList<Vector3> path;
@@ -27,17 +39,16 @@ namespace TowerConquest.Gameplay.Entities
         public void Initialize(IReadOnlyList<Vector3> pathWaypoints, BaseController baseTarget, float damageToBase)
         {
             path = pathWaypoints;
-            waypointIndex = 0;
+            // Start at waypoint index 1 since path[0] is the spawn position where we already are
+            // This ensures the unit immediately starts moving towards the target (path[1])
+            waypointIndex = (path != null && path.Count > 1) ? 1 : 0;
             baseController = baseTarget;
             baseDamage = Mathf.Max(0f, damageToBase);
             HasReachedGoal = false;
             isMoving = true;
 
-            // Start auf ersten Waypoint setzen
-            if (path != null && path.Count > 0)
-            {
-                transform.position = path[0];
-            }
+            // Don't teleport to path[0] - the unit is already at the spawn position
+            // The spawner already placed the unit at the correct spawn point
         }
 
         private void Update()

@@ -6,7 +6,7 @@
       "description": "Masters of discipline and engineering. Strong balanced units and defensive structures.",
       "color": "#8B0000",
       "availableUnits": ["unit_legionary", "unit_archer", "unit_cavalry"],
-      "availableTowers": ["tower_ballista", "tower_archer_tower"],
+      "availableTowers": ["tower_ballista", "tower_archery"],
       "availableHeroes": ["hero_centurion"],
       "specialAbility": "ability_testudo",
       "unlockCost": 0,
