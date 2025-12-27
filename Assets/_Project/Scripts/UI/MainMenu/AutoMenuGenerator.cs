@@ -55,14 +55,31 @@ namespace TowerConquest.UI.MainMenu
         {
             if (autoGenerateOnStart)
             {
+                LoadBackgroundSprite();
                 GenerateCompleteMenu();
             }
+        }
+
+        private void LoadBackgroundSprite()
+        {
+#if UNITY_EDITOR
+            if (backgroundSprite == null)
+            {
+                string bgPath = "Assets/_Project/Menu/Main_Menu_Background.png";
+                backgroundSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(bgPath);
+                if (backgroundSprite != null)
+                {
+                    Log.Info($"AutoMenuGenerator: Loaded background from {bgPath}");
+                }
+            }
+#endif
         }
 
         [ContextMenu("★ Generate Complete Menu (One-Click)")]
         public void GenerateCompleteMenu()
         {
             Log.Info("AutoMenuGenerator: Starting Complete Menu Generation...");
+            LoadBackgroundSprite();
 
             CleanupOldMenu();
             CreateCanvas();
@@ -74,7 +91,10 @@ namespace TowerConquest.UI.MainMenu
             SetupCamera();
 
 #if UNITY_EDITOR
-            EditorSceneManager.MarkSceneDirty(gameObject.scene);
+            if (!Application.isPlaying)
+            {
+                EditorSceneManager.MarkSceneDirty(gameObject.scene);
+            }
 #endif
 
             Log.Info("AutoMenuGenerator: ★ Complete Menu Generation finished! Menu is ready.");
